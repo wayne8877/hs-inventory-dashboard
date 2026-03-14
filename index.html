@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>合盛钮扣厂 · 出入库数据看板</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d28;
+    --card-border: #2a2d3a;
+    --text: #e4e6eb;
+    --text-dim: #8b8fa3;
+    --accent: #4f8cff;
+    --green: #00d68f;
+    --red: #ff4d6a;
+    --orange: #ffa940;
+    --purple: #a855f7;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #4f8cff, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header .timestamp {
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    border-radius: 14px 0 0 14px;
+  }
+  .kpi-card.blue::before { background: var(--accent); }
+  .kpi-card.green::before { background: var(--green); }
+  .kpi-card.red::before { background: var(--red); }
+  .kpi-card.orange::before { background: var(--orange); }
+  .kpi-label {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .kpi-value {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+  .kpi-card.blue .kpi-value { color: var(--accent); }
+  .kpi-card.green .kpi-value { color: var(--green); }
+  .kpi-card.red .kpi-value { color: var(--red); }
+  .kpi-card.orange .kpi-value { color: var(--orange); }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 22px 24px;
+  }
+  .chart-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chart-card h3 .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .chart-container {
+    position: relative;
+    height: 300px;
+  }
+  .full-width {
+    grid-column: 1 / -1;
+  }
+  /* Table styles */
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+  }
+  .data-table thead th {
+    background: rgba(79,140,255,0.08);
+    color: var(--text-dim);
+    font-weight: 600;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--card-border);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .data-table tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(42,45,58,0.5);
+    color: var(--text);
+  }
+  .data-table tbody tr:hover {
+    background: rgba(79,140,255,0.04);
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-dept {
+    background: rgba(79,140,255,0.12);
+    color: var(--accent);
+  }
+  .badge-warn {
+    background: rgba(255,77,106,0.12);
+    color: var(--red);
+  }
+  .cost-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cost-bar-fill {
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+  }
+  @media (max-width: 768px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    body { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏭 合盛钮扣厂 · 出入库数据看板</h1>
+  <div class="timestamp">数据更新时间：<span id="updateTime"></span></div>
+</div>
+
+<!-- KPI Cards -->
+<div class="kpi-row">
+  <div class="kpi-card blue">
+    <div class="kpi-label">📦 总 SKU 数</div>
+    <div class="kpi-value" id="totalSku">—</div>
+    <div class="kpi-sub">库存信息表全部商品</div>
+  </div>
+  <div class="kpi-card green">
+    <div class="kpi-label">✅ 有库存 SKU</div>
+    <div class="kpi-value" id="inStockSku">—</div>
+    <div class="kpi-sub" id="inStockPct"></div>
+  </div>
+  <div class="kpi-card red">
+    <div class="kpi-label">❌ 无库存 SKU</div>
+    <div class="kpi-value" id="noStockSku">—</div>
+    <div class="kpi-sub" id="noStockPct"></div>
+  </div>
+  <div class="kpi-card orange">
+    <div class="kpi-label">💰 库存总金额</div>
+    <div class="kpi-value" id="totalCost">—</div>
+    <div class="kpi-sub">按入库成本计算</div>
+  </div>
+</div>
+
+<!-- Charts Row 1 -->
+<div class="charts-row">
+  <div class="chart-card">
+    <h3><span class="dot" style="background:var(--green)"></span>库存健康分布</h3>
+    <div class="chart-container">
+      <canvas id="healthChart"></canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <h3><span class="dot" style="background:var(--accent)"></span>各部门库存金额</h3>
+    <div class="chart-container">
+      <canvas id="deptChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row 2 -->
+<div class="charts-row">
+  <div class="chart-card full-width">
+    <h3><span class="dot" style="background:var(--purple)"></span>库存金额 TOP 15</h3>
+    <div class="chart-container" style="height:400px">
+      <canvas id="topChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row 3: Tables -->
+<div class="charts-row">
+  <div class="chart-card">
+    <h3><span class="dot" style="background:var(--accent)"></span>各部门 SKU 统计</h3>
+    <table class="data-table">
+      <thead><tr><th>部门</th><th>SKU数</th><th>库存金额</th><th>占比</th></tr></thead>
+      <tbody id="deptTable"></tbody>
+    </table>
+  </div>
+  <div class="chart-card">
+    <h3><span class="dot" style="background:var(--red)"></span>需补货清单（无库存）</h3>
+    <div style="max-height:400px;overflow-y:auto">
+      <table class="data-table">
+        <thead><tr><th>商品名称</th><th>规格</th><th>部门</th></tr></thead>
+        <tbody id="restockTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== DATA (snapshot from Bitable API) ==========
+const INVENTORY_DATA = {
+  total_skus: 221,
+  in_stock: 110,
+  no_stock: 111,
+  total_cost: 151583,
+  dept_costs: {
+    "车钮部": 60033,
+    "棍花&片桶": 12483,
+    "后勤部": 34449,
+    "抛光部": 1440,
+    "片桶": 320,
+    "棍花&环保部": 680,
+    "抛光&片桶": 0,
+    "棍花&片桶&后勤": 640,
+    "环保部": 1298,
+  },
+  dept_counts: {
+    "车钮部": 92,
+    "棍花&片桶": 52,
+    "后勤部": 52,
+    "抛光部": 5,
+    "片桶": 3,
+    "棍花&环保部": 4,
+    "抛光&片桶": 2,
+    "棍花&片桶&后勤": 3,
+    "环保部": 8,
+  },
+  top_items: [
+    {name:"X（大型车钮备件）", cost:40000, stock:40, dept:"车钮部"},
+    {name:"电加热管/PVC龙头", cost:25000, stock:500, dept:"后勤部"},
+    {name:"砂轮 SDC800", cost:8000, stock:8, dept:"车钮部"},
+    {name:"红色系工业颜料 CR-600", cost:4000, stock:4, dept:"棍花&片桶"},
+    {name:"曼科开关插座86老式", cost:3000, stock:3, dept:"后勤部"},
+    {name:"橙色色浆 TR157", cost:2000, stock:2, dept:"棍花&片桶"},
+    {name:"控制系统（尼龙托轮）", cost:1400, stock:14, dept:"抛光部"},
+    {name:"钢针 17.5*5", cost:1200, stock:12, dept:"车钮部"},
+    {name:"弹性夹头（钮扣）", cost:1000, stock:1, dept:"车钮部"},
+    {name:"电位器（可调旋钮）", cost:1000, stock:1, dept:"车钮部"},
+    {name:"颜料黄红35", cost:1000, stock:1, dept:"棍花&片桶"},
+    {name:"白色膏 32KG", cost:1000, stock:1, dept:"棍花&片桶"},
+    {name:"高温色浆（品红）", cost:1000, stock:1, dept:"棍花&片桶"},
+    {name:"FL-2000", cost:1000, stock:1, dept:"棍花&片桶"},
+    {name:"深沟球轴承6002-2RS1", cost:1000, stock:1, dept:"车钮部"},
+  ],
+  restock_items: [
+    {name:"贝壳针1.8mm", spec:"1.8mm", dept:"车钮部"},
+    {name:"钨钢刀（车钮机备件）", spec:"—", dept:"车钮部"},
+    {name:"车钮机导管弹簧", spec:"—", dept:"车钮部"},
+    {name:"实心销钉", spec:"实心销钉", dept:"车钮部"},
+    {name:"车钮备件", spec:"车钮备件", dept:"车钮部"},
+    {name:"压缩弹簧", spec:"压缩弹簧", dept:"车钮部"},
+    {name:"不锈钢中轴", spec:"不锈钢中轴", dept:"车钮部"},
+    {name:"前股压板&珠茜机", spec:"—", dept:"车钮部"},
+    {name:"圆板牙", spec:"14/18", dept:"车钮部"},
+    {name:"黑色色浆", spec:"DR 122A/30KG", dept:"棍花&片桶"},
+    {name:"真空滚揉机托轮", spec:"尼龙托轮", dept:"抛光部"},
+    {name:"冲刀", spec:"—", dept:"抛光&片桶"},
+    {name:"吹尘枪气管", spec:"—", dept:"后勤部"},
+    {name:"五孔空调安全插座", spec:"—", dept:"后勤部"},
+    {name:"空气断路器", spec:"—", dept:"后勤部"},
+    {name:"三菱交流接触器", spec:"—", dept:"后勤部"},
+    {name:"平头自复位按钮开关", spec:"—", dept:"后勤部"},
+    {name:"LA16按钮开关", spec:"—", dept:"后勤部"},
+    {name:"锐风散热风扇", spec:"—", dept:"后勤部"},
+    {name:"电磁调速电机控制器", spec:"—", dept:"后勤部"},
+  ]
+};
+
+// ========== RENDER ==========
+const D = INVENTORY_DATA;
+
+// Timestamp
+document.getElementById('updateTime').textContent = new Date().toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'});
+
+// KPI
+document.getElementById('totalSku').textContent = D.total_skus;
+document.getElementById('inStockSku').textContent = D.in_stock;
+document.getElementById('noStockSku').textContent = D.no_stock;
+document.getElementById('totalCost').textContent = '¥' + D.total_cost.toLocaleString();
+document.getElementById('inStockPct').textContent = `占比 ${(D.in_stock/D.total_skus*100).toFixed(1)}%`;
+document.getElementById('noStockPct').textContent = `占比 ${(D.no_stock/D.total_skus*100).toFixed(1)}% · 需关注`;
+
+// Health donut
+new Chart(document.getElementById('healthChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['✅ 有库存', '❌ 无库存'],
+    datasets: [{
+      data: [D.in_stock, D.no_stock],
+      backgroundColor: ['#00d68f', '#ff4d6a'],
+      borderWidth: 0,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '65%',
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#8b8fa3', padding: 20, font: {size:13} } },
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold', size: 16 },
+        formatter: (v) => v
+      }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+
+// Department bar chart
+const deptLabels = Object.keys(D.dept_costs);
+const deptValues = Object.values(D.dept_costs);
+new Chart(document.getElementById('deptChart'), {
+  type: 'bar',
+  data: {
+    labels: deptLabels,
+    datasets: [{
+      label: '库存金额 (¥)',
+      data: deptValues,
+      backgroundColor: [
+        '#4f8cff','#a855f7','#00d68f','#ffa940','#ff4d6a',
+        '#36cfc9','#ff85c0','#bae637','#597ef7'
+      ],
+      borderRadius: 6,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: {
+      legend: { display: false },
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: '#8b8fa3',
+        font: { size: 11 },
+        formatter: (v) => '¥' + v.toLocaleString()
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(42,45,58,0.5)' },
+        ticks: { color: '#8b8fa3', callback: v => '¥'+v.toLocaleString() }
+      },
+      y: {
+        grid: { display: false },
+        ticks: { color: '#e4e6eb', font: {size:12} }
+      }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+
+// Top 15 items
+const topNames = D.top_items.map(i => i.name);
+const topCosts = D.top_items.map(i => i.cost);
+const maxCost = Math.max(...topCosts);
+new Chart(document.getElementById('topChart'), {
+  type: 'bar',
+  data: {
+    labels: topNames,
+    datasets: [{
+      label: '库存金额 (¥)',
+      data: topCosts,
+      backgroundColor: topCosts.map(v => {
+        const ratio = v / maxCost;
+        if (ratio > 0.5) return '#ff4d6a';
+        if (ratio > 0.2) return '#ffa940';
+        return '#4f8cff';
+      }),
+      borderRadius: 4,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: {
+      legend: { display: false },
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: '#e4e6eb',
+        font: { size: 11, weight:'bold' },
+        formatter: (v) => '¥' + v.toLocaleString()
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(42,45,58,0.3)' },
+        ticks: { color: '#8b8fa3', callback: v => '¥'+v.toLocaleString() }
+      },
+      y: {
+        grid: { display: false },
+        ticks: { color: '#e4e6eb', font: {size:11} }
+      }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+
+// Department table
+const deptTableBody = document.getElementById('deptTable');
+deptLabels.forEach((dept, i) => {
+  const cost = deptValues[i];
+  const count = D.dept_counts[dept] || 0;
+  const pct = (cost / D.total_cost * 100).toFixed(1);
+  const barW = Math.max(cost / Math.max(...deptValues) * 100, 2);
+  deptTableBody.innerHTML += `<tr>
+    <td><span class="badge badge-dept">${dept}</span></td>
+    <td>${count}</td>
+    <td>¥${cost.toLocaleString()}</td>
+    <td><div class="cost-bar"><div class="cost-bar-fill" style="width:${barW}px"></div>${pct}%</div></td>
+  </tr>`;
+});
+
+// Restock table
+const restockBody = document.getElementById('restockTable');
+D.restock_items.forEach(item => {
+  restockBody.innerHTML += `<tr>
+    <td>${item.name}</td>
+    <td style="color:var(--text-dim)">${item.spec}</td>
+    <td><span class="badge badge-dept">${item.dept}</span></td>
+  </tr>`;
+});
+</script>
+</body>
+</html>
