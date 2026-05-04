@@ -276,7 +276,7 @@
 // 飞书 Base 数据代理服务（dev: http://localhost:18792）
 // 生产环境请部署 server.js 后修改 BASE_URL
 // ============================================================
-const API_BASE = 'http://localhost:18792';
+const API_BASE = '';  // Vercel: 同域部署，直接用相对路径
 let _charts = {};
 
 async function apiFetch(path) {
