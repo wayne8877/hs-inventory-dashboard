@@ -1,20 +1,18 @@
 /**
  * api/inventory.js — Vercel Serverless Functions 格式
- * 
- * Vercel 会自动注入 process.env
- * 前端通过 /api/inventory, /api/inbound 等调用
  */
 
 const axios = require('axios');
 
 const BOT_TOKEN = process.env.FEISHU_BOT_TOKEN;
-const FEISHU_BASE_URL = 'https://open.feishu.cn/open-apis/bitable/v1/apps';
+const BASE_APP_TOKEN = 'Pe1CbQuAfaPsOhs4unzczHgQnVe';
+const FEISHU_BASE_URL = `https://open.feishu.cn/open-apis/bitable/v1/apps/${BASE_APP_TOKEN}/tables`;
 
 async function fetchBitableRecords(tableId, params = {}) {
   const records = [];
   let pageToken = '';
   do {
-    const query = { ...params, page_size: 500 };
+    const query = { page_size: 500, ...params };
     if (pageToken) query.page_token = pageToken;
     const resp = await axios.get(`${FEISHU_BASE_URL}/${tableId}/records`, {
       headers: { Authorization: `Bearer ${BOT_TOKEN}` },
@@ -45,7 +43,6 @@ function flatNum(val) {
 }
 
 module.exports = async (req, res) => {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
