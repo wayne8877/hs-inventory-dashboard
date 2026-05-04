@@ -1,0 +1,23 @@
+# wrangler.toml — Cloudflare Workers 生产部署示例
+#
+# 部署步骤：
+#   1. npx wrangler login
+#   2. 将 FEISHU_BOT_TOKEN 通过 Dashboard 设为 Worker Secrets
+#   3. npx wrangler deploy
+#
+# 部署后 Workers URL 即为前端 API_BASE
+
+name = "hs-inventory-proxy"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+# 请在 Cloudflare Dashboard → Workers → Settings → Variables 中设为 Encrypt 变量
+# 不要在此文件明文填写
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "https://your-dashboard-domain.com"
+    Access-Control-Allow-Headers = "Content-Type"
+    Cache-Control = "public, max-age=60"
