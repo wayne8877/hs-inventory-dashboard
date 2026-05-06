@@ -1,21 +1,44 @@
 /**
  * api/inventory.js — Vercel Serverless Functions 格式
+ * 修复：改用 App Access Token（运行时动态获取，避免 Bot Token 2小时过期问题）
  */
 
 const axios = require('axios');
 
-const BOT_TOKEN = process.env.FEISHU_BOT_TOKEN;
+const APP_ID = process.env.FEISHU_APP_ID;
+const APP_SECRET = process.env.FEISHU_APP_SECRET;
 const BASE_APP_TOKEN = 'Pe1CbQuAfaPsOhs4unzczHgQnVe';
-const FEISHU_BASE_URL = `https://open.feishu.cn/open-apis/bitable/v1/apps/${BASE_APP_TOKEN}/tables`;
+const FEISHU_BASE_URL = `https://open.feishu.cn/open-apis/bitable/v1/apps/${BASE_APP_TOKEN}/tables';
+
+// 缓存 App Access Token（有效期约 5000 秒）
+let _cachedToken = null;
+let _tokenExpiresAt = 0;
+
+async function getAppAccessToken() {
+  const now = Date.now();
+  if (_cachedToken && now < _tokenExpiresAt - 60000) {
+    return _cachedToken;
+  }
+  const resp = await axios.post('https://open.feishu.cn/open-apis/auth/v3/app_access_token/internal', {
+    app_id: APP_ID,
+    app_secret: APP_SECRET,
+  }, { timeout: 10000 });
+  const data = resp.data;
+  if (data.code !== 0) throw new Error(`Token error ${data.code}: ${data.msg}`);
+  _cachedToken = data.app_access_token;
+  _tokenExpiresAt = now + (data.expire || 5000) * 1000;
+  return _cachedToken;
+}
 
 async function fetchBitableRecords(tableId, params = {}) {
+  const token = await getAppAccessToken();
   const records = [];
   let pageToken = '';
   do {
     const query = { page_size: 500, ...params };
     if (pageToken) query.page_token = pageToken;
     const resp = await axios.get(`${FEISHU_BASE_URL}/${tableId}/records`, {
-      headers: { Authorization: `Bearer ${BOT_TOKEN}` },
+      headers: { Authorization: `Bearer ${token}` },
       params: query,
       timeout: 30000,
     });
@@ -102,7 +125,8 @@ module.exports = async (req, res) => {
       return res.status(200).json({ items });
     }
     if (path === '/api/health') {
-      return res.status(200).json({ ok: true, tokenSet: !!BOT_TOKEN });
+      const token = await getAppAccessToken();
+      return res.status(200).json({ ok: true, tokenOk: true });
     }
     return res.status(404).json({ error: 'not found' });
   } catch (e) {
