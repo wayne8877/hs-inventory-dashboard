@@ -338,26 +338,26 @@ async function init() {
   const tick = setInterval(() => {
     elapsed++;
     msgEl.textContent = `正在拉取库存数据… 已等待 ${elapsed}s`;
-    if (elapsed >= 8) clearInterval(tick);
   }, 1000);
-
   const hide = () => { clearInterval(tick); overlay.classList.add('hidden'); };
 
   try {
-    const [inv, inbound, outbound, batch] = await Promise.all([
-      apiFetch('/api/inventory', 30000).catch(() => ({ items: [] })),
-      apiFetch('/api/inbound',   30000).catch(() => ({ items: [] })),
-      apiFetch('/api/outbound',  30000).catch(() => ({ items: [] })),
-      apiFetch('/api/batches',   30000).catch(() => ({ items: [] })),
-    ]);
-    clearInterval(tick);
+    // 串行加载：先库存（最重要），其余后台并行
+    msgEl.textContent = '正在加载主库存…';
+    const inv = await apiFetch('/api/inventory', 30000).catch(() => ({ items: [] }));
+    renderInventory(inv.items || []);
     hide();
     timeEl.textContent = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }) + ' · 实时';
-    renderInventory(inv.items || []);
+
+    // 剩余三个后台加载
+    const [inbound, outbound, batch] = await Promise.all([
+      apiFetch('/api/inbound',  20000).catch(() => ({ items: [] })),
+      apiFetch('/api/outbound', 20000).catch(() => ({ items: [] })),
+      apiFetch('/api/batches',  20000).catch(() => ({ items: [] })),
+    ]);
     renderOutboundFreq(outbound.items || []);
     renderBatchFreshness(batch.items || [], inbound.items || []);
   } catch (err) {
-    clearInterval(tick);
     hide();
     timeEl.innerHTML = `⚠ 加载失败 <button class="retry-btn" onclick="location.reload()">重新加载</button>`;
     console.error(err);
