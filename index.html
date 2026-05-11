@@ -2,85 +2,130 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>合盛钮扣厂 · 库存健康看板</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-:root{--bg:#f5f6fa;--card:#fff;--primary:#4a6cf7;--green:#27ae60;--red:#e74c3c;--orange:#f39c12;--text:#2d3436;--sub:#636e72;--border:#dfe6e9}
+:root{--bg:#f0f2f5;--c:#fff;--bl:#4a6cf7;--g:#27ae60;--r:#e74c3c;--o:#f39c12;--text:#1a1a2e;--sub:#7f8c8d;--bd:#e0e4e8}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:14px}
-.header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
-.header h1{font-size:18px}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:13px}
+.header{background:var(--c);border-bottom:1px solid var(--bd);padding:14px 24px;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:16px;font-weight:600}
 .header .meta{color:var(--sub);font-size:12px}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:20px 24px}
-.kpi-card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);text-align:center}
-.kpi-card .num{font-size:28px;font-weight:700;margin-bottom:4px}
-.kpi-card .blue{color:var(--primary)}
-.kpi-card .green{color:var(--green)}
-.kpi-card .red{color:var(--red)}
-.kpi-card .orange{color:var(--orange)}
-.kpi-card .label{color:var(--sub);font-size:13px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 24px 20px}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:0 24px 20px}
-.section{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
-.section h3{font-size:14px;color:var(--sub);margin-bottom:14px;border-left:3px solid var(--primary);padding-left:10px}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;color:var(--sub);font-weight:500;padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;white-space:nowrap}
-td{padding:8px 10px;border-bottom:1px solid #f0f0f0}
+
+.kpi-row{display:flex;gap:12px;padding:16px 24px 0}
+.kpi{flex:1;background:var(--c);border-radius:10px;padding:14px 16px;
+      box-shadow:0 1px 3px rgba(0,0,0,0.06);text-align:center}
+.kn{font-size:26px;font-weight:700;margin-bottom:2px}
+.kn.blue{color:var(--bl)}
+.kn.green{color:var(--g)}
+.kn.red{color:var(--r)}
+.kn.orange{color:#c0700a}
+.kl{color:var(--sub);font-size:12px}
+
+.mid-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:12px 24px}
+.bot-row{display:grid;grid-template-columns:1fr 2fr;gap:12px;padding:0 24px 20px}
+
+.card{background:var(--c);border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.ct{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ct.gold{color:#a07800}
+.ct.red{color:var(--r)}
+.ct.orange{color:#c0700a}
+.ct.navy{color:#2c3e50}
+.bg{background:#e8f8f0;color:var(--g);padding:1px 7px;border-radius:10px;font-size:11px;font-weight:400}
+.br{background:#fdf0ee;color:var(--r);padding:1px 7px;border-radius:10px;font-size:11px;font-weight:400}
+.tip{background:#fff8e6;border:1px solid #f5d06c;border-radius:6px;padding:7px 10px;
+      font-size:11px;color:#7a6000;margin-bottom:8px;line-height:1.5}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;color:var(--sub);font-weight:500;padding:5px 8px;border-bottom:1px solid var(--bd);font-size:11px;white-space:nowrap}
+td{padding:5px 8px;border-bottom:1px solid #f5f5f5}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#f8f9fa}
+tr:hover td{background:#fafafa}
 .num{text-align:right;font-variant-numeric:tabular-nums}
-canvas{max-height:220px}
-@media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3{grid-template-columns:1fr}}
+.more{color:var(--sub);font-size:11px;margin-top:5px;text-align:right}
+
+canvas{max-height:140px}
+
+.legend{margin-top:6px}
+.legend-item{display:flex;align-items:center;gap:5px;padding:2px 0;font-size:11px}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.lname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lpct{color:var(--sub);width:35px;text-align:right}
+.lval{width:65px;text-align:right;font-variant-numeric:tabular-nums}
+
+@media(max-width:900px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .mid-row,.bot-row{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 <div class="header">
   <h1>🏭 合盛钮扣厂 · 库存健康看板</h1>
-  <div class="meta">数据来源：飞书多维表格 · <span id="ts"></span></div>
+  <div class="meta">飞书多维表格 · 471 品项</div>
 </div>
-<div class="kpi-grid">
-  <div class="kpi-card"><div class="num blue">471</div><div class="label">总 SKU</div></div>
-  <div class="kpi-card"><div class="num green">157</div><div class="label">有库存</div></div>
-  <div class="kpi-card"><div class="num red">314</div><div class="label">无库存（需补货）</div></div>
-  <div class="kpi-card"><div class="num orange">¥71,866</div><div class="label">库存总金额（元）</div></div>
+<div class="kpi-row">
+  <div class="kpi"><div class="kn blue">471</div><div class="kl">总 SKU</div></div>
+  <div class="kpi"><div class="kn green">157</div><div class="kl">有库存</div></div>
+  <div class="kpi"><div class="kn red">314</div><div class="kl">无库存</div></div>
+  <div class="kpi"><div class="kn orange">¥71,866</div><div class="kl">库存总值（元）</div></div>
 </div>
-<div class="grid-2">
-  <div class="section"><h3>库存金额分布（部门占比）</h3><canvas id="pieChart"></canvas></div>
-  <div class="section"><h3>各部门 SKU 数量</h3><canvas id="barChart"></canvas></div>
+<div class="mid-row">
+  <div class="card">
+    <div class="ct">各部门库存金额占比</div>
+    <canvas id="pieChart" height="140"></canvas>
+    <div class="legend"><div class="legend-item"><span class="dot" style="background:#4a6cf7"></span><span class="lname">后勤部</span><span class="lpct">69.3%</span><span class="lval">¥49,831</span></div><div class="legend-item"><span class="dot" style="background:#27ae60"></span><span class="lname">棍花&片桶</span><span class="lpct">13.6%</span><span class="lval">¥9,755</span></div><div class="legend-item"><span class="dot" style="background:#f39c12"></span><span class="lname">车钮部</span><span class="lpct">12.0%</span><span class="lval">¥8,620</span></div><div class="legend-item"><span class="dot" style="background:#e74c3c"></span><span class="lname">抛光部</span><span class="lpct">2.9%</span><span class="lval">¥2,060</span></div><div class="legend-item"><span class="dot" style="background:#9b59b6"></span><span class="lname">片桶</span><span class="lpct">1.3%</span><span class="lval">¥960</span></div><div class="legend-item"><span class="dot" style="background:#1abc9c"></span><span class="lname">棍花&环保部</span><span class="lpct">0.9%</span><span class="lval">¥640</span></div><div class="legend-item"><span class="dot" style="background:#3498db"></span><span class="lname">抛光&片桶</span><span class="lpct">0.0%</span><span class="lval">¥0</span></div><div class="legend-item"><span class="dot" style="background:#e67e22"></span><span class="lname">未知部门</span><span class="lpct">0.0%</span><span class="lval">¥0</span></div><div class="legend-item"><span class="dot" style="background:#95a5a6"></span><span class="lname">棍花部</span><span class="lpct">0.0%</span><span class="lval">¥0</span></div></div>
+  </div>
+  <div class="card">
+    <div class="ct gold">🏗 行政后勤·有库存 <span class="bg">38品 · ¥49,831</span></div>
+    <table><tr><th>品名</th><th>规格</th><th>部门</th><th>库存</th><th>金额</th></tr><tr><td>电加热管</td><td>83102M
+免生料带龙头4</td><td>后勤部</td><td class="num">501</td><td class="num">¥25,050</td></tr><tr><td>陶瓷保险熔断器</td><td>短：RO26-32A D02</td><td>后勤部</td><td class="num">22</td><td class="num">¥22,000</td></tr><tr><td>热风枪 喷火枪 燃气喷火枪</td><td>热风枪 喷火枪 燃气喷火枪</td><td>后勤部</td><td class="num">5</td><td class="num">¥750</td></tr><tr><td>吹尘枪气管</td><td>吹尘枪气管</td><td>后勤部</td><td class="num">3</td><td class="num">¥450</td></tr><tr><td>下总承板&珠茜机</td><td>—</td><td>后勤部</td><td class="num">8</td><td class="num">¥320</td></tr><tr><td>不锈钢球阀</td><td>下总承板&珠茜机</td><td>后勤部</td><td class="num">3</td><td class="num">¥300</td></tr><tr><td>锐风散热风扇</td><td>—</td><td>后勤部</td><td class="num">2</td><td class="num">¥300</td></tr><tr><td>PVC-U塑胶龙头</td><td>X</td><td>后勤部</td><td class="num">4</td><td class="num">¥200</td></tr><tr><td>围裙&袖套</td><td>围裙&袖套</td><td>后勤部</td><td class="num">3</td><td class="num">¥120</td></tr><tr><td>T型六角扳手</td><td>jack/杰克</td><td>后勤部</td><td class="num">54</td><td class="num">¥108</td></tr><tr><td>开关面板插座</td><td>开关面板插座</td><td>后勤部</td><td class="num">1</td><td class="num">¥100</td></tr><tr><td>水泵软管涂塑pvc塑料管</td><td>水泵软管涂塑pvc塑料管</td><td>后勤部</td><td class="num">15</td><td class="num">¥75</td></tr><tr><td>减压阀支架</td><td>减压阀支架</td><td>后勤部</td><td class="num">2</td><td class="num">¥30</td></tr><tr><td>KOINO平头按钮开关</td><td>—</td><td>后勤部</td><td class="num">6</td><td class="num">¥12</td></tr><tr><td>六角扳手</td><td>T型内</td><td>后勤部</td><td class="num">2</td><td class="num">¥10</td></tr><tr><td>白防水密封胶带</td><td>白防水密封胶带</td><td>后勤部</td><td class="num">2</td><td class="num">¥4</td></tr><tr><td>五孔空调安全插座</td><td>五孔空调安全插座</td><td>后勤部</td><td class="num">1</td><td class="num">¥2</td></tr><tr><td>压线钳</td><td>压线钳</td><td>后勤部</td><td class="num">2</td><td class="num">¥0</td></tr><tr><td>日光灯启动器</td><td>Aileen</td><td>后勤部</td><td class="num">18</td><td class="num">¥0</td></tr><tr><td>曼科开关插座86老式指粒开关</td><td>一开</td><td>后勤部</td><td class="num">4</td><td class="num">¥0</td></tr></table>
+    <div class="more">18 条未显示 ↓</div>
+  </div>
+  <div class="card">
+    <div class="ct red">⚠ 行政后勤·缺货 <span class="br">88品</span></div>
+    <div class="tip">建议结合实际消耗频次判断是否需要采购，低频物料暂缺可先观察</div>
+    <table><tr><th>品名</th><th>规格</th><th>部门</th><th>库存</th><th>状态</th></tr><tr><td>压线钳</td><td>压线钳</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>日光灯启动器</td><td>Aileen</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>曼科开关插座86老式指粒开关</td><td>一开</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>玻璃胶</td><td>玻璃胶</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>外丝公制铜宝塔接头</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>空气断路器</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>三菱交流接触器</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>空气断路器</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>平头自复位按钮点动开关</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>LA16按钮开关</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>锦时动力控制按钮开关盒</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>夹抱箍固定圈</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>电磁调速电机控制器</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>AIR电子排水阀VR-A-15</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>LA16按钮开关</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>控制变压器</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>气动气管快速接头</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>常安电动机保护 CAD3系列</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>平头自复位按钮点动开关</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>FD-M型变频器</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr></table>
+    <div class="more">68 条未显示 ↓</div>
+  </div>
 </div>
-<div class="grid-3">
-  <div class="section"><h3>各部门统计</h3><table><tr><th>部门</th><th>SKU</th><th>金额</th><th>占比</th></tr><tr><td>后勤部</td><td class="num">126</td><td class="num">¥49,831</td><td class="num">69.3%</td></tr><tr><td>棍花&片桶</td><td class="num">82</td><td class="num">¥9,755</td><td class="num">13.6%</td></tr><tr><td>车钮部</td><td class="num">207</td><td class="num">¥8,620.4</td><td class="num">12.0%</td></tr><tr><td>抛光部</td><td class="num">8</td><td class="num">¥2,060</td><td class="num">2.9%</td></tr><tr><td>片桶</td><td class="num">10</td><td class="num">¥960</td><td class="num">1.3%</td></tr><tr><td>棍花&环保部</td><td class="num">6</td><td class="num">¥640</td><td class="num">0.9%</td></tr><tr><td>抛光&片桶</td><td class="num">2</td><td class="num">¥0</td><td class="num">0.0%</td></tr><tr><td>棍花部</td><td class="num">5</td><td class="num">¥0</td><td class="num">0.0%</td></tr><tr><td>未知部门</td><td class="num">25</td><td class="num">¥0</td><td class="num">0.0%</td></tr></table></div>
-  <div class="section" style="grid-column:span 2"><h3>需补货清单（无库存）</h3><table><tr><th>商品名称</th><th>规格</th><th>部门</th></tr><tr><td>深沟球轴承6000-2RS1/C3</td><td>6000-2RS1/C3</td><td>车钮部</td></tr><tr><td>砂轮</td><td>SDC800
-100D*10W</td><td>车钮部</td></tr><tr><td>砂轮</td><td>SDC 1200
-100D*3</td><td>车钮部</td></tr><tr><td>砂轮</td><td>型号不详</td><td>车钮部</td></tr><tr><td>钨钢刀（车钮机备件）</td><td></td><td>车钮部</td></tr><tr><td>车钮机导管弹簧</td><td></td><td>车钮部</td></tr><tr><td>轴承油封</td><td>10*17*10</td><td>车钮部</td></tr><tr><td>圆板牙</td><td>M12*1.75</td><td>车钮部</td></tr><tr><td>圆板牙</td><td></td><td>车钮部</td></tr><tr><td>压缩弹簧</td><td>压缩弹簧</td><td>车钮部</td></tr><tr><td>高精密切割钼丝</td><td>金堆城钼业光明(山东)</td><td>车钮部</td></tr><tr><td>翻边铜套轴承套</td><td>翻边铜套轴承套</td><td>车钮部</td></tr><tr><td>不锈钢中轴</td><td>不锈钢中轴</td><td>车钮部</td></tr><tr><td>电位器</td><td>可调滑动旋钮电阻</td><td>车钮部</td></tr><tr><td>车钮机导管弹簧</td><td>JQX-38F-12VDC 2</td><td>车钮部</td></tr><tr><td>圆锯片</td><td>博世</td><td>车钮部</td></tr><tr><td>真空滚揉机高强度
-尼龙托轮配轴承带轴…</td><td>真空滚揉机高强度
-尼龙托轮配轴</td><td>抛光部</td></tr><tr><td>真空滚揉机高强度
-尼龙托轮配轴承带轴…</td><td>真空滚揉机高强度
-尼龙托轮配轴</td><td>抛光部</td></tr><tr><td>柑色</td><td>K-258/30GK</td><td>棍花&片桶</td></tr><tr><td>紫色膏</td><td>JC-5012S/32 KGS</td><td>棍花&片桶</td></tr><tr><td>白色膏</td><td>32KG</td><td>棍花&片桶</td></tr><tr><td>蓝色膏</td><td>JC-8072s/32KG</td><td>棍花&片桶</td></tr><tr><td>橙色膏</td><td>K-1105-1/32KG</td><td>棍花&片桶</td></tr><tr><td>黄色膏</td><td>32KG</td><td>棍花&片桶</td></tr><tr><td>环保钻水</td><td>100kg</td><td>棍花&片桶</td></tr><tr><td>螢光紅色浆</td><td>DR 1131A/10 KG</td><td>棍花&片桶</td></tr><tr><td>珍珠浆</td><td>CW600/25KG</td><td>棍花&片桶</td></tr><tr><td>橙色色浆</td><td>TR157/20 KGS</td><td>棍花&片桶</td></tr><tr><td>蓝色色浆</td><td>DR 183A/10 KG</td><td>棍花&片桶</td></tr><tr><td>绿色色浆</td><td>TR2354/20 KGS</td><td>棍花&片桶</td></tr><tr><td>黑色色浆</td><td>DR 122A/30KG</td><td>棍花&片桶</td></tr><tr><td>黄3G</td><td>Lustron P-Yello</td><td>棍花&片桶</td></tr><tr><td>有机黄色颜料</td><td>P-YELLOW 35
-1KG</td><td>棍花&片桶</td></tr><tr><td>883</td><td>1KG / 罐</td><td>棍花&片桶</td></tr><tr><td>浓缩水性色浆</td><td>1KG / 罐</td><td>棍花&片桶</td></tr><tr><td>粉色系颜料</td><td></td><td>棍花&片桶</td></tr><tr><td>FL-2000</td><td></td><td>棍花&片桶</td></tr><tr><td>温色浆（红）</td><td>Green PS-11
-1KG</td><td>棍花&片桶</td></tr><tr><td>绿色系工业颜料</td><td>Yellow PS-10
-1K</td><td>棍花&片桶</td></tr><tr><td>黄色系工业颜料</td><td>Magenta C-2012
-</td><td>棍花&片桶</td></tr><tr><td>高温色浆（品红）</td><td>Yellow P-22B
-1K</td><td>棍花&片桶</td></tr><tr><td>黄色系工业颜料</td><td>Lilac C-GT23
-1K</td><td>棍花&片桶</td></tr><tr><td>高温色浆（紫）</td><td>Blue PS-19
-1KG </td><td>棍花&片桶</td></tr><tr><td>蓝色系工业颜料</td><td>Blue P-25B
-1KG </td><td>棍花&片桶</td></tr><tr><td>蓝色系工业颜料</td><td>Lilac PS-98
-1KG</td><td>棍花&片桶</td></tr><tr><td>黑色色浆</td><td>水泵</td><td>棍花&环保部</td></tr><tr><td>冲刀</td><td></td><td>抛光&片桶</td></tr><tr><td>棍花搅拌机油封（ TC 型密封圈）</td><td>TC12*25*10</td><td>棍花&片桶</td></tr><tr><td>压线钳</td><td>压线钳</td><td>后勤部</td></tr><tr><td>日光灯启动器</td><td>Aileen</td><td>后勤部</td></tr></table></div>
+<div class="bot-row">
+  <div class="card">
+    <div class="ct navy">📦 库存金额 TOP 20</div>
+    <table><tr><th>品名</th><th>规格</th><th>部门</th><th>库存</th><th>金额</th></tr><tr><td>电加热管</td><td>83102M
+免生料带龙头4</td><td>后勤部</td><td class="num">501</td><td class="num">¥25,050</td></tr><tr><td>陶瓷保险熔断器</td><td>短：RO26-32A D02</td><td>后勤部</td><td class="num">22</td><td class="num">¥22,000</td></tr><tr><td>红色系工业颜料</td><td>CR-600
+1KG / 罐</td><td>棍花&片桶</td><td class="num">7</td><td class="num">¥7,000</td></tr><tr><td>弹性夹头（钮扣）</td><td>14/18</td><td>车钮部</td><td class="num">4</td><td class="num">¥4,000</td></tr><tr><td>颜料黄红 35(偶氮类有机颜料)</td><td>P-RED 35
+1KG /</td><td>棍花&片桶</td><td class="num">2</td><td class="num">¥2,000</td></tr><tr><td>控制系统</td><td>真空滚揉机高强度
+尼龙托轮配</td><td>抛光部</td><td class="num">19</td><td class="num">¥1,900</td></tr><tr><td>真空滚揉机高强度
+尼龙托轮配轴承…</td><td>尼龙托轮配轴承带轴滚轮滚筒</td><td>片桶</td><td class="num">24</td><td class="num">¥960</td></tr><tr><td>圆锯片</td><td>圆锯片</td><td>车钮部</td><td class="num">6</td><td class="num">¥900</td></tr><tr><td>钢针</td><td>型号较多领取时统计</td><td>车钮部</td><td class="num">20</td><td class="num">¥800</td></tr><tr><td>下料口机械备件</td><td>下料口机械备件</td><td>车钮部</td><td class="num">16</td><td class="num">¥800</td></tr><tr><td>热风枪 喷火枪 燃气喷火枪</td><td>热风枪 喷火枪 燃气喷火枪</td><td>后勤部</td><td class="num">5</td><td class="num">¥750</td></tr><tr><td>水泵</td><td>泵</td><td>棍花&环保部</td><td class="num">11</td><td class="num">¥550</td></tr><tr><td>胶木板</td><td>胶木板</td><td>车钮部</td><td class="num">9</td><td class="num">¥450</td></tr><tr><td>吹尘枪气管</td><td>吹尘枪气管</td><td>后勤部</td><td class="num">3</td><td class="num">¥450</td></tr><tr><td>淡紫色系工业颜料</td><td>Magenta PS-18
+</td><td>棍花&片桶</td><td class="num">4</td><td class="num">¥400</td></tr><tr><td>轴承油封</td><td>12*25*10</td><td>车钮部</td><td class="num">512</td><td class="num">¥358</td></tr><tr><td>下总承板&珠茜机</td><td>—</td><td>后勤部</td><td class="num">8</td><td class="num">¥320</td></tr><tr><td>鱼眼接头关节轴承</td><td>鱼眼接头关节轴承</td><td>车钮部</td><td class="num">3</td><td class="num">¥300</td></tr><tr><td>不锈钢球阀</td><td>下总承板&珠茜机</td><td>后勤部</td><td class="num">3</td><td class="num">¥300</td></tr><tr><td>锐风散热风扇</td><td>—</td><td>后勤部</td><td class="num">2</td><td class="num">¥300</td></tr></table>
+  </div>
+  <div class="card">
+    <div class="ct orange">🔔 缺货清单（全厂 183 品）</div>
+    <div class="tip">⚠ 缺货≠需要补货：高频消耗且缺货→立即采购；低频使用且缺货→先观察</div>
+    <table><tr><th>品名</th><th>规格</th><th>部门</th><th>库存</th><th>状态</th></tr><tr><td>深沟球轴承6000-2RS1/C…</td><td>6000-2RS1/C3</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>砂轮</td><td>SDC800
+100D*10</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>砂轮</td><td>SDC 1200
+100D*</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>砂轮</td><td>型号不详</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>钨钢刀（车钮机备件）</td><td>—</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>车钮机导管弹簧</td><td>—</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>轴承油封</td><td>10*17*10</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>圆板牙</td><td>M12*1.75</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>圆板牙</td><td>—</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>压缩弹簧</td><td>压缩弹簧</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>高精密切割钼丝</td><td>金堆城钼业光明(山东)</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>翻边铜套轴承套</td><td>翻边铜套轴承套</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>不锈钢中轴</td><td>不锈钢中轴</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>电位器</td><td>可调滑动旋钮电阻</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>车钮机导管弹簧</td><td>JQX-38F-12VDC </td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>圆锯片</td><td>博世</td><td>车钮部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>真空滚揉机高强度
+尼龙托轮配轴承…</td><td>真空滚揉机高强度
+尼龙托轮配</td><td>抛光部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>真空滚揉机高强度
+尼龙托轮配轴承…</td><td>真空滚揉机高强度
+尼龙托轮配</td><td>抛光部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>柑色</td><td>K-258/30GK</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>紫色膏</td><td>JC-5012S/32 KG</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>白色膏</td><td>32KG</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>蓝色膏</td><td>JC-8072s/32KG</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>橙色膏</td><td>K-1105-1/32KG</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>黄色膏</td><td>32KG</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>环保钻水</td><td>100kg</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>螢光紅色浆</td><td>DR 1131A/10 KG</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>珍珠浆</td><td>CW600/25KG</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>橙色色浆</td><td>TR157/20 KGS</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>蓝色色浆</td><td>DR 183A/10 KG</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>绿色色浆</td><td>TR2354/20 KGS</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>黑色色浆</td><td>DR 122A/30KG</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>黄3G</td><td>Lustron P-Yell</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>有机黄色颜料</td><td>P-YELLOW 35
+1K</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>883</td><td>1KG / 罐</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>浓缩水性色浆</td><td>1KG / 罐</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>粉色系颜料</td><td>—</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>FL-2000</td><td>—</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>温色浆（红）</td><td>Green PS-11
+1K</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>绿色系工业颜料</td><td>Yellow PS-10
+1</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>黄色系工业颜料</td><td>Magenta C-2012</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>高温色浆（品红）</td><td>Yellow P-22B
+1</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>黄色系工业颜料</td><td>Lilac C-GT23
+1</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>高温色浆（紫）</td><td>Blue PS-19
+1KG</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>蓝色系工业颜料</td><td>Blue P-25B
+1KG</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>蓝色系工业颜料</td><td>Lilac PS-98
+1K</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>黑色色浆</td><td>水泵</td><td>棍花&环保部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>冲刀</td><td>—</td><td>抛光&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>棍花搅拌机油封（ TC 型密封圈…</td><td>TC12*25*10</td><td>棍花&片桶</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>压线钳</td><td>压线钳</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>日光灯启动器</td><td>Aileen</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>曼科开关插座86老式指粒开关</td><td>一开</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>玻璃胶</td><td>玻璃胶</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>外丝公制铜宝塔接头</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>空气断路器</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>三菱交流接触器</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>空气断路器</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>平头自复位按钮点动开关</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>LA16按钮开关</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>锦时动力控制按钮开关盒</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr><tr><td>夹抱箍固定圈</td><td>—</td><td>后勤部</td><td class="num">0</td><td class="num">缺货</td></tr></table>
+  </div>
 </div>
 <script>
-document.getElementById('ts').textContent = new Date().toLocaleString('zh-CN');
-
 new Chart(document.getElementById('pieChart'),{
   type:'doughnut',
-  data:{labels:["后勤部", "棍花&片桶", "车钮部", "抛光部", "片桶", "棍花&环保部", "抛光&片桶", "棍花部"],datasets:[{data:[49831, 9755, 8620, 2060, 960, 640, 0, 0],backgroundColor:['#4a6cf7','#27ae60','#f39c12','#e74c3c','#9b59b6','#1abc9c','#3498db','#e67e22'],borderWidth:0}]},
-  options:{responsive:true,plugins:{legend:{position:'right',labels:{boxWidth:12,padding:8,font:{size:11}}}},cutout:'55%'}
-});
-
-new Chart(document.getElementById('barChart'),{
-  type:'bar',
-  data:{labels:["后勤部", "棍花&片桶", "车钮部", "抛光部", "片桶", "棍花&环保部", "抛光&片桶", "棍花部"],datasets:[{label:'SKU数',data:[126, 82, 207, 8, 10, 6, 2, 5],backgroundColor:'#4a6cf7',borderRadius:4}]},
-  options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+  data:{labels:["后勤部", "棍花&片桶", "车钮部", "抛光部", "片桶", "棍花&环保部", "抛光&片桶", "未知部门", "棍花部"],datasets:[{data:[49831, 9755, 8620, 2060, 960, 640, 0, 0, 0],backgroundColor:["#4a6cf7", "#27ae60", "#f39c12", "#e74c3c", "#9b59b6", "#1abc9c", "#3498db", "#e67e22", "#95a5a6"],borderWidth:0}]},
+  options:{responsive:true,plugins:{legend:{display:false}},cutout:'55%'}
 });
 </script>
 </body>
