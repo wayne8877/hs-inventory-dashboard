@@ -1,6 +1,5 @@
 /**
- * api/inventory.js — Vercel Serverless Functions
- * 已更新：指向 OPS Base（運營總表）
+ * api/inventory.js — Vercel Serverless Functions（含缓存）
  */
 const axios = require('axios');
 
@@ -9,13 +8,26 @@ const APP_SECRET = process.env.FEISHU_APP_SECRET;
 const BASE_APP_TOKEN = 'A6tEbHzUCakECGsX8n8cZgEMnQh'; // OPS Base
 const FEISHU_BASE_URL = `https://open.feishu.cn/open-apis/bitable/v1/apps/${BASE_APP_TOKEN}/tables`;
 
-// 產品表 ID
 const TABLE_INVENTORY = 'tblspZZr5mWRQdio';  // 货品库存台账
 const TABLE_INBOUND   = 'tblXP1nxIQjCqzyT';  // 库存入库管理
 const TABLE_OUTBOUND  = 'tblxF2VdPfO3Ma3V';  // 货品出库明细
 const TABLE_BATCHES   = 'tblfq6qynqWMI2KU';  // 批次明细表（FIFO）
 
-// 缓存 App Access Token
+// ── 内存缓存（Vercel serverless 冷启会重置，但5分钟内同实例有缓存）──
+const cache = new Map();
+const TTL = 5 * 60 * 1000; // 5分钟
+
+function getCached(key) {
+  const entry = cache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > TTL) { cache.delete(key); return null; }
+  return entry.data;
+}
+function setCache(key, data) {
+  cache.set(key, { data, ts: Date.now() });
+}
+
+// 缓存 App Access Token（模块级）
 let _cachedToken = null;
 let _tokenExpiresAt = 0;
 
@@ -62,19 +74,26 @@ function flatText(val) {
 function flatNum(val) {
   if (!val && val !== 0) return 0;
   if (typeof val === 'number') return val;
-  const s = String(val).replace(/[¥,，\s]/g, '');
+  const s = String(val).replace(/[¥，\s]/g, '');
   return parseFloat(s) || 0;
 }
 
-module.exports = async (req, res) => {
+function allowCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
+module.exports = async (req, res) => {
+  allowCors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const path = req.url || '';
+  const start = Date.now();
   try {
     if (path.startsWith('/api/inventory')) {
+      const cached = getCached('inventory');
+      if (cached) return res.status(200).json(cached);
       const records = await fetchBitableRecords(TABLE_INVENTORY);
       const items = records.map(r => ({
         id: r.record_id,
@@ -85,9 +104,13 @@ module.exports = async (req, res) => {
         cost: flatNum(r.fields?.['库存总价值']),
         dept: flatText(r.fields?.['所属部门']),
       }));
-      return res.status(200).json({ items });
+      const result = { items };
+      setCache('inventory', result);
+      return res.status(200).json(result);
     }
     if (path.startsWith('/api/inbound')) {
+      const cached = getCached('inbound');
+      if (cached) return res.status(200).json(cached);
       const records = await fetchBitableRecords(TABLE_INBOUND);
       const items = records.map(r => ({
         id: r.record_id,
@@ -97,22 +120,30 @@ module.exports = async (req, res) => {
         price: flatNum(r.fields?.['单价']),
         date: flatText(r.fields?.['入库提示']),
       }));
-      return res.status(200).json({ items });
+      const result = { items };
+      setCache('inbound', result);
+      return res.status(200).json(result);
     }
     if (path.startsWith('/api/outbound')) {
+      const cached = getCached('outbound');
+      if (cached) return res.status(200).json(cached);
       const records = await fetchBitableRecords(TABLE_OUTBOUND);
       const items = records.map(r => ({
         id: r.record_id,
-        name: '',
-        spec: '',
+        name: flatText(r.fields?.['货品名称']) || '',
+        spec: flatText(r.fields?.['规格型号']) || '',
         qty: flatNum(r.fields?.['出库数量']),
         date: flatText(r.fields?.['出库时间']),
         dept: flatText(r.fields?.['出库提示']),
       }));
-      return res.status(200).json({ items });
+      const result = { items };
+      setCache('outbound', result);
+      return res.status(200).json(result);
     }
     if (path.startsWith('/api/batches')) {
-      if (!TABLE_BATCHES) return res.status(200).json({ items: [], note: '等待批次表ID' });
+      const cached = getCached('batches');
+      if (cached) return res.status(200).json(cached);
+      if (!TABLE_BATCHES) return res.status(200).json({ items: [] });
       const records = await fetchBitableRecords(TABLE_BATCHES);
       const items = records.map(r => ({
         id: r.record_id,
@@ -121,15 +152,21 @@ module.exports = async (req, res) => {
         initQty: flatNum(r.fields?.['初始数量']),
         allocated: flatNum(r.fields?.['剩余数量']),
         sourceInboundNo: flatText(r.fields?.['入库批次号']),
+        lastInboundTime: r.fields?.['最后入库时间']
+          ? String(r.fields['最后入库时间'])
+          : '',
       }));
-      return res.status(200).json({ items });
+      const result = { items };
+      setCache('batches', result);
+      return res.status(200).json(result);
     }
     if (path === '/api/health') {
       await getAppAccessToken();
-      return res.status(200).json({ ok: true });
+      return res.status(200).json({ ok: true, ts: Date.now() });
     }
     return res.status(404).json({ error: 'not found' });
   } catch (e) {
+    console.error('API Error:', e.message, 'Duration:', Date.now() - start, 'ms');
     return res.status(500).json({ error: e.message });
   }
 };
