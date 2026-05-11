@@ -29,6 +29,11 @@ body{
   font-size:13px;
   -webkit-font-smoothing:antialiased;
 }
+.container{
+  max-width:1400px;
+  margin:0 auto;
+  padding:0 20px;
+}
 
 .header{
   background:var(--c);
@@ -50,7 +55,7 @@ body{
 .header .meta{color:var(--sub);font-size:12px}
 
 /* KPI */
-.kpi-row{display:flex;gap:14px;padding:20px 32px 0}
+.kpi-row{display:flex;gap:14px;padding:16px 0 0}
 .kpi{
   flex:1;
   background:var(--c);
@@ -66,7 +71,7 @@ body{
 .ks{font-size:11px;color:var(--sub)}
 
 /* 中间行 */
-.mid-row{display:grid;grid-template-columns:1fr 380px;gap:14px;padding:0 32px 14px;align-items:start}
+.mid-row{display:grid;grid-template-columns:1fr 380px;gap:14px;padding:0 0 14px;align-items:start}
 .card-lg{
   background:var(--c);
   border-radius:14px;
@@ -134,7 +139,7 @@ tr:hover td{background:#FAFAF8}
 .note{font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.4}
 
 /* 底行 */
-.bot-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 32px 24px}
+.bot-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 0 24px}
 .bot-row .card{background:var(--c);border-radius:14px;padding:18px;border:1px solid var(--bd)}
 
 @media(max-width:900px){
@@ -145,6 +150,7 @@ tr:hover td{background:#FAFAF8}
 </style>
 </head>
 <body>
+<div class="container">
 <div class="header">
   <div class="brand">
     <div class="logo">HS</div>
@@ -234,6 +240,7 @@ tr:hover td{background:#FAFAF8}
   </div>
 </div>
 
+</div><!-- end container -->
 <script>
 new Chart(document.getElementById('pieChart'),{
   type:'doughnut',
