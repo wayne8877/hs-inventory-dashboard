@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>合盛钮扣厂 · 出入库数据看板</title>
+<title>合盛钮扣厂 · 库存健康看板</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
@@ -118,7 +118,6 @@
   .chart-container { position: relative; }
   .chart-container.tall { height: 320px; }
   .chart-container.short { height: 240px; }
-  .chart-container.vshort { height: 180px; }
   /* Table styles */
   .data-table {
     width: 100%;
@@ -161,9 +160,9 @@
   .table-scroll { max-height: 380px; overflow-y: auto; }
   .loading { color: var(--text-dim); font-size: 14px; padding: 20px; text-align: center; }
   .error-msg { color: var(--red); font-size: 13px; padding: 12px; background: rgba(255,77,106,0.08); border-radius: 8px; margin: 8px 0; }
-  .freshness-bar { display: flex; align-items: center; gap: 8px; }
-  .freshness-bar-track { flex: 1; height: 6px; background: var(--card-border); border-radius: 3px; overflow: hidden; }
-  .freshness-bar-fill { height: 100%; border-radius: 3px; }
+  /* 部门未知警告 */
+  .dept-unknown { background: rgba(255,169,64,0.15) !important; }
+  .dept-unknown td { color: var(--orange) !important; }
   @media (max-width: 768px) {
     .kpi-row { grid-template-columns: repeat(2, 1fr); }
     .charts-row.two-col { grid-template-columns: 1fr; }
@@ -174,7 +173,7 @@
 <body>
 
 <div class="header">
-  <h1>🏭 合盛钮扣厂 · 出入库数据看板</h1>
+  <h1>🏭 合盛钮扣厂 · 库存健康看板</h1>
   <div class="timestamp">
     <span class="live-dot"></span>
     <span id="updateTime">加载中…</span>
@@ -201,7 +200,7 @@
   <div class="kpi-card orange">
     <div class="kpi-label">💰 库存总金额</div>
     <div class="kpi-value" id="totalCost">—</div>
-    <div class="kpi-sub">按入库成本计算</div>
+    <div class="kpi-sub">按库存成本计算</div>
   </div>
 </div>
 
@@ -247,10 +246,10 @@
   </div>
 </div>
 
-<!-- NEW: 出入库频次统计 -->
+<!-- Charts Row 4: 出库 + 批次 -->
 <div class="charts-row two-col">
   <div class="chart-card">
-    <h3><span class="dot" style="background:var(--purple)"></span>高频出库物料 TOP 10（按出库次数）</h3>
+    <h3><span class="dot" style="background:var(--purple)"></span>高频出库物料 TOP 10（按出库量）</h3>
     <div class="chart-container tall"><canvas id="outboundFreqChart"></canvas></div>
     <div class="table-scroll" style="margin-top:12px">
       <table class="data-table">
@@ -272,45 +271,58 @@
 </div>
 
 <script>
-// ============================================================
-// 飞书 Base 数据代理服务（dev: http://localhost:18792）
-// 生产环境请部署 server.js 后修改 BASE_URL
-// ============================================================
-const API_BASE = '';  // Vercel: 同域部署，直接用相对路径
+const API_BASE = '';
 let _charts = {};
 
-async function apiFetch(path) {
-  const r = await fetch(API_BASE + path);
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  return r.json();
+// 名字截断辅助函数
+function trunc(str, len) {
+  if (!str || !str.trim()) return '—';
+  const s = str.trim();
+  return s.length > len ? s.slice(0, len) + '…' : s;
 }
 
-function daysAgo(dateStr) {
-  if (!dateStr) return Infinity;
-  const d = new Date(dateStr);
+// 格式化日期（Unix ms → YYYY-MM-DD）
+function fmtDate(ts) {
+  if (!ts) return '—';
+  const d = new Date(parseInt(ts));
+  if (isNaN(d)) return '—';
+  return d.toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai' });
+}
+
+// 计算天数差
+function daysAgo(ts) {
+  if (!ts) return Infinity;
+  const d = new Date(parseInt(ts));
   if (isNaN(d)) return Infinity;
   return Math.floor((Date.now() - d.getTime()) / 86400000);
 }
 
-// ============================================================
-// 主渲染流程
-// ============================================================
+// 整数化（去除小数点）
+function int(v) { return Math.round(v); }
+
+// 过滤噪音关键词
+const NOISE = new Set(['', 'X', '记录本', '备注', '测试']);
+
+async function apiFetch(path) {
+  const r = await fetch(API_BASE + path);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
 async function init() {
   try {
     const [inv, inbound, outbound, batch] = await Promise.all([
-      apiFetch('/api/inventory').catch(e => ({ items: [], error: e.message })),
-      apiFetch('/api/inbound').catch(e => ({ items: [], error: e.message })),
-      apiFetch('/api/outbound').catch(e => ({ items: [], error: e.message })),
-      apiFetch('/api/batches').catch(e => ({ items: [], error: e.message })),
+      apiFetch('/api/inventory').catch(() => ({ items: [] })),
+      apiFetch('/api/inbound').catch(() => ({ items: [] })),
+      apiFetch('/api/outbound').catch(() => ({ items: [] })),
+      apiFetch('/api/batches').catch(() => ({ items: [] })),
     ]);
-
-    // 更新 timestamp
     document.getElementById('updateTime').textContent =
       new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }) + ' · 实时';
 
-    renderInventory(inv.items);
-    renderOutboundFreq(outbound.items);
-    renderBatchFreshness(batch.items, inbound.items);
+    renderInventory(inv.items || []);
+    renderOutboundFreq(outbound.items || []);
+    renderBatchFreshness(batch.items || [], inbound.items || []);
   } catch (err) {
     document.getElementById('updateTime').textContent = '⚠ 加载失败';
     console.error(err);
@@ -318,42 +330,46 @@ async function init() {
 }
 
 // ============================================================
-// 渲染库存相关图表
+// 渲染库存
 // ============================================================
 function renderInventory(items) {
-  const totalSkus = items.length;
-  const inStock = items.filter(i => i.stock > 0);
-  const noStock = items.filter(i => i.stock <= 0);
-  const totalCost = items.reduce((s, i) => s + (i.cost || 0), 0);
+  const totalSkus  = items.length;
+  const inStock    = items.filter(i => i.stock > 0);
+  const noStock    = items.filter(i => i.stock <= 0);
+  const totalCost  = items.reduce((s, i) => s + (i.cost || 0), 0);
 
-  // KPI
-  document.getElementById('totalSku').textContent = totalSkus;
+  // KPI（整数，无小数）
+  document.getElementById('totalSku').textContent   = totalSkus;
   document.getElementById('inStockSku').textContent = inStock.length;
   document.getElementById('noStockSku').textContent = noStock.length;
-  document.getElementById('totalCost').textContent = '¥' + Math.round(totalCost).toLocaleString();
+  document.getElementById('totalCost').textContent  = '¥' + int(totalCost).toLocaleString();
   document.getElementById('inStockPct').textContent =
-    totalSkus ? `占比 ${(inStock.length / totalSkus * 100).toFixed(1)}%` : '';
+    totalSkus ? '占比 ' + int(inStock.length / totalSkus * 100) + '%' : '';
   document.getElementById('noStockPct').textContent =
-    totalSkus ? `${(noStock.length / totalSkus * 100).toFixed(1)}% · 需关注` : '';
+    totalSkus ? int(noStock.length / totalSkus * 100) + '% · 需关注' : '';
 
-  // 聚合部门维度
-  const deptCostMap = {};
+  // 部门维度聚合
+  const deptCostMap  = {};
   const deptCountMap = {};
-  const topItems = [];
+  const topItems     = [];
   const restockItems = [];
 
   items.forEach(item => {
-    const dept = item.dept || '未知';
-    deptCostMap[dept] = (deptCostMap[dept] || 0) + (item.cost || 0);
+    const name = (item.name || '').trim();
+    const dept = name && !NOISE.has(name) ? (item.dept || '未分类') : '未分类';
+    deptCostMap[dept]  = (deptCostMap[dept]  || 0) + (item.cost || 0);
     deptCountMap[dept] = (deptCountMap[dept] || 0) + 1;
     if (item.stock > 0) topItems.push(item);
-    if (item.stock <= 0) restockItems.push({ name: item.name, spec: item.spec, dept: item.dept });
+    // 过滤噪音后才加入缺货清单
+    if (item.stock <= 0 && name && !NOISE.has(name)) {
+      restockItems.push({ name, spec: (item.spec || '').trim(), dept: item.dept || '未知' });
+    }
   });
 
   topItems.sort((a, b) => (b.cost || 0) - (a.cost || 0));
   const top15 = topItems.slice(0, 15);
 
-  // Health donut
+  // ── 库存健康饼图 ──
   if (_charts.health) _charts.health.destroy();
   _charts.health = new Chart(document.getElementById('healthChart'), {
     type: 'doughnut',
@@ -367,14 +383,14 @@ function renderInventory(items) {
     plugins: [ChartDataLabels]
   });
 
-  // Dept bar
+  // ── 部门金额柱状图 ──
   const deptLabels = Object.keys(deptCostMap).sort((a, b) => deptCostMap[b] - deptCostMap[a]);
-  const deptValues = deptLabels.map(k => Math.round(deptCostMap[k]));
+  const deptValues = deptLabels.map(k => int(deptCostMap[k]));
   if (_charts.dept) _charts.dept.destroy();
   _charts.dept = new Chart(document.getElementById('deptChart'), {
     type: 'bar',
     data: {
-      labels: deptLabels,
+      labels: deptLabels.map(l => trunc(l, 8)),
       datasets: [{ label: '库存金额 (¥)', data: deptValues, backgroundColor: '#4f8cff', borderRadius: 6, borderSkipped: false }]
     },
     options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y',
@@ -385,10 +401,10 @@ function renderInventory(items) {
     plugins: [ChartDataLabels]
   });
 
-  // Top 15
-  const topNames = top15.map(i => i.name);
+  // ── TOP15 ──
+  const topNames = top15.map(i => trunc(i.name, 14));
   const topCosts = top15.map(i => i.cost || 0);
-  const maxCost = Math.max(...topCosts, 1);
+  const maxCost  = Math.max(...topCosts, 1);
   if (_charts.top) _charts.top.destroy();
   _charts.top = new Chart(document.getElementById('topChart'), {
     type: 'bar',
@@ -400,83 +416,88 @@ function renderInventory(items) {
     },
     options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y',
       plugins: { legend: { display: false },
-                 datalabels: { anchor: 'end', align: 'end', color: '#e4e6eb', font: { size: 11, weight: 'bold' }, formatter: v => '¥' + v.toLocaleString() } },
-      scales: { x: { grid: { color: 'rgba(42,45,58,0.3)' }, ticks: { color: '#8b8fa3', callback: v => '¥' + v.toLocaleString() } },
+                 datalabels: { anchor: 'end', align: 'end', color: '#e4e6eb', font: { size: 11, weight: 'bold' }, formatter: v => '¥' + int(v).toLocaleString() } },
+      scales: { x: { grid: { color: 'rgba(42,45,58,0.3)' }, ticks: { color: '#8b8fa3', callback: v => '¥' + int(v).toLocaleString() } },
                 y: { grid: { display: false }, ticks: { color: '#e4e6eb', font: { size: 11 } } } } },
     plugins: [ChartDataLabels]
   });
 
-  // Dept table
+  // ── 部门统计表格 ──
   const maxVal = Math.max(...deptValues, 1);
   const deptTableBody = document.getElementById('deptTable');
   deptTableBody.innerHTML = '';
   deptLabels.forEach(dept => {
-    const cost = deptCostMap[dept];
+    const cost  = deptCostMap[dept];
     const count = deptCountMap[dept] || 0;
-    const pct = totalCost ? (cost / totalCost * 100).toFixed(1) : '0.0';
-    const barW = Math.max(cost / maxVal * 100, 2);
-    deptTableBody.innerHTML += `<tr>
-      <td><span class="badge badge-dept">${dept}</span></td>
+    const pct   = totalCost ? int(cost / totalCost * 100) : 0;
+    const barW  = Math.max(cost / maxVal * 100, 2);
+    const isUnknown = dept === '未分类';
+    deptTableBody.innerHTML += `<tr${isUnknown ? ' class="dept-unknown"' : ''}>
+      <td><span class="badge badge-dept">${dept}${isUnknown ? ' ⚠' : ''}</span></td>
       <td>${count}</td>
-      <td>¥${Math.round(cost).toLocaleString()}</td>
+      <td>¥${int(cost).toLocaleString()}</td>
       <td><div class="cost-bar"><div class="cost-bar-fill" style="width:${barW}px"></div>${pct}%</div></td>
     </tr>`;
   });
 
-  // Restock table
+  // ── 缺货清单（已过滤噪音） ──
   const restockBody = document.getElementById('restockTable');
   restockBody.innerHTML = '';
-  restockItems.slice(0, 30).forEach(item => {
-    restockBody.innerHTML += `<tr>
-      <td>${item.name}</td>
-      <td style="color:var(--text-dim)">${item.spec || '—'}</td>
-      <td><span class="badge badge-dept">${item.dept || '未知'}</span></td>
-    </tr>`;
-  });
+  if (restockItems.length === 0) {
+    restockBody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:24px;color:#00d68f">✅ 暂无缺货商品</td></tr>';
+  } else {
+    restockItems.slice(0, 30).forEach(item => {
+      restockBody.innerHTML += `<tr>
+        <td title="${item.name}">${trunc(item.name, 12)}</td>
+        <td style="color:var(--text-dim)">${trunc(item.spec, 18)}</td>
+        <td><span class="badge badge-dept">${item.dept}</span></td>
+      </tr>`;
+    });
+  }
 }
 
 // ============================================================
-// 出库频次统计
+// 出库频次（按出库量排序，图表用qty）
 // ============================================================
 function renderOutboundFreq(items) {
-  const freqMap = {};
-  const qtyMap = {};
+  const qtyMap  = {};
+  const cntMap  = {};
   items.forEach(item => {
-    const key = item.name || '(无名)';
-    freqMap[key] = (freqMap[key] || 0) + 1;
+    const key = (item.name || '').trim();
+    if (!key || NOISE.has(key)) return;
     qtyMap[key] = (qtyMap[key] || 0) + (item.qty || 0);
+    cntMap[key] = (cntMap[key] || 0) + 1;
   });
-  const sorted = Object.entries(freqMap)
+  // 按出库量排序
+  const sorted = Object.entries(qtyMap)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10);
 
-  // Bar chart
   const labels = sorted.map(([k]) => k);
-  const counts = sorted.map(([, v]) => v);
+  const qties = sorted.map(([, v]) => v);
   if (_charts.outboundFreq) _charts.outboundFreq.destroy();
   _charts.outboundFreq = new Chart(document.getElementById('outboundFreqChart'), {
     type: 'bar',
     data: {
-      labels,
-      datasets: [{ label: '出库次数', data: counts, backgroundColor: '#a855f7', borderRadius: 4, borderSkipped: false }]
+      labels: labels.map(l => trunc(l, 12)),
+      datasets: [{ label: '出库量', data: qties, backgroundColor: '#a855f7', borderRadius: 4, borderSkipped: false }]
     },
     options: { responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false },
-                 datalabels: { anchor: 'end', align: 'end', color: '#e4e6eb', font: { size: 11 }, formatter: v => v + '次' } },
-      scales: { x: { grid: { display: false }, ticks: { color: '#e4e6eb', font: { size: 11 }, maxRotation: 30 } },
-                y: { grid: { color: 'rgba(42,45,58,0.3)' }, ticks: { color: '#8b8fa3' }, beginAtZero: true } } },
+                 datalabels: { anchor: 'end', align: 'end', color: '#e4e6eb', font: { size: 11 }, formatter: v => int(v) } },
+      scales: { x: { grid: { display: false }, ticks: { color: '#e4e6eb', font: { size: 10 }, maxRotation: 30 } },
+                y: { grid: { color: 'rgba(42,45,58,0.3)' }, ticks: { color: '#8b8fa3' }, beginAtZero: true } } } },
     plugins: [ChartDataLabels]
   });
 
-  // Table
   const tbody = document.getElementById('outboundFreqTable');
   tbody.innerHTML = '';
-  sorted.forEach(([name, count], i) => {
+  sorted.forEach(([name, qty], i) => {
     tbody.innerHTML += `<tr>
       <td style="color:var(--text-dim)">${i + 1}</td>
-      <td>${name}</td>
-      <td style="color:var(--purple);font-weight:700">${count}</td>
-      <td>${qtyMap[name] || 0}</td>
+      <td title="${name}">${trunc(name, 12)}</td>
+      <td style="color:var(--purple);font-weight:700">${int(cntMap[name])}</td>
+      <td>${int(qty)}</td>
     </tr>`;
   });
 }
@@ -489,54 +510,60 @@ function renderBatchFreshness(batchItems, inboundItems) {
   const tbody = document.getElementById('batchFreshTable');
 
   if (!batchItems || batchItems.length === 0) {
-    msgEl.innerHTML = '<div class="error-msg">暂无批次数据，请确认先进先出批次明细表有数据</div>';
+    msgEl.innerHTML = '<div class="error-msg">暂无批次数据，请确认"先进先出批次明细表"有数据</div>';
     return;
   }
   msgEl.remove();
 
-  // 以商品名称+规格为 key，收集所有来源入库单的日期
-  const lastInboundDate = {};
+  // 建立 name|spec → 最后入库时间（毫秒时间戳）
+  const lastInboundMap = {};
   (inboundItems || []).forEach(item => {
     const key = (item.name || '') + '|' + (item.spec || '');
-    if (item.date) {
-      const d = new Date(item.date);
-      if (!isNaN(d) && (!lastInboundDate[key] || d > new Date(lastInboundDate[key]))) {
-        lastInboundDate[key] = item.date;
+    const raw = item.date; // Unix ms 时间戳
+    if (raw) {
+      const t = parseInt(raw);
+      if (!isNaN(t) && (!lastInboundMap[key] || t > lastInboundMap[key])) {
+        lastInboundMap[key] = t;
       }
     }
   });
 
-  // 展示批次明细中的商品，标注新鲜度
+  // 收集批次行
   const seen = new Set();
   const rows = [];
   batchItems.forEach(b => {
-    const key = b.name + '|' + b.spec;
+    const key = (b.name || '') + '|' + (b.spec || '');
     if (seen.has(key)) return;
     seen.add(key);
-    const dateStr = lastInboundDate[key] || b.sourceInboundNo || '';
-    const days = daysAgo(dateStr);
-    rows.push({ name: b.name, spec: b.spec, dateStr, days });
+    // 优先用 b.lastInboundTime（毫秒），没有则用映射表
+    const ts = b.lastInboundTime
+      ? parseInt(b.lastInboundTime)
+      : (lastInboundMap[key] || 0);
+    rows.push({
+      name: b.name || '—',
+      spec: b.spec || '—',
+      ts,
+      days: ts ? daysAgo(ts) : Infinity,
+    });
   });
 
-  // 按新鲜度倒序（最旧的排前面）
   rows.sort((a, b) => b.days - a.days);
   const maxDays = Math.max(...rows.map(r => r.days).filter(d => d !== Infinity), 30);
 
   tbody.innerHTML = '';
   rows.slice(0, 50).forEach(row => {
-    const isOld = row.days >= 30 && row.days !== Infinity;
+    const isOld    = row.days >= 30 && row.days !== Infinity;
     const isVeryOld = row.days >= 60 && row.days !== Infinity;
-    const fillPct = row.days === Infinity ? 100 : Math.min(row.days / maxDays * 100, 100);
-    const fillColor = isVeryOld ? '#ff4d6a' : isOld ? '#ffa940' : '#00d68f';
     const badge = isVeryOld
       ? '<span class="badge badge-warn">⚠ 严重老化</span>'
       : isOld
       ? '<span class="badge badge-old">⏳ 超30天</span>'
       : '<span class="badge badge-ok">✅ 正常</span>';
+    const dayLabel = row.days === Infinity ? '无记录' : row.days + '天前';
     tbody.innerHTML += `<tr>
-      <td>${row.name}</td>
-      <td style="color:var(--text-dim)">${row.spec || '—'}</td>
-      <td>${row.dateStr || '—'}</td>
+      <td title="${row.name}">${trunc(row.name, 12)}</td>
+      <td style="color:var(--text-dim)">${trunc(row.spec, 16)}</td>
+      <td>${fmtDate(row.ts)}<br><span style="font-size:11px;color:var(--text-dim)">${dayLabel}</span></td>
       <td>${badge}</td>
     </tr>`;
   });
