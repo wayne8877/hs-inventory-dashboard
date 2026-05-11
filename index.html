@@ -177,9 +177,9 @@ tr:hover td{background:#FAFAF8}
 .three-row .card{min-width:0} /* 防止grid item溢出 */
 
 /* 两列并排 */
-.two-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
-.two-row .card{min-width:0}
-.two-row .tbl-scroll{max-height:260px}
+.two-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:stretch}
+.two-row .card{min-width:0;display:flex;flex-direction:column}
+.two-row .tbl-scroll{flex:1;max-height:260px}
 
 /* 序号列 */
 .td-num{width:18px;color:#8A95A5;font-size:10px;text-align:center;flex-shrink:0}
