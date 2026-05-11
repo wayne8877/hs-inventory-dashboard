@@ -22,42 +22,42 @@ body{
 /* header */
 .hdr{
   background:#fff;
-  display:flex;
-  align-items:stretch;
-  border-bottom:1px solid #E4E2DF;
-  overflow:hidden;
+  position:relative;
+  box-shadow:0 1px 3px rgba(0,0,0,0.06);
 }
-.brand{
-  background:#3D4F6F;
-  padding:22px 28px;
+/* 顶部品牌色细线 */
+.hdr::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,#3D4F6F 0%,#5B7FA6 100%);
+}
+.hdr-inner{
   display:flex;
   align-items:center;
-  gap:14px;
-  min-width:260px;
+  justify-content:space-between;
+  padding:18px 28px;
 }
+.brand{display:flex;align-items:center;gap:16px}
 .brand-mark{
-  width:40px;height:40px;
-  background:rgba(255,255,255,0.15);
+  width:42px;height:42px;
+  background:#3D4F6F;
   border-radius:10px;
   display:flex;align-items:center;justify-content:center;
-  color:#fff;font-weight:800;font-size:18px;
-  letter-spacing:-1px;
+  color:#fff;font-size:22px;font-weight:800;
   flex-shrink:0;
 }
-.brand-text{display:flex;flex-direction:column;gap:2px}
-.brand-name{font-size:17px;font-weight:700;color:#fff;letter-spacing:1px}
-.brand-en{font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:2px;text-transform:uppercase}
+.brand-name{font-size:20px;font-weight:800;color:#1A1A2E;letter-spacing:1px}
+.brand-en{font-size:11px;color:#8A94A2;letter-spacing:3px;text-transform:uppercase;margin-top:2px}
 .hdr-info{
-  flex:1;
   display:flex;
   align-items:center;
-  padding:0 28px;
-  gap:32px;
+  gap:28px;
 }
-.hdr-info-item{display:flex;flex-direction:column;gap:2px}
-.hdr-info-label{font-size:11px;color:#8A95A5;letter-spacing:1px}
-.hdr-info-value{font-size:15px;font-weight:600;color:#1C2333}
-.hdr-divider{width:1px;height:28px;background:#E4E2DF}
+.hdr-info-item{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.hdr-info-label{font-size:10px;color:#8A94A2;letter-spacing:2px;text-transform:uppercase}
+.hdr-info-value{font-size:17px;font-weight:700;color:#1A1A2E}
+.hdr-divider{width:1px;height:28px;background:#E8E7E3}
 
 /* KPI */
 .kpi-row{display:flex;gap:14px;padding:16px 0}
@@ -208,27 +208,29 @@ tr:hover td{background:#FAFAF8}
 <body>
 <div class="wrap">
 <header class="hdr">
-  <div class="brand">
-    <div class="brand-mark">合</div>
-    <div class="brand-text">
-      <span class="brand-name">合盛辅料</span>
-      <span class="brand-en">HeSheng</span>
+  <div class="hdr-inner">
+    <div class="brand">
+      <div class="brand-mark">合</div>
+      <div>
+        <div class="brand-name">合盛辅料</div>
+        <div class="brand-en">HeSheng</div>
+      </div>
     </div>
-  </div>
-  <div class="hdr-info">
-    <div class="hdr-info-item">
-      <span class="hdr-info-label">物料 SKU</span>
-      <span class="hdr-info-value">471</span>
-    </div>
-    <div class="hdr-divider"></div>
-    <div class="hdr-info-item">
-      <span class="hdr-info-label">库存总额</span>
-      <span class="hdr-info-value">¥71,866</span>
-    </div>
-    <div class="hdr-divider"></div>
-    <div class="hdr-info-item">
-      <span class="hdr-info-label">更新时间</span>
-      <span class="hdr-info-value">—</span>
+    <div class="hdr-info">
+      <div class="hdr-info-item">
+        <span class="hdr-info-label">物料 SKU</span>
+        <span class="hdr-info-value">471</span>
+      </div>
+      <div class="hdr-divider"></div>
+      <div class="hdr-info-item">
+        <span class="hdr-info-label">库存总额</span>
+        <span class="hdr-info-value">¥71,866</span>
+      </div>
+      <div class="hdr-divider"></div>
+      <div class="hdr-info-item">
+        <span class="hdr-info-label">更新时间</span>
+        <span class="hdr-info-value">—</span>
+      </div>
     </div>
   </div>
 </header>
