@@ -220,24 +220,28 @@ function renderReorder(items){
   var reorder=items.filter(function(it){return it.stock===0&&it.name.length>1});
   document.getElementById('reorderCount').textContent=reorder.length+' 品';
   var html='';
-  reorder.forEach(function(it){
+  reorder.slice(0,20).forEach(function(it){
     html+='<tr><td class="td-name">'+esc(it.name)+'</td><td>'+esc(it.dept)+'</td><td><span class="st r">缺货</span></td></tr>';
   });
   document.getElementById('reorderBody').innerHTML=html;
+}
+
+function fmtDate(v){
+  if(!v&&v!==0)return '—';
+  if(typeof v==='number'){var d=new Date(v);return (d.getMonth()+1)+'-'+d.getDate();}
+  return String(v);
 }
 
 function renderInbound(){
   // 从API获取入库数据
   fetch('/api/inbound').then(function(r){return r.json()}).then(function(data){
     var items=data.items||[];
-    var today=new Date().toISOString().slice(0,10);
-    var todayItems=items.filter(function(it){
-      return it.date&&it.date.indexOf(today.slice(2))>=0;
-    });
-    document.getElementById('todayInboundLabel').textContent='📥 入库记录 ('+items.length+' 条)';
+    // 按日期降序排列（最新的在前）
+    items.sort(function(a,b){return (b.date||0)-(a.date||0)});
+    document.getElementById('todayInboundLabel').textContent='📥 最新入库 ('+items.length+' 条)';
     var html='';
-    items.slice(0,30).forEach(function(it){
-      var d=it.date||'—';
+    items.slice(0,20).forEach(function(it){
+      var d=fmtDate(it.date);
       var qty=it.qty||0;
       html+='<tr><td class="name">'+esc(it.name)+'</td><td style="text-align:right;white-space:nowrap">'+qty+'</td><td style="color:#8A95A5;white-space:nowrap">'+esc(d)+'</td></tr>';
     });

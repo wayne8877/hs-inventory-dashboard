@@ -118,7 +118,7 @@ module.exports = async (req, res) => {
         spec: flatText(r.fields?.['规格型号']),
         qty: flatNum(r.fields?.['入库数量']),
         price: flatNum(r.fields?.['单价']),
-        date: flatText(r.fields?.['入库提示']),
+        date: r.fields?.['入库日期'] || flatText(r.fields?.['入库提示']),
       }));
       const result = { items };
       setCache('inbound', result);
