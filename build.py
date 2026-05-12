@@ -192,7 +192,7 @@ body{{
 .tab-body{{padding:10px 14px;font-size:13px;max-height:170px;overflow-y:auto;}}
 .tab-body table{{width:100%;border-collapse:collapse;font-size:13px;}}
 .tab-body td{{padding:4px 6px;border-bottom:1px solid #F0EFEC;}}
-.tab-body td.name{{max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
+.tab-body td.name{{white-space:nowrap;}}
 .note{{font-size:11px;color:#8A95A5;padding:6px 16px 0;}}
 .two-row{{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 0 24px;align-items:start;}}
 .tbl-scroll{{overflow-x:auto;}}
