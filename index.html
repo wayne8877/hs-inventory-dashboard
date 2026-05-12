@@ -6,13 +6,10 @@
 <title>合盛辅料 HeSheng · 库存健康看板</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{
-  font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
-  background:#F2F1EE;color:#1C2333;font-size:15px;
-  -webkit-font-smoothing:antialiased;
-}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#F2F1EE;color:#1C2333;font-size:15px;-webkit-font-smoothing:antialiased;}
 .wrap{max-width:1280px;margin:0 auto;padding:0 16px}
 .section-gap{margin-bottom:14px}
+/* Header */
 .hdr{background:#fff;position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
 .hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3D4F6F 0%,#5B7FA6 100%);}
 .hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;}
@@ -24,22 +21,32 @@ body{
 .hdr-info-item{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
 .hdr-info-label{font-size:10px;color:#8A94A2;letter-spacing:2px;text-transform:uppercase}
 .hdr-info-value{font-size:17px;font-weight:700;color:#1A1A2E}
+.st{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;margin-left:3px}
+.st.g{background:#E8F5E9;color:#2E7D32}
+.st.r{background:#FDECEC;color:#B85C5C}
+.st.o{background:#FEF3E2;color:#C4883A}
 .hdr-divider{width:1px;height:28px;background:#E8E7E3}
+/* Loading */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 0 60px;gap:16px;}
+.spinner{width:40px;height:40px;border:4px solid #E4E2DF;border-top-color:#3D4F6F;border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{color:#8A94A2;font-size:14px}
+/* KPI */
 .kpi-row{display:flex;gap:14px;padding:16px 0}
 .kpi{flex:1;background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #E4E2DF;min-width:0;}
 .kn{font-size:28px;font-weight:700;line-height:1;margin-bottom:3px}
-.kn.g{color:#4A8C6F}
-.kn.r{color:#B85C5C}
-.kn.o{color:#C4883A}
+.kn.g{color:#4A8C6F}.kn.r{color:#B85C5C}.kn.o{color:#C4883A}
 .kl{font-size:13px;font-weight:500;color:#1C2333;margin-bottom:2px}
 .ks{font-size:11px;color:#8A95A5}
+/* Cards */
 .card{background:#fff;border-radius:12px;border:1px solid #E4E2DF;overflow:hidden;}
 .ctitle{font-size:14px;font-weight:700;padding:12px 16px;border-bottom:2px solid #E8E7E3;display:flex;align-items:center;gap:6px;}
 .ctitle.navy{border-bottom-color:#3D4F6F}
 .ctitle.orange{border-bottom-color:#C4883A}
 .cnt{font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px}
-.cnt.o{background:#FEF3E2;color:#C4883A}
+.cnt.g{background:#E8F5E9;color:#2E7D32}.cnt.o{background:#FEF3E2;color:#C4883A}.cnt.r{background:#FDECEC;color:#B85C5C}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+/* Mid row */
 .mid-row{display:grid;grid-template-columns:1fr 340px;gap:14px;padding:0 0 14px;align-items:start;}
 .pie-section{display:flex;gap:16px;align-items:center;padding:12px 16px;}
 .pie-svg{flex-shrink:0;width:200px;height:200px;}
@@ -50,23 +57,27 @@ body{
 .tab-bar{display:flex;border-bottom:2px solid #E8E7E3;}
 .tab{flex:1;padding:10px 0;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:#8A94A2;transition:all 0.15s;}
 .tab.active{color:#3D4F6F;border-bottom:2px solid #3D4F6F;margin-bottom:-2px;}
-.tab-body{padding:10px 14px;font-size:13px;max-height:170px;overflow-y:auto;}
+.tab-body{padding:10px 14px;font-size:13px;max-height:180px;overflow-y:auto;}
 .tab-body table{width:100%;border-collapse:collapse;font-size:13px;}
-.tab-body td{padding:4px 6px;border-bottom:1px solid #F0EFEC;}
+.tab-body td{padding:4px 6px;border-bottom:1px solid #F0EFEC;word-break:break-all;}
 .tab-body td.name{white-space:nowrap;}
-.note{font-size:11px;color:#8A95A5;padding:6px 16px 0;}
+/* Two column */
 .two-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 0 24px;align-items:start;}
 .tbl-scroll{overflow-x:auto;}
 .tbl-scroll table{width:100%;border-collapse:collapse;font-size:13px;}
-.tbl-scroll th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;color:#555E6D;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #E8E7E3;position:sticky;top:0;background:#fff;}
+.tbl-scroll th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;color:#555E6D;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #E8E7E3;position:sticky;top:0;background:#fff;white-space:nowrap;}
 .tbl-scroll th.tr{text-align:right;}
-.tbl-scroll td{padding:6px 10px;border-bottom:1px solid #F0EFEC;vertical-align:middle;}
-.tbl-scroll td.tr{text-align:right;font-variant-numeric:tabular-nums;}
+.tbl-scroll td{padding:6px 10px;border-bottom:1px solid #F0EFEC;vertical-align:middle;word-break:break-all;}
+.tbl-scroll td.tr{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
 .td-num{color:#8A95A5;font-size:11px;width:28px;text-align:center;}
-.td-name{font-weight:500;max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.st{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;}
-.st.r{background:#FDECEC;color:#B85C5C;}
+.td-name{font-weight:500;word-break:break-all;}
+.note{font-size:11px;color:#8A95A5;padding:6px 16px 0;}
 .ftr{text-align:center;padding:16px 0 24px;font-size:11px;color:#8A95A5;}
+/* Error */
+.error-box{text-align:center;padding:60px 20px;background:#fff;border-radius:12px;margin-top:16px;}
+.error-box p{color:#B85C5C;margin-bottom:16px;font-size:15px;}
+.error-box button{padding:8px 24px;background:#3D4F6F;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:600;}
+.error-box button:hover{background:#2E3D5A;}
 </style>
 </head>
 <body>
@@ -75,46 +86,33 @@ body{
     <div class="brand-mark">HS</div>
     <div><div class="brand-name">合盛辅料</div><div class="brand-en">HeSheng Button</div></div>
   </div>
-  <div class="hdr-info">
-    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-05-12 10:31</div></div>
-    <div class="hdr-divider"></div>
-    <div class="hdr-info-item"><div class="hdr-info-label">Source</div><div class="hdr-info-value">Feishu Bitable</div></div>
+  <div class="hdr-info" id="hdrInfo">
+    <div class="hdr-info-item"><div class="hdr-info-label">Status</div><div class="hdr-info-value"><span id="statusBadge" class="st o">加载中</span></div></div>
   </div>
 </div></div>
+
 <div class="wrap">
 
-<div class="kpi-row section-gap">
-  <div class="kpi"><div class="kn">347</div><div class="kl">总 SKU</div><div class="ks">全部物料品类</div></div>
-  <div class="kpi"><div class="kn g">158</div><div class="kl">有库存</div><div class="ks">可正常领用</div></div>
-  <div class="kpi"><div class="kn r">189</div><div class="kl">无库存</div><div class="ks">当前缺货待补</div></div>
-  <div class="kpi"><div class="kn o">¥75,104</div><div class="kl">库存总值</div><div class="ks">已占用资金</div></div>
+<div id="loading" class="loading">
+  <div class="spinner"></div>
+  <p>正在从飞书获取最新库存数据…</p>
+  <p style="font-size:12px;color:#B0B8C4">首次加载约需 5-10 秒，之后会快很多</p>
 </div>
+
+<div id="error" class="error-box" style="display:none">
+  <p>⚠️ 数据加载失败</p>
+  <p style="font-size:13px;color:#8A95A5;margin-bottom:20px" id="errMsg"></p>
+  <button onclick="location.reload()">刷新重试</button>
+</div>
+
+<div id="dashboard" style="display:none">
+
+<div class="kpi-row section-gap" id="kpiRow"></div>
 
 <div class="mid-row section-gap">
   <div class="card">
     <div class="ctitle navy">🏭 各部门库存金额占比</div>
-    <div class="pie-section">
-      <svg class="pie-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-      <path d="M30.5 16.0 A14.5 14.5 0 1 1 8.50 3.59 L10.83 7.44 A10 10 0 1 0 26.00 16.00 Z" fill="#3D4F6F"/>
-      <path d="M8.5 3.6 A14.5 14.5 0 0 1 23.50 3.59 L21.17 7.44 A10 10 0 0 0 10.83 7.44 Z" fill="#5B7FA6"/>
-      <path d="M23.5 3.6 A14.5 14.5 0 0 1 29.83 11.63 L25.53 12.99 A10 10 0 0 0 21.17 7.44 Z" fill="#8BAA9E"/>
-      <path d="M29.8 11.6 A14.5 14.5 0 0 1 30.37 14.06 L25.91 14.67 A10 10 0 0 0 25.53 12.99 Z" fill="#C4883A"/>
-      <path d="M30.4 14.1 A14.5 14.5 0 0 1 30.48 15.22 L25.99 15.46 A10 10 0 0 0 25.91 14.67 Z" fill="#B85C5C"/>
-      <path d="M30.5 15.2 A14.5 14.5 0 0 1 30.50 16.00 L26.00 16.00 A10 10 0 0 0 25.99 15.46 Z" fill="#9B7EB5"/>
-      </svg>
-      <div class="pie-legend">
-        <table>
-          <tr><td><span class="dot" style="background:#3D4F6F"></span>后勤部</td><td class="num">66.3%</td><td class="num">¥49,831</td></tr>
-          <tr><td><span class="dot" style="background:#5B7FA6"></span>棍花&片桶</td><td class="num">17.3%</td><td class="num">¥12,993</td></tr>
-          <tr><td><span class="dot" style="background:#8BAA9E"></span>车钮部</td><td class="num">11.5%</td><td class="num">¥8,620</td></tr>
-          <tr><td><span class="dot" style="background:#C4883A"></span>抛光部</td><td class="num">2.7%</td><td class="num">¥2,060</td></tr>
-          <tr><td><span class="dot" style="background:#B85C5C"></span>片桶</td><td class="num">1.3%</td><td class="num">¥960</td></tr>
-          <tr><td><span class="dot" style="background:#9B7EB5"></span>棍花&环保部</td><td class="num">0.9%</td><td class="num">¥640</td></tr>
-          <tr><td><span class="dot" style="background:#5A9E8F"></span>抛光&片桶</td><td class="num">0.0%</td><td class="num">¥0</td></tr>
-          <tr><td><span class="dot" style="background:#C49A6C"></span>未知</td><td class="num">0.0%</td><td class="num">¥0</td></tr>
-        </table>
-      </div>
-    </div>
+    <div class="pie-section" id="pieSection"></div>
   </div>
   <div class="card">
     <div class="tab-bar">
@@ -122,13 +120,11 @@ body{
       <div class="tab" onclick="swTab(this,'out')">📤 出库</div>
     </div>
     <div id="t-in" class="tab-body">
-      <div style="color:#4A8C6F;font-weight:600;margin-bottom:6px">今日入库 158 品</div>
-      <table><tbody>
-        <tr><td class="name">沽水（促进剂）</td><td style="text-align:right">100 kg</td><td style="color:#8A95A5">05-11</td></tr>
-      </tbody></table>
+      <div style="color:#4A8C6F;font-weight:600;margin-bottom:6px" id="todayInboundLabel">今日入库</div>
+      <table><tbody id="inboundBody"></tbody></table>
     </div>
     <div id="t-out" class="tab-body" style="display:none">
-      <div style="color:#8A95A5;text-align:center;padding:20px 0">暂无出库记录</div>
+      <div id="outboundBody" style="color:#8A95A5;text-align:center;padding:20px 0">暂无出库记录</div>
     </div>
   </div>
 </div>
@@ -137,109 +133,154 @@ body{
   <div class="card">
     <div class="ctitle navy">📦 库存金额 TOP 20</div>
     <div class="tbl-scroll">
-      <table>
-        <thead><tr><th style="width:8%">#</th><th style="width:35%">品名</th><th style="width:20%">部门</th><th class="tr" style="width:17%">库存</th><th class="tr" style="width:20%">金额</th></tr></thead>
-        <tbody>
-        <tr><td class="td-num">1</td><td class="td-name">电加热管</td><td>后勤部</td><td class="tr">501</td><td class="tr">¥25,050</td></tr>
-        <tr><td class="td-num">2</td><td class="td-name">陶瓷保险熔断器</td><td>后勤部</td><td class="tr">22</td><td class="tr">¥22,000</td></tr>
-        <tr><td class="td-num">3</td><td class="td-name">红色系工业颜料</td><td>棍花&片桶</td><td class="tr">7</td><td class="tr">¥7,000</td></tr>
-        <tr><td class="td-num">4</td><td class="td-name">弹性夹头（钮扣）</td><td>车钮部</td><td class="tr">4</td><td class="tr">¥4,000</td></tr>
-        <tr><td class="td-num">5</td><td class="td-name">沽水</td><td>棍花&片桶</td><td class="tr">175</td><td class="tr">¥3,238</td></tr>
-        <tr><td class="td-num">6</td><td class="td-name">颜料黄红 35(偶氮类有机颜料)</td><td>棍花&片桶</td><td class="tr">2</td><td class="tr">¥2,000</td></tr>
-        <tr><td class="td-num">7</td><td class="td-name">控制系统</td><td>抛光部</td><td class="tr">19</td><td class="tr">¥1,900</td></tr>
-        <tr><td class="td-num">8</td><td class="td-name">真空滚揉机高强度
-尼龙托轮配轴承…</td><td>片桶</td><td class="tr">24</td><td class="tr">¥960</td></tr>
-        <tr><td class="td-num">9</td><td class="td-name">圆锯片</td><td>车钮部</td><td class="tr">6</td><td class="tr">¥900</td></tr>
-        <tr><td class="td-num">10</td><td class="td-name">钢针</td><td>车钮部</td><td class="tr">20</td><td class="tr">¥800</td></tr>
-        <tr><td class="td-num">11</td><td class="td-name">下料口机械备件</td><td>车钮部</td><td class="tr">16</td><td class="tr">¥800</td></tr>
-        <tr><td class="td-num">12</td><td class="td-name">热风枪 喷火枪 燃气喷火枪</td><td>后勤部</td><td class="tr">5</td><td class="tr">¥750</td></tr>
-        <tr><td class="td-num">13</td><td class="td-name">水泵</td><td>棍花&环保部</td><td class="tr">11</td><td class="tr">¥550</td></tr>
-        <tr><td class="td-num">14</td><td class="td-name">胶木板</td><td>车钮部</td><td class="tr">9</td><td class="tr">¥450</td></tr>
-        <tr><td class="td-num">15</td><td class="td-name">吹尘枪气管</td><td>后勤部</td><td class="tr">3</td><td class="tr">¥450</td></tr>
-        <tr><td class="td-num">16</td><td class="td-name">淡紫色系工业颜料</td><td>棍花&片桶</td><td class="tr">4</td><td class="tr">¥400</td></tr>
-        <tr><td class="td-num">17</td><td class="td-name">轴承油封</td><td>车钮部</td><td class="tr">512</td><td class="tr">¥358</td></tr>
-        <tr><td class="td-num">18</td><td class="td-name">下总承板&珠茜机</td><td>后勤部</td><td class="tr">8</td><td class="tr">¥320</td></tr>
-        <tr><td class="td-num">19</td><td class="td-name">鱼眼接头关节轴承</td><td>车钮部</td><td class="tr">3</td><td class="tr">¥300</td></tr>
-        <tr><td class="td-num">20</td><td class="td-name">不锈钢球阀</td><td>后勤部</td><td class="tr">3</td><td class="tr">¥300</td></tr>
-        </tbody>
-      </table>
+      <table><thead><tr><th style="width:8%">#</th><th style="width:35%">品名</th><th style="width:20%">部门</th><th class="tr" style="width:17%">库存</th><th class="tr" style="width:20%">金额</th></tr></thead>
+      <tbody id="top20Body"></tbody></table>
     </div>
   </div>
   <div class="card">
-    <div class="ctitle orange">🔔 缺货清单 <span class="cnt o">184 品</span></div>
+    <div class="ctitle orange">🔔 缺货清单 <span class="cnt o" id="reorderCount">0 品</span></div>
     <div class="note">缺货 ≠ 补货 · 高频消耗+缺货 → 立即采购</div>
-    <div class="tbl-scroll" style="max-height:400px;overflow-y:auto;">
-      <table>
-        <thead><tr><th style="width:38%">品名</th><th style="width:28%">部门</th><th style="width:34%">状态</th></tr></thead>
-        <tbody>
-        <tr><td class="td-name">深沟球轴承6000-2RS1/C…</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">砂轮</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">砂轮</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">砂轮</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">钨钢刀（车钮机备件）</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">车钮机导管弹簧</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">轴承油封</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">圆板牙</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">圆板牙</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">压缩弹簧</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">高精密切割钼丝</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">翻边铜套轴承套</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">不锈钢中轴</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">电位器</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">车钮机导管弹簧</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">圆锯片</td><td>车钮部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">真空滚揉机高强度
-尼龙托轮配轴承…</td><td>抛光部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">真空滚揉机高强度
-尼龙托轮配轴承…</td><td>抛光部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">柑色</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">紫色膏</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">白色膏</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">蓝色膏</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">橙色膏</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">黄色膏</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">环保钻水</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">螢光紅色浆</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">珍珠浆</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">橙色色浆</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">蓝色色浆</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">绿色色浆</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">黑色色浆</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">黄3G</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">有机黄色颜料</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">883</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">浓缩水性色浆</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">粉色系颜料</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">FL-2000</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">温色浆（红）</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">绿色系工业颜料</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">黄色系工业颜料</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">高温色浆（品红）</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">黄色系工业颜料</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">高温色浆（紫）</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">蓝色系工业颜料</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">蓝色系工业颜料</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">黑色色浆</td><td>棍花&环保部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">冲刀</td><td>抛光&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">棍花搅拌机油封（ TC 型密封圈…</td><td>棍花&片桶</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">压线钳</td><td>后勤部</td><td><span class="st r">缺货</span></td></tr>
-        <tr><td class="td-name">日光灯启动器</td><td>后勤部</td><td><span class="st r">缺货</span></td></tr>
-        </tbody>
-      </table>
+    <div class="tbl-scroll" style="max-height:420px;overflow-y:auto;">
+      <table><thead><tr><th style="width:38%">品名</th><th style="width:28%">部门</th><th style="width:34%">状态</th></tr></thead>
+      <tbody id="reorderBody"></tbody></table>
     </div>
   </div>
 </div>
 
-<div class="ftr">合盛钮扣厂 · 生产运营司 · 数据来源 飞书多维表格</div>
+<div class="ftr">合盛钮扣厂 · 生产运营司 · 数据来源 飞书多维表格 · 实时模式</div>
+
+</div><!-- end dashboard -->
 </div><!-- end wrap -->
 
 <script>
+function fmt(n){return n.toLocaleString('zh-CN')}
+function esc(s){var d=document.createElement('div');d.appendChild(document.createTextNode(s||''));return d.innerHTML}
+
+var PIE_COLORS=['#3D4F6F','#5B7FA6','#8BAA9E','#C4883A','#B85C5C','#9B7EB5','#5A9E8F','#C49A6C'];
+
+function renderPie(items){
+  var deptMap={},totalVal=0;
+  items.forEach(function(it){
+    var d=it.dept||'未知';
+    if(!deptMap[d])deptMap[d]={count:0,val:0};
+    deptMap[d].count++;deptMap[d].val+=it.cost;totalVal+=it.cost;
+  });
+  var sorted=Object.keys(deptMap).map(function(k){return{name:k,count:deptMap[k].count,val:deptMap[k].val}})
+    .sort(function(a,b){return b.val-a.val}).slice(0,8);
+  var t=totalVal||1;
+  // legend
+  var legend='<table>';
+  sorted.forEach(function(d,i){
+    var p=d.val/t*100;
+    legend+='<tr><td><span class="dot" style="background:'+PIE_COLORS[i%PIE_COLORS.length]+'"></span>'+esc(d.name)+'</td><td class="num">'+p.toFixed(1)+'%</td><td class="num">¥'+fmt(Math.round(d.val))+'</td></tr>';
+  });
+  legend+='</table>';
+  // SVG donut
+  var cx=16,cy=16,ri=10,ro=14.5,angle=0,paths='';
+  sorted.forEach(function(d,i){
+    var pct=d.val/t;
+    var a2=angle+pct*360;
+    if(pct<0.005){angle=a2;return}
+    var rad1=angle*Math.PI/180,rad2=a2*Math.PI/180;
+    var x1o=cx+ro*Math.cos(rad1),y1o=cy+ro*Math.sin(rad1);
+    var x2o=cx+ro*Math.cos(rad2),y2o=cy+ro*Math.sin(rad2);
+    var x1i=cx+ri*Math.cos(rad2),y1i=cy+ri*Math.sin(rad2);
+    var x2i=cx+ri*Math.cos(rad1),y2i=cy+ri*Math.sin(rad1);
+    var large=pct>0.5?1:0;
+    paths+='<path d="M'+x1o.toFixed(1)+' '+y1o.toFixed(1)+' A'+ro+' '+ro+' 0 '+large+' 1 '+x2o.toFixed(2)+' '+y2o.toFixed(2)+' L'+x1i.toFixed(2)+' '+y1i.toFixed(2)+' A'+ri+' '+ri+' 0 '+large+' 0 '+x2i.toFixed(2)+' '+y2i.toFixed(2)+' Z" fill="'+PIE_COLORS[i%PIE_COLORS.length]+'"/>';
+    angle=a2;
+  });
+  var svg='<svg class="pie-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">'+paths+'</svg>';
+  document.getElementById('pieSection').innerHTML=svg+'<div class="pie-legend">'+legend+'</div>';
+}
+
+function renderKPI(items){
+  var total=items.length,inS=0,outS=0,totalVal=0;
+  items.forEach(function(it){
+    if(it.stock>0)inS++;else outS++;
+    totalVal+=it.cost;
+  });
+  var html='<div class="kpi"><div class="kn">'+total+'</div><div class="kl">总 SKU</div><div class="ks">全部物料品类</div></div>'+
+    '<div class="kpi"><div class="kn g">'+inS+'</div><div class="kl">有库存</div><div class="ks">可正常领用</div></div>'+
+    '<div class="kpi"><div class="kn r">'+outS+'</div><div class="kl">无库存</div><div class="ks">当前缺货待补</div></div>'+
+    '<div class="kpi"><div class="kn o">¥'+fmt(Math.round(totalVal))+'</div><div class="kl">库存总值</div><div class="ks">已占用资金</div></div>';
+  document.getElementById('kpiRow').innerHTML=html;
+}
+
+function renderTop20(items){
+  var sorted=items.filter(function(it){return it.cost>0}).sort(function(a,b){return b.cost-a.cost}).slice(0,20);
+  var html='';
+  sorted.forEach(function(it,i){
+    html+='<tr><td class="td-num">'+(i+1)+'</td><td class="td-name">'+esc(it.name)+'</td><td>'+esc(it.dept)+'</td><td class="tr">'+it.stock+'</td><td class="tr">¥'+fmt(it.cost)+'</td></tr>';
+  });
+  document.getElementById('top20Body').innerHTML=html;
+}
+
+function renderReorder(items){
+  var reorder=items.filter(function(it){return it.stock===0&&it.name.length>1});
+  document.getElementById('reorderCount').textContent=reorder.length+' 品';
+  var html='';
+  reorder.forEach(function(it){
+    html+='<tr><td class="td-name">'+esc(it.name)+'</td><td>'+esc(it.dept)+'</td><td><span class="st r">缺货</span></td></tr>';
+  });
+  document.getElementById('reorderBody').innerHTML=html;
+}
+
+function renderInbound(){
+  // 从API获取入库数据
+  fetch('/api/inbound').then(function(r){return r.json()}).then(function(data){
+    var items=data.items||[];
+    var today=new Date().toISOString().slice(0,10);
+    var todayItems=items.filter(function(it){
+      return it.date&&it.date.indexOf(today.slice(2))>=0;
+    });
+    document.getElementById('todayInboundLabel').textContent='📥 入库记录 ('+items.length+' 条)';
+    var html='';
+    items.slice(0,30).forEach(function(it){
+      var d=it.date||'—';
+      var qty=it.qty||0;
+      html+='<tr><td class="name">'+esc(it.name)+'</td><td style="text-align:right;white-space:nowrap">'+qty+'</td><td style="color:#8A95A5;white-space:nowrap">'+esc(d)+'</td></tr>';
+    });
+    document.getElementById('inboundBody').innerHTML=html||'<tr><td style="text-align:center;color:#8A95A5;padding:20px 0" colspan="3">暂无入库记录</td></tr>';
+  }).catch(function(){
+    document.getElementById('inboundBody').innerHTML='<tr><td style="text-align:center;color:#8A95A5;padding:20px 0" colspan="3">入库数据加载失败</td></tr>';
+  });
+}
+
 function swTab(el,tab){
   document.querySelectorAll('.tab').forEach(function(e){e.classList.remove('active')});
   el.classList.add('active');
   document.getElementById('t-in').style.display=tab==='in'?'block':'none';
   document.getElementById('t-out').style.display=tab==='out'?'block':'none';
 }
+
+// ── 主入口 ──
+var startTs=Date.now();
+fetch('/api/inventory',{signal:AbortSignal.timeout(25000)})
+  .then(function(r){
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return r.json();
+  })
+  .then(function(data){
+    var items=data.items||[];
+    var elapsed=((Date.now()-startTs)/1000).toFixed(1);
+    document.getElementById('loading').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    document.getElementById('statusBadge').textContent='✓ '+elapsed+'s';
+    document.getElementById('statusBadge').className='st g';
+    renderKPI(items);
+    renderPie(items);
+    renderTop20(items);
+    renderReorder(items);
+    renderInbound();
+  })
+  .catch(function(err){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('error').style.display='block';
+    document.getElementById('errMsg').textContent=err.message||'网络请求失败，请检查网络后重试';
+    document.getElementById('statusBadge').textContent='✗ 失败';
+    document.getElementById('statusBadge').className='st r';
+  });
 </script>
 </body>
 </html>
