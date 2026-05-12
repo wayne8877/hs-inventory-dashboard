@@ -3,78 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>合盛辅料 HeSheng · 出入库看板</title>
+<title>HeSheng Button · 合盛辅料 运营仪表盘</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#F2F1EE;color:#1C2333;font-size:15px;-webkit-font-smoothing:antialiased;}
-.wrap{max-width:1400px;margin:0 auto;padding:0 20px}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#F2F1EE;color:#1C2333;font-size:15px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1440px;margin:0 auto;padding:0 24px}
 
-/* Header */
-.hdr{background:#fff;position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:14px}
-.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3D4F6F 0%,#5B7FA6 100%);}
-.hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 28px}
-.brand{display:flex;align-items:center;gap:14px}
-.brand-mark{width:38px;height:38px;background:#3D4F6F;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:800;flex-shrink:0}
-.brand-name{font-size:18px;font-weight:800;color:#1A1A2E;letter-spacing:1px}
-.hdr-info{display:flex;align-items:center;gap:20px}
-.hdr-info-item{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
-.hdr-info-label{font-size:10px;color:#8A94A2}
-.hdr-info-value{font-size:15px;font-weight:700;color:#1A1A2E}
-.st{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px}
-.st.g{background:#E8F5E9;color:#2E7D32}
-.st.r{background:#FDECEC;color:#B85C5C}
-.st.o{background:#FEF3E2;color:#C4883A}
+/* ── 国际化抬头 ── */
+.hdr{background:#fff;position:relative;margin-bottom:16px}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#3D4F6F 20%,#D0CFCC 80%)}
+.hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px}
+.hdr-left{display:flex;align-items:center;gap:18px}
+.hdr-logo{width:36px;height:36px;background:linear-gradient(135deg,#3D4F6F,#5B7FA6);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:800;flex-shrink:0}
+.hdr-brand{display:flex;flex-direction:column;gap:1px}
+.hdr-brand-en{font-size:11px;font-weight:600;color:#8A94A2;letter-spacing:2.5px;text-transform:uppercase}
+.hdr-brand-cn{font-size:17px;font-weight:800;color:#1A1A2E;letter-spacing:0.5px}
+.hdr-right{display:flex;align-items:center;gap:24px}
+.hdr-stat{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.hdr-stat-label{font-size:9px;color:#B0B8C4;letter-spacing:1.5px;text-transform:uppercase}
+.hdr-stat-val{font-size:14px;font-weight:700;color:#1A1A2E}
+.st{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
+.st.g{background:#E8F5E9;color:#2E7D32}.st.r{background:#FDECEC;color:#B85C5C}.st.o{background:#FEF3E2;color:#C4883A}
 
-/* Loading */
+/* Loading / Error */
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 0;gap:16px}
-.spinner{width:36px;height:36px;border:3px solid #E4E2DF;border-top-color:#3D4F6F;border-radius:50%;animation:spin 0.8s linear infinite}
+.spinner{width:32px;height:32px;border:3px solid #E4E2DF;border-top-color:#3D4F6F;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading p{color:#8A94A2;font-size:14px}
+.loading p{color:#8A94A2;font-size:13px}
 .error-box{text-align:center;padding:60px 20px;background:#fff;border-radius:12px;margin-top:16px}
-.error-box p{color:#B85C5C;margin-bottom:12px;font-size:15px}
-.error-box button{padding:8px 24px;background:#3D4F6F;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer}
+.error-box p{color:#B85C5C;margin-bottom:12px;font-size:14px}
+.error-box button{padding:8px 24px;background:#3D4F6F;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer}
 
 /* KPI */
 .kpi-row{display:flex;gap:12px;margin-bottom:14px}
 .kpi{flex:1;background:#fff;border-radius:10px;padding:14px 16px;border:1px solid #E4E2DF;min-width:0}
 .kn{font-size:26px;font-weight:700;line-height:1;margin-bottom:2px}
-.kn.g{color:#4A8C6F}.kn.r{color:#B85C5C}.kn.o{color:#C4883A}
-.kl{font-size:12px;font-weight:500;color:#1C2333}
-.ks{font-size:10px;color:#8A95A5}
+.kn.g{color:#4A8C6F}.kn.r{color:#B85C5C}.kn.o{color:#C4883A}.kn.n{color:#3D4F6F}
+.kl{font-size:12px;font-weight:500;color:#1C2333}.ks{font-size:10px;color:#8A95A5}
 
-/* 大表区域 */
-.section{background:#fff;border-radius:10px;border:1px solid #E4E2DF;margin-bottom:14px;overflow:hidden}
-.section-title{font-size:15px;font-weight:700;padding:12px 16px;border-bottom:2px solid #E8E7E3;display:flex;align-items:center;gap:8px}
-.section-title .badge{font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px;margin-left:4px}
-.badge.b{background:#E8F0FE;color:#3D4F6F}
-.badge.r{background:#FDECEC;color:#B85C5C}
-.badge.o{background:#FEF3E2;color:#C4883A}
+/* 数据盘（中间行） */
+.mid-row{display:grid;grid-template-columns:1fr 280px;gap:14px;margin-bottom:14px;align-items:stretch}
+.card{background:#fff;border-radius:10px;border:1px solid #E4E2DF;overflow:hidden}
+.card-title{font-size:13px;font-weight:700;padding:10px 14px;border-bottom:2px solid #E8E7E3;display:flex;align-items:center;gap:6px}
+.pie-inner{display:flex;gap:14px;align-items:center;padding:10px 14px}
+.pie-svg{flex-shrink:0;width:180px;height:180px}
+.pie-legend{flex:1}
+.pie-legend table{width:100%;border-collapse:collapse;font-size:12px}
+.pie-legend td{padding:2px 4px;vertical-align:middle}
+.pie-legend td.num{text-align:right;color:#555E6D}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.order-list{padding:10px 14px;font-size:13px}
+.order-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #F0EFEC}
+.order-item:last-child{border:none}
+.order-label{color:#555E6D}.order-val{font-weight:600;color:#1C2333}
 
-.tbl-wrap{overflow-x:auto}
+/* 出入库左右并排 */
+.inout-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;align-items:stretch}
+.tbl-scroll{overflow-x:auto;max-height:340px;overflow-y:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-thead th{text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:#555E6D;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #E8E7E3;position:sticky;top:0;background:#fff;white-space:nowrap}
+thead th{text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#555E6D;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #E8E7E3;position:sticky;top:0;background:#fff;white-space:nowrap}
 thead th.tr{text-align:right}
-tbody td{padding:7px 12px;border-bottom:1px solid #F0EFEC;vertical-align:middle}
-tbody td.tr{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody td{padding:6px 10px;border-bottom:1px solid #F0EFEC;vertical-align:middle}
+tbody td.tr{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 tbody tr:hover{background:#F8F7F5}
-.td-dept{font-size:11px;color:#8A95A5}
-.td-date{color:#8A95A5;white-space:nowrap;font-size:12px}
-.empty-row td{text-align:center;color:#B0B8C4;padding:30px 0;font-size:14px}
+.td-dept{font-size:11px;color:#8A95A5}.td-date{color:#8A95A5;font-size:11px;white-space:nowrap}
+.badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:8px;margin-left:4px}
+.badge.b{background:#E8F0FE;color:#3D4F6F}.badge.r{background:#FDECEC;color:#B85C5C}.badge.o{background:#FEF3E2;color:#C4883A}
+.empty-row td{text-align:center;color:#B0B8C4;padding:24px 0;font-size:13px}
 
-/* 底部两列 */
-.bot-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-bottom:24px;align-items:stretch}
-.bot-row .section{margin-bottom:0}
-.ftr{text-align:center;padding:8px 0 20px;font-size:11px;color:#8A95A5}
+/* 底部行 */
+.bot-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-bottom:20px;align-items:stretch}
+.bot-row .card{margin-bottom:0}
+.ftr{text-align:center;padding:6px 0 18px;font-size:10px;color:#B0B8C4;letter-spacing:1px}
 </style>
 </head>
 <body>
 <div class="hdr"><div class="hdr-inner">
-  <div class="brand">
-    <div class="brand-mark">HS</div>
-    <div class="brand-name">合盛辅料 · 出入库看板</div>
+  <div class="hdr-left">
+    <div class="hdr-logo">HS</div>
+    <div class="hdr-brand">
+      <div class="hdr-brand-en">HeSheng Button Co.</div>
+      <div class="hdr-brand-cn">合盛辅料</div>
+    </div>
   </div>
-  <div class="hdr-info">
-    <div class="hdr-info-item"><div class="hdr-info-label">Status</div><div class="hdr-info-value"><span id="statusBadge" class="st o">加载中</span></div></div>
+  <div class="hdr-right">
+    <div class="hdr-stat"><div class="hdr-stat-label">Status</div><div class="hdr-stat-val"><span id="statusBadge" class="st o">SYNC</span></div></div>
+    <div class="hdr-stat"><div class="hdr-stat-label">Updated</div><div class="hdr-stat-val" id="updateTime">—</div></div>
+    <div class="hdr-stat"><div class="hdr-stat-label">Source</div><div class="hdr-stat-val" style="font-size:11px;font-weight:500;color:#8A94A2">Feishu API</div></div>
   </div>
 </div></div>
 
@@ -82,53 +97,69 @@ tbody tr:hover{background:#F8F7F5}
 
 <div id="loading" class="loading">
   <div class="spinner"></div>
-  <p>正在加载最新数据…</p>
-  <p style="font-size:12px;color:#B0B8C4">首次加载约需 5-10 秒</p>
+  <p>Loading inventory data…</p>
+  <p style="font-size:11px;color:#B0B8C4">首次加载约需 5-10 秒</p>
 </div>
 
 <div id="error" class="error-box" style="display:none">
   <p>⚠️ 数据加载失败</p>
-  <p style="font-size:13px;color:#8A95A5;margin-bottom:16px" id="errMsg"></p>
-  <button onclick="location.reload()">刷新重试</button>
+  <p id="errMsg" style="font-size:12px;color:#8A95A5;margin-bottom:14px"></p>
+  <button onclick="location.reload()">重新加载</button>
 </div>
 
 <div id="dashboard" style="display:none">
 
+<!-- KPI -->
 <div class="kpi-row" id="kpiRow"></div>
 
-<div class="section">
-  <div class="section-title">📥 入库明细 <span class="badge b" id="inboundCount">0 条</span></div>
-  <div class="tbl-wrap" style="max-height:420px;overflow-y:auto">
-    <table>
-      <thead><tr><th style="width:30%">品名</th><th style="width:20%">规格</th><th class="tr" style="width:12%">数量</th><th style="width:16%">部门</th><th style="width:12%">日期</th></tr></thead>
-      <tbody id="inboundBody"></tbody>
-    </table>
+<!-- 数据盘：部门占比 + 订单状态 -->
+<div class="mid-row">
+  <div class="card">
+    <div class="card-title">🏭 各部门库存占比</div>
+    <div class="pie-inner" id="pieSection"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 订单总览</div>
+    <div class="order-list" id="orderSummary"></div>
   </div>
 </div>
 
-<div class="section">
-  <div class="section-title">📤 出库明细 <span class="badge r" id="outboundCount">0 条</span></div>
-  <div class="tbl-wrap" style="max-height:280px;overflow-y:auto">
-    <table>
-      <thead><tr><th style="width:30%">品名</th><th style="width:20%">规格</th><th class="tr" style="width:12%">数量</th><th style="width:16%">部门</th><th style="width:12%">日期</th></tr></thead>
-      <tbody id="outboundBody"></tbody>
-    </table>
+<!-- 出入库左右并排 -->
+<div class="inout-row">
+  <div class="card">
+    <div class="card-title">📥 入库明细 <span class="badge b" id="inboundCount">0</span></div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th style="width:30%">品名</th><th class="tr" style="width:12%">数量</th><th style="width:14%">部门</th><th style="width:12%">日期</th></tr></thead>
+        <tbody id="inboundBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📤 出库明细 <span class="badge r" id="outboundCount">0</span></div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th style="width:30%">品名</th><th class="tr" style="width:12%">数量</th><th style="width:14%">部门</th><th style="width:12%">日期</th></tr></thead>
+        <tbody id="outboundBody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
+<!-- 底部：TOP20 + 缺货 -->
 <div class="bot-row">
-  <div class="section">
-    <div class="section-title">📦 库存金额 TOP20</div>
-    <div class="tbl-wrap" style="max-height:360px;overflow-y:auto">
+  <div class="card">
+    <div class="card-title">📦 库存金额 TOP20</div>
+    <div class="tbl-scroll" style="max-height:340px">
       <table>
         <thead><tr><th style="width:6%">#</th><th style="width:32%">品名</th><th style="width:18%">部门</th><th class="tr" style="width:14%">库存</th><th class="tr" style="width:18%">金额</th></tr></thead>
         <tbody id="top20Body"></tbody>
       </table>
     </div>
   </div>
-  <div class="section">
-    <div class="section-title">🔔 缺货清单 <span class="badge o" id="reorderCount">0 品</span></div>
-    <div class="tbl-wrap" style="max-height:360px;overflow-y:auto">
+  <div class="card">
+    <div class="card-title">🔔 缺货清单 <span class="badge o" id="reorderCount">0</span></div>
+    <div class="tbl-scroll" style="max-height:340px">
       <table>
         <thead><tr><th style="width:55%">品名</th><th style="width:30%">部门</th><th style="width:15%">状态</th></tr></thead>
         <tbody id="reorderBody"></tbody>
@@ -137,35 +168,75 @@ tbody tr:hover{background:#F8F7F5}
   </div>
 </div>
 
-<div class="ftr">合盛钮扣厂 · 数据来源 飞书多维表格 · 实时模式</div>
+<div class="ftr">HE SHENG BUTTON CO. · 生产运营司 · POWERED BY FEISHU API</div>
 </div>
 </div>
 
 <script>
+var PIE_C=['#3D4F6F','#5B7FA6','#8BAA9E','#C4883A','#B85C5C','#9B7EB5','#5A9E8F','#C49A6C'];
+
 function fmt(n){return n.toLocaleString('zh-CN')}
 function esc(s){var d=document.createElement('div');d.appendChild(document.createTextNode(s||''));return d.innerHTML}
 function fmtDate(v){
   if(!v&&v!==0)return '—';
-  if(typeof v==='number'){var d=new Date(v);return (d.getMonth()+1)+'月'+d.getDate()+'日';}
+  if(typeof v==='number'){var d=new Date(v);return (d.getMonth()+1)+'/'+d.getDate();}
   return String(v);
 }
 
 var startTs=Date.now();
 
-// ── 1. 库存数据（KPI + TOP20 + 缺货） ──
+// ── 库存数据 ──
 fetch('/api/inventory',{signal:AbortSignal.timeout(25000)})
   .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
   .then(function(data){
     var items=data.items||[];
     var total=items.length,inS=0,outS=0,totalVal=0;
     items.forEach(function(it){if(it.stock>0)inS++;else outS++;totalVal+=it.cost});
+    totalVal=Math.round(totalVal);
+
+    // 更新时间
+    var now=new Date();
+    document.getElementById('updateTime').textContent=(now.getMonth()+1)+'/'+now.getDate()+' '+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
 
     // KPI
     document.getElementById('kpiRow').innerHTML=
-      '<div class="kpi"><div class="kn">'+total+'</div><div class="kl">总 SKU</div><div class="ks">全部物料</div></div>'+
-      '<div class="kpi"><div class="kn g">'+inS+'</div><div class="kl">有库存</div><div class="ks">可领用</div></div>'+
-      '<div class="kpi"><div class="kn r">'+outS+'</div><div class="kl">缺货</div><div class="ks">待补货</div></div>'+
-      '<div class="kpi"><div class="kn o">¥'+fmt(Math.round(totalVal))+'</div><div class="kl">库存总值</div><div class="ks">已占用资金</div></div>';
+      '<div class="kpi"><div class="kn n">'+total+'</div><div class="kl">总 SKU</div><div class="ks">Total SKUs</div></div>'+
+      '<div class="kpi"><div class="kn g">'+inS+'</div><div class="kl">有库存</div><div class="ks">In Stock</div></div>'+
+      '<div class="kpi"><div class="kn r">'+outS+'</div><div class="kl">缺货</div><div class="ks">Out of Stock</div></div>'+
+      '<div class="kpi"><div class="kn o">¥'+fmt(totalVal)+'</div><div class="kl">库存总值</div><div class="ks">Total Value</div></div>'+
+      '<div class="kpi"><div class="kn n">—</div><div class="kl">本月订单</div><div class="ks">Monthly Orders</div></div>'+
+      '<div class="kpi"><div class="kn r">—</div><div class="kl">未回款</div><div class="ks">Outstanding</div></div>';
+
+    // 饼图
+    var deptMap={},tv=0;
+    items.forEach(function(it){var d=it.dept||'未知';if(!deptMap[d])deptMap[d]={c:0,v:0};deptMap[d].c++;deptMap[d].v+=it.cost;tv+=it.cost});
+    var sorted=Object.keys(deptMap).map(function(k){return{n:k,c:deptMap[k].c,v:deptMap[k].v}}).sort(function(a,b){return b.v-a.v}).slice(0,8);
+    var t=tv||1,legend='<table>';
+    sorted.forEach(function(d,i){
+      var p=d.v/t*100;
+      legend+='<tr><td><span class="dot" style="background:'+PIE_C[i%PIE_C.length]+'"></span>'+esc(d.n)+'</td><td class="num">'+p.toFixed(1)+'%</td><td class="num">¥'+fmt(Math.round(d.v))+'</td></tr>';
+    });
+    legend+='</table>';
+    var cx=16,cy=16,ri=10,ro=14.5,angle=0,paths='';
+    sorted.forEach(function(d,i){
+      var pct=d.v/t,a2=angle+pct*360;
+      if(pct<0.005){angle=a2;return}
+      var r1=angle*Math.PI/180,r2=a2*Math.PI/180;
+      var x1o=cx+ro*Math.cos(r1),y1o=cy+ro*Math.sin(r1);
+      var x2o=cx+ro*Math.cos(r2),y2o=cy+ro*Math.sin(r2);
+      var x1i=cx+ri*Math.cos(r2),y1i=cy+ri*Math.sin(r2);
+      var x2i=cx+ri*Math.cos(r1),y2i=cy+ri*Math.sin(r1);
+      paths+='<path d="M'+x1o.toFixed(1)+' '+y1o.toFixed(1)+' A'+ro+' '+ro+' 0 '+(pct>0.5?1:0)+' 1 '+x2o.toFixed(2)+' '+y2o.toFixed(2)+' L'+x1i.toFixed(2)+' '+y1i.toFixed(2)+' A'+ri+' '+ri+' 0 '+(pct>0.5?1:0)+' 0 '+x2i.toFixed(2)+' '+y2i.toFixed(2)+' Z" fill="'+PIE_C[i%PIE_C.length]+'"/>';
+      angle=a2;
+    });
+    document.getElementById('pieSection').innerHTML='<svg class="pie-svg" viewBox="0 0 32 32">'+paths+'</svg><div class="pie-legend">'+legend+'</div>';
+
+    // 订单总览（placeholder）
+    document.getElementById('orderSummary').innerHTML=
+      '<div class="order-item"><span class="order-label">待处理</span><span class="order-val">— 笔</span></div>'+
+      '<div class="order-item"><span class="order-label">处理中</span><span class="order-val">— 笔</span></div>'+
+      '<div class="order-item"><span class="order-label">已完成</span><span class="order-val">— 笔</span></div>'+
+      '<div class="order-item"><span class="order-label">未回款</span><span class="order-val" style="color:#B85C5C">—</span></div>';
 
     // TOP20
     var top20=items.filter(function(it){return it.cost>0}).sort(function(a,b){return b.cost-a.cost}).slice(0,20);
@@ -173,16 +244,16 @@ fetch('/api/inventory',{signal:AbortSignal.timeout(25000)})
     top20.forEach(function(it,i){h+='<tr><td class="td-dept">'+(i+1)+'</td><td>'+esc(it.name)+'</td><td class="td-dept">'+esc(it.dept)+'</td><td class="tr">'+it.stock+'</td><td class="tr">¥'+fmt(it.cost)+'</td></tr>'});
     document.getElementById('top20Body').innerHTML=h;
 
-    // 缺货清单（20条）
+    // 缺货
     var reorder=items.filter(function(it){return it.stock===0&&it.name.length>1});
-    document.getElementById('reorderCount').textContent=reorder.length+' 品';
+    document.getElementById('reorderCount').textContent=reorder.length;
     h='';
     reorder.slice(0,20).forEach(function(it){h+='<tr><td>'+esc(it.name)+'</td><td class="td-dept">'+esc(it.dept)+'</td><td><span class="st r">缺货</span></td></tr>'});
     document.getElementById('reorderBody').innerHTML=h;
 
     // 状态
-    var elapsed=((Date.now()-startTs)/1000).toFixed(1);
-    document.getElementById('statusBadge').textContent='✓ '+elapsed+'s';
+    var sec=((Date.now()-startTs)/1000).toFixed(1);
+    document.getElementById('statusBadge').textContent=sec+'s';
     document.getElementById('statusBadge').className='st g';
     document.getElementById('loading').style.display='none';
     document.getElementById('dashboard').style.display='block';
@@ -191,49 +262,32 @@ fetch('/api/inventory',{signal:AbortSignal.timeout(25000)})
     document.getElementById('loading').style.display='none';
     document.getElementById('error').style.display='block';
     document.getElementById('errMsg').textContent=err.message||'网络请求失败';
-    document.getElementById('statusBadge').textContent='✗ 失败';
+    document.getElementById('statusBadge').textContent='ERR';
     document.getElementById('statusBadge').className='st r';
   });
 
-// ── 2. 入库明细 ──
+// ── 入库 ──
 fetch('/api/inbound',{signal:AbortSignal.timeout(20000)})
-  .then(function(r){return r.json()})
-  .then(function(data){
+  .then(function(r){return r.json()}).then(function(data){
     var items=data.items||[];
-    document.getElementById('inboundCount').textContent=items.length+' 条';
-    // 按日期降序，无日期的排最后
-    items.sort(function(a,b){
-      var da=a.date||0,db=b.date||0;
-      if(da&&!db)return -1;if(!da&&db)return 1;
-      return db-da;
-    });
+    document.getElementById('inboundCount').textContent=items.length;
+    items.sort(function(a,b){var da=a.date||0,db=b.date||0;if(da&&!db)return -1;if(!da&&db)return 1;return db-da});
     var h='';
-    items.forEach(function(it){
-      h+='<tr><td>'+esc(it.name)+'</td><td style="color:#8A95A5;font-size:12px">'+esc(it.spec||'—')+'</td><td class="tr">'+it.qty+'</td><td class="td-dept">'+esc(it.dept||'—')+'</td><td class="td-date">'+fmtDate(it.date)+'</td></tr>';
-    });
-    if(!items.length)h='<tr class="empty-row"><td colspan="5">暂无入库记录</td></tr>';
+    items.slice(0,100).forEach(function(it){h+='<tr><td>'+esc(it.name)+'</td><td class="tr">'+it.qty+'</td><td class="td-dept">'+esc(it.dept||'—')+'</td><td class="td-date">'+fmtDate(it.date)+'</td></tr>'});
+    if(!items.length)h='<tr class="empty-row"><td colspan="4">暂无入库记录</td></tr>';
     document.getElementById('inboundBody').innerHTML=h;
-  })
-  .catch(function(){
-    document.getElementById('inboundBody').innerHTML='<tr class="empty-row"><td colspan="5">入库数据加载失败</td></tr>';
-  });
+  }).catch(function(){document.getElementById('inboundBody').innerHTML='<tr class="empty-row"><td colspan="4">加载失败</td></tr>'});
 
-// ── 3. 出库明细 ──
+// ── 出库 ──
 fetch('/api/outbound',{signal:AbortSignal.timeout(20000)})
-  .then(function(r){return r.json()})
-  .then(function(data){
+  .then(function(r){return r.json()}).then(function(data){
     var items=data.items||[];
-    document.getElementById('outboundCount').textContent=items.length+' 条';
+    document.getElementById('outboundCount').textContent=items.length;
     var h='';
-    items.forEach(function(it){
-      h+='<tr><td>'+esc(it.name||'—')+'</td><td style="color:#8A95A5;font-size:12px">'+esc(it.spec||'—')+'</td><td class="tr">'+(it.qty||0)+'</td><td class="td-dept">'+esc(it.dept||'—')+'</td><td class="td-date">'+fmtDate(it.date)+'</td></tr>';
-    });
-    if(!items.length)h='<tr class="empty-row"><td colspan="5">暂无出库记录</td></tr>';
+    items.forEach(function(it){h+='<tr><td>'+esc(it.name||'—')+'</td><td class="tr">'+(it.qty||0)+'</td><td class="td-dept">'+esc(it.dept||'—')+'</td><td class="td-date">'+fmtDate(it.date)+'</td></tr>'});
+    if(!items.length)h='<tr class="empty-row"><td colspan="4">暂无出库记录</td></tr>';
     document.getElementById('outboundBody').innerHTML=h;
-  })
-  .catch(function(){
-    document.getElementById('outboundBody').innerHTML='<tr class="empty-row"><td colspan="5">出库数据加载失败</td></tr>';
-  });
+  }).catch(function(){document.getElementById('outboundBody').innerHTML='<tr class="empty-row"><td colspan="4">加载失败</td></tr>'});
 </script>
 </body>
 </html>
