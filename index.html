@@ -98,6 +98,80 @@ body{
 .o-order-table th.tr{text-align:right;}
 .o-order-table td{padding:5px 8px;border-bottom:1px solid #F5F3F0;vertical-align:middle;}
 .o-order-table td.tr{text-align:right;font-variant-numeric:tabular-nums;}
+/* ── 手机端适配 ── */
+@media(max-width:768px){
+  body{font-size:14px}
+  .wrap{padding:0 10px}
+  .hdr-inner{flex-direction:column;gap:10px;padding:14px 16px;align-items:flex-start}
+  .hdr-info{gap:16px;width:100%;justify-content:flex-start}
+  .hdr-info-value{font-size:14px}
+  .hdr-divider{display:none}
+  .brand-name{font-size:17px}
+  .brand-mark{width:34px;height:34px;font-size:18px}
+  .kpi-row{flex-wrap:wrap;gap:8px;padding:12px 0}
+  .kpi-row .kpi{flex:1 1 calc(50% - 4px);min-width:0;padding:12px 14px}
+  .kn{font-size:22px}
+  .mid-row{grid-template-columns:1fr;gap:10px;padding:0 0 10px}
+  .two-row{grid-template-columns:1fr;gap:10px;padding:0 0 16px}
+  .pie-section{flex-direction:column;align-items:center;padding:10px}
+  .pie-svg{width:160px;height:160px}
+  .o-kpi-row{flex-wrap:wrap;gap:6px;padding:12px 14px}
+  .okpi{flex:1 1 calc(50% - 3px);min-width:0;padding:10px 12px;gap:8px}
+  .okpi-icon{width:34px;height:34px;font-size:16px;border-radius:7px}
+  .okpi-num{font-size:20px}
+  .okpi-sub{display:none}
+  .okpi:nth-child(5){flex:1 1 100%}
+  .o-grid{grid-template-columns:1fr}
+  .o-pipeline{border-right:none;border-bottom:1px solid #F0EFEC;padding:14px 14px}
+  .o-clients{padding:14px 14px}
+  .o-active-orders{padding:0 14px 14px}
+  .o-header{padding:14px 14px}
+  .o-updated{display:none}
+  .o-title{font-size:15px}
+  .o-pipe-row{flex-wrap:wrap;gap:4px}
+  .o-pipe-row > div{flex:1 1 calc(25% - 3px)!important;min-width:60px}
+  .o-order-scroll{max-height:240px}
+  .o-order-table{font-size:11px}
+  .o-order-table th{font-size:9px;padding:4px 5px}
+  .o-order-table td{padding:3px 5px}
+  .tab{font-size:13px}
+  .tab-body{font-size:12px;max-height:200px}
+  .tbl-scroll table{font-size:12px}
+  .tbl-scroll th{font-size:10px;padding:6px 8px}
+  .ctitle{font-size:13px;padding:10px 14px}
+  .note{font-size:10px;padding:4px 12px}
+  .ftr{font-size:10px;padding:12px 0 20px}
+  .td-name{max-width:120px!important}
+}
+@media(max-width:480px){
+  .wrap{padding:0 6px}
+  .hdr-inner{padding:12px 12px}
+  .brand-mark{width:30px;height:30px;font-size:15px;border-radius:7px}
+  .brand-name{font-size:16px;letter-spacing:0}
+  .brand-en{display:none}
+  .hdr-info-value{font-size:12px}
+  .hdr-info-label{font-size:9px}
+  .kpi-row .kpi{flex:1 1 100%;padding:10px 12px}
+  .kn{font-size:20px}
+  .kl{font-size:12px}
+  .ks{font-size:10px}
+  .okpi{flex:1 1 calc(50% - 3px);padding:8px 10px;gap:6px}
+  .okpi-icon{width:28px;height:28px;font-size:14px;border-radius:6px}
+  .okpi-num{font-size:18px}
+  .okpi-label{font-size:10px}
+  .o-pipe-row > div{flex:1 1 calc(50% - 2px)!important;min-width:0}
+  .o-pipe-legend{font-size:9px;letter-spacing:1px}
+  .pie-svg{width:130px;height:130px}
+  .pie-legend table{font-size:11px}
+  .o-section{border-radius:10px}
+  .card{border-radius:10px}
+  .kpi{border-radius:10px}
+  .okpi{border-radius:8px}
+  .tbl-scroll table{font-size:11px}
+  .tbl-scroll th{font-size:9px;padding:4px 6px}
+  .tbl-scroll td{padding:4px 6px}
+  .tab{font-size:12px;padding:8px 0}
+}
 </style>
 </head>
 <body>
@@ -107,7 +181,7 @@ body{
     <div><div class="brand-name">合盛辅料</div><div class="brand-en">HeSheng Button</div></div>
   </div>
   <div class="hdr-info">
-    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-05-13 13:17</div></div>
+    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-05-13 13:21</div></div>
     <div class="hdr-divider"></div>
     <div class="hdr-info-item"><div class="hdr-info-label">Source</div><div class="hdr-info-value">Feishu Bitable</div></div>
   </div>
@@ -118,7 +192,7 @@ body{
 <div class="o-section">
   <div class="o-header">
     <div class="o-title">📋 订单追踪</div>
-    <div class="o-updated">更新于 2026-05-13 13:17</div>
+    <div class="o-updated">更新于 2026-05-13 13:21</div>
   </div>
   <div class="o-kpi-row"><div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">33</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">今日+0</div></div>
 <div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num">5G</div><div class="okpi-label">订单总量</div></div><div class="okpi-sub">≈720颗</div></div>
