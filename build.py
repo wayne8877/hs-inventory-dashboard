@@ -31,7 +31,7 @@ def fetch_all(base, table):
         if data.get("code") != 0:
             print(f"API错误: {data.get('msg','')}")
             break
-        records.extend(data["data"]["items"])
+        records.extend(data.get("data", {}).get("items", []))
         if not data["data"].get("has_more"): break
         pt = data["data"]["page_token"]
     return records
@@ -55,7 +55,10 @@ def short(s, n=18):
 # ── 1. 拉数据 ──
 print("拉取数据...")
 items = fetch_all(OPS_BASE, MASTER_TBL)
-print(f"共 {len(items)} 条")
+inbound_recs = fetch_all(OPS_BASE, INBOUND_TBL)
+OUTBOUND_TBL = "tblxF2VdPfO3Ma3V"
+outbound_recs = fetch_all(OPS_BASE, OUTBOUND_TBL)
+print(f"台账 {len(items)} 条, 入库 {len(inbound_recs)} 条, 出库 {len(outbound_recs)} 条")
 
 records = []
 for r in items:
@@ -80,6 +83,37 @@ for r in records:
     dept_data[d]["count"] += 1
     dept_data[d]["val"] += r["cost"]
     dept_data[d]["items"].append(r)
+
+# 出入库处理
+in_rows = []
+for r in inbound_recs:
+    f = r.get("fields", {})
+    name = safe_str(f.get("货品名称", ""))
+    if not name: continue
+    qty = safe_num(f.get("入库数量", 0))
+    dept = safe_str(f.get("部门", ""))
+    dt = f.get("入库日期")
+    date_str = ""
+    if dt and isinstance(dt, (int, float)):
+        d = datetime.datetime.fromtimestamp(dt / 1000)
+        date_str = f"{d.month:02d}-{d.day:02d}"
+    in_rows.append({"name": name, "qty": qty, "dept": dept, "date": date_str})
+in_rows.sort(key=lambda r: r["date"], reverse=True)
+
+out_rows = []
+for r in outbound_recs:
+    f = r.get("fields", {})
+    name = safe_str(f.get("货品名称", ""))
+    if not name: continue
+    qty = safe_num(f.get("出库数量", 0))
+    dept = safe_str(f.get("部门", ""))
+    dt = f.get("出库日期")
+    date_str = ""
+    if dt and isinstance(dt, (int, float)):
+        d = datetime.datetime.fromtimestamp(dt / 1000)
+        date_str = f"{d.month:02d}-{d.day:02d}"
+    out_rows.append({"name": name, "qty": qty, "dept": dept, "date": date_str})
+out_rows.sort(key=lambda r: r["date"], reverse=True)
 
 dept_sorted = sorted(dept_data.items(), key=lambda x: x[1]["val"], reverse=True)
 
@@ -261,6 +295,26 @@ for i, r in enumerate(top20, 1):
 reorder_rows = ""
 for r in reorder[:50]:
     reorder_rows += f"""        <tr><td class="td-name">{short(r['name'], 16)}</td><td>{r['dept']}</td><td><span class="st r">缺货</span></td></tr>\n"""
+
+# 入库行
+inbound_body = ""
+if in_rows:
+    inbound_body = '<table><thead><tr><th>品名</th><th>数量</th><th>部门</th><th>日期</th></tr></thead><tbody>\n'
+    for r in in_rows[:50]:
+        inbound_body += f"""        <tr><td class="name">{short(r['name'], 22)}</td><td style="text-align:right">{int(r['qty'])}</td><td>{r['dept']}</td><td style="color:#8A95A5">{r['date']}</td></tr>\n"""
+    inbound_body += '</tbody></table>'
+else:
+    inbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无入库记录</div>'
+
+# 出库行
+outbound_body = ""
+if out_rows:
+    outbound_body = '<table><thead><tr><th>品名</th><th>数量</th><th>部门</th><th>日期</th></tr></thead><tbody>\n'
+    for r in out_rows[:50]:
+        outbound_body += f"""        <tr><td class="name">{short(r['name'], 22)}</td><td style="text-align:right">{int(r['qty'])}</td><td>{r['dept']}</td><td style="color:#8A95A5">{r['date']}</td></tr>\n"""
+    outbound_body += '</tbody></table>'
+else:
+    outbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无出库记录</div>'
 
 # 饼图 - 部门金额占比（纯SVG donut）
 pie_data = [(d, info) for d, info in dept_sorted[:8]]
@@ -566,13 +620,11 @@ body{{
       <div class="tab" onclick="swTab(this,'out')">出库</div>
     </div>
     <div id="t-in" class="tab-body">
-      <div style="color:#4A8C6F;font-weight:600;margin-bottom:6px">今日入库 {in_stock} 品</div>
-      <table><tbody>
-        <tr><td class="name">沽水（促进剂）</td><td style="text-align:right">100 kg</td><td style="color:#8A95A5">05-11</td></tr>
-      </tbody></table>
+      <div style="color:#4A8C6F;font-weight:600;margin-bottom:6px">入库记录 {len(in_rows)} 条</div>
+{inbound_body}
     </div>
     <div id="t-out" class="tab-body" style="display:none">
-      <div style="color:#8A95A5;text-align:center;padding:20px 0">暂无出库记录</div>
+{outbound_body}
     </div>
   </div>
 </div>

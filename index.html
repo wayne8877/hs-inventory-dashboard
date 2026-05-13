@@ -40,11 +40,17 @@ body{
 .cnt{font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px}
 .cnt.o{background:#FEF3E2;color:#C4883A}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}
-.ftr{text-align:center;padding:16px 0 24px;font-size:11px;color:#8A95A5;}
+.mid-row{display:grid;grid-template-columns:1fr 340px;gap:14px;padding:0 0 14px;align-items:start;}
+.pie-section{display:flex;gap:16px;align-items:center;padding:12px 16px;}
+.pie-svg{flex-shrink:0;width:200px;height:200px;}
+.pie-legend{flex:1;}
+.pie-legend table{width:100%;border-collapse:collapse;font-size:13px;}
+.pie-legend td{padding:3px 4px;vertical-align:middle;}
+.pie-legend td.num{text-align:right;font-variant-numeric:tabular-nums;color:#555E6D;}
 .tab-bar{display:flex;border-bottom:2px solid #E8E7E3;}
 .tab{flex:1;padding:10px 0;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:#8A94A2;transition:all 0.15s;}
 .tab.active{color:#3D4F6F;border-bottom:2px solid #3D4F6F;margin-bottom:-2px;}
-.tab-body{padding:10px 14px;font-size:13px;overflow-y:auto;}
+.tab-body{padding:10px 14px;font-size:13px;max-height:170px;overflow-y:auto;}
 .tab-body table{width:100%;border-collapse:collapse;font-size:13px;}
 .tab-body td{padding:4px 6px;border-bottom:1px solid #F0EFEC;}
 .tab-body td.name{white-space:nowrap;}
@@ -61,15 +67,7 @@ body{
 .st{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;}
 .st.r{background:#FDECEC;color:#B85C5C;}
 .ftr{text-align:center;padding:16px 0 24px;font-size:11px;color:#8A95A5;}
-.tab-bar{display:flex;border-bottom:2px solid #E8E7E3;}
-.tab{flex:1;padding:10px 0;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:#8A94A2;transition:all 0.15s;}
-.tab.active{color:#3D4F6F;border-bottom:2px solid #3D4F6F;margin-bottom:-2px;}
-.tab-body{padding:10px 14px;font-size:13px;overflow-y:auto;}
-.tab-body table{width:100%;border-collapse:collapse;font-size:13px;}
-.tab-body td{padding:4px 6px;border-bottom:1px solid #F0EFEC;}
-.tab-body td.name{white-space:nowrap;}
-.note{font-size:11px;color:#8A95A5;padding:6px 16px 0;}
-.two-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 0 24px;align-items:start;}
+/* ── 订单追踪专属样式 ── */
 .o-section{background:#fff;border-radius:14px;border:1px solid #E4E2DF;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.04);}
 .o-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #F0EFEC;background:linear-gradient(135deg,#FAFBFC 0%,#F5F3F0 100%);}
 .o-title{font-size:17px;font-weight:700;color:#1A1A2E;letter-spacing:0.5px;}
@@ -191,7 +189,7 @@ body{
     <div><div class="brand-name">合盛辅料</div><div class="brand-en">HeSheng Button</div></div>
   </div>
   <div class="hdr-info">
-    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-05-13 15:00</div></div>
+    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-05-13 15:27</div></div>
     <div class="hdr-divider"></div>
     <div class="hdr-info-item"><div class="hdr-info-label">Source</div><div class="hdr-info-value">Feishu Bitable</div></div>
   </div>
@@ -202,7 +200,7 @@ body{
 <div class="o-section">
   <div class="o-header">
     <div class="o-title">📋 订单追踪</div>
-    <div class="o-updated">更新于 2026-05-13 15:00</div>
+    <div class="o-updated">更新于 2026-05-13 15:27</div>
   </div>
   <div class="o-kpi-row"><div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">34</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">本月4单</div></div>
 <div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num">752G</div><div class="okpi-label">订单总量 </div></div><div class="okpi-sub">本月0G</div></div>
@@ -270,27 +268,47 @@ body{
   <div class="kpi"><div class="kn o">¥75,104</div><div class="kl">库存总值</div><div class="ks">已占用资金</div></div>
 </div>
 
-<div class="section-gap">
+<div class="mid-row section-gap">
+  <div class="card">
+    <div class="ctitle navy">各部门库存金额占比</div>
+    <div class="pie-section">
+      <svg class="pie-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M30.5 16.0 A14.5 14.5 0 1 1 29.97 12.12 L25.64 13.32 A10 10 0 1 0 26.00 16.00 Z" fill="#3D4F6F"/>
+      <path d="M30.0 12.1 A14.5 14.5 0 0 1 30.50 16.00 L26.00 16.00 A10 10 0 0 0 25.64 13.32 Z" fill="#5B7FA6"/>
+      </svg>
+      <div class="pie-legend">
+        <table>
+          <tr><td><span class="dot" style="background:#3D4F6F"></span>未知</td><td class="num">95.7%</td><td class="num">¥71,866</td></tr>
+          <tr><td><span class="dot" style="background:#5B7FA6"></span>棍花&片桶</td><td class="num">4.3%</td><td class="num">¥3,238</td></tr>
+          <tr><td><span class="dot" style="background:#8BAA9E"></span>车钮部</td><td class="num">0.0%</td><td class="num">¥0</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
   <div class="card">
     <div class="tab-bar">
-      <div class="tab active" onclick="swTab(this,'in')">📥 入库记录</div>
-      <div class="tab" onclick="swTab(this,'out')">📤 出库记录</div>
+      <div class="tab active" onclick="swTab(this,'in')">入库</div>
+      <div class="tab" onclick="swTab(this,'out')">出库</div>
     </div>
-    <div id="t-in" class="tab-body" style="min-height:120px">
-      <div style="text-align:center;padding:40px 0;color:#8A95A5">暂无入库记录 · 连接飞书出入库表后可自动呈现</div>
+    <div id="t-in" class="tab-body">
+      <div style="color:#4A8C6F;font-weight:600;margin-bottom:6px">入库记录 0 条</div>
+<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无入库记录</div>
     </div>
-    <div id="t-out" class="tab-body" style="min-height:120px;display:none">
-      <div style="text-align:center;padding:40px 0;color:#8A95A5">暂无出库记录 · 连接飞书出入库表后可自动呈现</div>
+    <div id="t-out" class="tab-body" style="display:none">
+<table><thead><tr><th>品名</th><th>数量</th><th>部门</th><th>日期</th></tr></thead><tbody>
+        <tr><td class="name">SKF 深沟球轴承 6204-2RS1/C3</td><td style="text-align:right">2</td><td>车钮部</td><td style="color:#8A95A5">05-13</td></tr>
+        <tr><td class="name">SKF 深沟球轴承 6205-2RS1/C3</td><td style="text-align:right">4</td><td>车钮部</td><td style="color:#8A95A5">05-13</td></tr>
+</tbody></table>
     </div>
   </div>
 </div>
 
 <div class="section-gap two-row">
   <div class="card">
-    <div class="ctitle navy">📊 库存金额 TOP 20</div>
+    <div class="ctitle navy">库存金额 TOP 20</div>
     <div class="tbl-scroll">
       <table>
-        <thead><tr><th style="width:8%">#</th><th style="width:38%">品名</th><th style="width:22%">部门</th><th class="tr" style="width:15%">库存</th><th class="tr" style="width:17%">金额</th></tr></thead>
+        <thead><tr><th style="width:8%">#</th><th style="width:35%">品名</th><th style="width:20%">部门</th><th class="tr" style="width:17%">库存</th><th class="tr" style="width:20%">金额</th></tr></thead>
         <tbody>
         <tr><td class="td-num">1</td><td class="td-name">电加热管</td><td></td><td class="tr">501</td><td class="tr">¥25,050</td></tr>
         <tr><td class="td-num">2</td><td class="td-name">陶瓷保险熔断器</td><td></td><td class="tr">22</td><td class="tr">¥22,000</td></tr>
@@ -318,11 +336,11 @@ body{
     </div>
   </div>
   <div class="card">
-    <div class="ctitle navy">⚠️ 缺货清单 <span class="cnt o">11 品</span></div>
+    <div class="ctitle orange">缺货清单 <span class="cnt o">11 品</span></div>
     <div class="note">缺货 ≠ 补货 · 高频消耗+缺货 → 立即采购</div>
     <div class="tbl-scroll" style="max-height:400px;overflow-y:auto;">
       <table>
-        <thead><tr><th style="width:42%">品名</th><th style="width:28%">部门</th><th style="width:30%">状态</th></tr></thead>
+        <thead><tr><th style="width:38%">品名</th><th style="width:28%">部门</th><th style="width:34%">状态</th></tr></thead>
         <tbody>
         <tr><td class="td-name">压缩弹簧</td><td></td><td><span class="st r">缺货</span></td></tr>
         <tr><td class="td-name">三菱交流接触器</td><td></td><td><span class="st r">缺货</span></td></tr>
