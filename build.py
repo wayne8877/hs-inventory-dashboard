@@ -331,6 +331,36 @@ body{{
 </div></div>
 <div class="wrap">
 
+<!-- ═══ 订单追踪 ═══ -->
+<div class="section-gap" style="background:#fff;border-radius:12px;border:1px solid #E4E2DF;padding:0 0 16px">
+  <div class="ctitle navy" style="border-bottom:2px solid #C4883A">订单追踪</div>
+  <div class="kpi-row" style="padding:14px 16px">
+{order_kpi_cards}
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 380px 320px;gap:14px;padding:0 16px">
+    <div>
+      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">客户订单排名（按G数）</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr><th style="text-align:left;padding:4px 6px;border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">客户</th><th class="tr" style="border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">单数</th><th class="tr" style="border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">G数</th><th style="width:60px;border-bottom:2px solid #E8E7E3"></th></tr></thead>
+        <tbody>{client_rows}</tbody>
+      </table>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">今日工序进度</div>
+      <div style="display:flex;gap:4px;margin-bottom:10px">{pipe_html}</div>
+      <div style="font-size:11px;color:#8A95A5;text-align:center;margin-top:6px">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">在途订单（{len(active_orders)}单）</div>
+      <div style="max-height:220px;overflow-y:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <tbody>{order_rows}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="kpi-row section-gap">
   <div class="kpi"><div class="kn">{total}</div><div class="kl">总 SKU</div><div class="ks">全部物料品类</div></div>
   <div class="kpi"><div class="kn g">{in_stock}</div><div class="kl">有库存</div><div class="ks">可正常领用</div></div>
@@ -387,36 +417,6 @@ body{{
         <tbody>
 {reorder_rows}        </tbody>
       </table>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ 订单追踪 ═══ -->
-<div class="section-gap" style="background:#fff;border-radius:12px;border:1px solid #E4E2DF;padding:0 0 16px">
-  <div class="ctitle navy" style="border-bottom:2px solid #C4883A">订单追踪</div>
-  <div class="kpi-row" style="padding:14px 16px">
-{order_kpi_cards}
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 380px 320px;gap:14px;padding:0 16px">
-    <div>
-      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">客户订单排名（按G数）</div>
-      <table style="width:100%;border-collapse:collapse;font-size:13px">
-        <thead><tr><th style="text-align:left;padding:4px 6px;border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">客户</th><th class="tr" style="border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">单数</th><th class="tr" style="border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">G数</th><th style="width:60px;border-bottom:2px solid #E8E7E3"></th></tr></thead>
-        <tbody>{client_rows}</tbody>
-      </table>
-    </div>
-    <div>
-      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">今日工序进度</div>
-      <div style="display:flex;gap:4px;margin-bottom:10px">{pipe_html}</div>
-      <div style="font-size:11px;color:#8A95A5;text-align:center;margin-top:6px">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
-    </div>
-    <div>
-      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">在途订单（{len(active_orders)}单）</div>
-      <div style="max-height:220px;overflow-y:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <tbody>{order_rows}</tbody>
-        </table>
-      </div>
     </div>
   </div>
 </div>
