@@ -299,9 +299,14 @@ for r in reorder[:50]:
 # 入库行
 inbound_body = ""
 if in_rows:
-    inbound_body = '<table><thead><tr><th>品名</th><th>数量</th><th>部门</th><th>日期</th></tr></thead><tbody>\n'
-    for r in in_rows[:50]:
-        inbound_body += f"""        <tr><td class="name">{short(r['name'], 22)}</td><td style="text-align:right">{int(r['qty'])}</td><td>{r['dept']}</td><td style="color:#8A95A5">{r['date']}</td></tr>\n"""
+    inbound_body = '<table><thead><tr><th>品名</th><th style="width:60px;text-align:right">数量</th><th>部门</th><th style="width:60px;text-align:right">库存</th><th style="width:60px">日期</th></tr></thead><tbody>\n'
+    for r in in_rows:
+        stock = 0
+        for rec in records:
+            if rec['name'] == r['name']:
+                stock = rec['stock']
+                break
+        inbound_body += f"""        <tr><td class="name">{short(r['name'], 20)}</td><td style="text-align:right">{int(r['qty'])}</td><td>{r['dept']}</td><td style="text-align:right">{stock}</td><td style="color:#8A95A5">{r['date']}</td></tr>\n"""
     inbound_body += '</tbody></table>'
 else:
     inbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无入库记录</div>'
@@ -309,9 +314,14 @@ else:
 # 出库行
 outbound_body = ""
 if out_rows:
-    outbound_body = '<table><thead><tr><th>品名</th><th>数量</th><th>部门</th><th>日期</th></tr></thead><tbody>\n'
-    for r in out_rows[:50]:
-        outbound_body += f"""        <tr><td class="name">{short(r['name'], 22)}</td><td style="text-align:right">{int(r['qty'])}</td><td>{r['dept']}</td><td style="color:#8A95A5">{r['date']}</td></tr>\n"""
+    outbound_body = '<table><thead><tr><th>品名</th><th style="width:60px;text-align:right">数量</th><th>部门</th><th style="width:60px;text-align:right">库存</th><th style="width:60px">日期</th></tr></thead><tbody>\n'
+    for r in out_rows:
+        stock = 0
+        for rec in records:
+            if rec['name'] == r['name']:
+                stock = rec['stock']
+                break
+        outbound_body += f"""        <tr><td class="name">{short(r['name'], 20)}</td><td style="text-align:right">{int(r['qty'])}</td><td>{r['dept']}</td><td style="text-align:right">{stock}</td><td style="color:#8A95A5">{r['date']}</td></tr>\n"""
     outbound_body += '</tbody></table>'
 else:
     outbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无出库记录</div>'
