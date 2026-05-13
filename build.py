@@ -393,7 +393,7 @@ body{{
 .cnt{{font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px}}
 .cnt.o{{background:#FEF3E2;color:#C4883A}}
 .dot{{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}}
-.mid-row{{display:grid;grid-template-columns:1fr 340px;gap:14px;padding:0 0 14px;align-items:start;}}
+.mid-row{{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 0 14px;align-items:stretch;}}
 .pie-section{{display:flex;gap:16px;align-items:center;padding:12px 16px;}}
 .pie-svg{{flex-shrink:0;width:200px;height:200px;}}
 .pie-legend{{flex:1;}}
@@ -604,26 +604,14 @@ body{{
 
 <div class="mid-row section-gap">
   <div class="card">
-    <div class="ctitle navy">各部门库存金额占比</div>
-    <div class="pie-section">
-      <svg class="pie-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-{pie_segments}      </svg>
-      <div class="pie-legend">
-        <table>
-{dept_chart_rows}        </table>
-      </div>
+    <div class="ctitle navy">📥 入库记录 <span class="cnt">{len(in_rows)} 条</span></div>
+    <div class="tbl-scroll" style="max-height:300px;overflow-y:auto">
+{inbound_body}
     </div>
   </div>
   <div class="card">
-    <div class="tab-bar">
-      <div class="tab active" onclick="swTab(this,'in')">入库</div>
-      <div class="tab" onclick="swTab(this,'out')">出库</div>
-    </div>
-    <div id="t-in" class="tab-body">
-      <div style="color:#4A8C6F;font-weight:600;margin-bottom:6px">入库记录 {len(in_rows)} 条</div>
-{inbound_body}
-    </div>
-    <div id="t-out" class="tab-body" style="display:none">
+    <div class="ctitle navy">📤 出库记录 <span class="cnt">{len(out_rows)} 条</span></div>
+    <div class="tbl-scroll" style="max-height:300px;overflow-y:auto">
 {outbound_body}
     </div>
   </div>
