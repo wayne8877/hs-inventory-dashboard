@@ -134,8 +134,8 @@ module.exports = async (req, res) => {
         name: flatText(r.fields?.['货品名称']) || '',
         spec: flatText(r.fields?.['规格型号']) || '',
         qty: flatNum(r.fields?.['出库数量']),
-        date: flatText(r.fields?.['出库时间']),
-        dept: flatText(r.fields?.['出库提示']),
+        date: r.fields?.['出库日期'] || flatText(r.fields?.['出库时间']),
+        dept: flatText(r.fields?.['部门']),
       }));
       const result = { items };
       setCache('outbound', result);
