@@ -436,7 +436,8 @@ function swTab(el,tab){{
 </html>"""
 
 # ── 3. 写入文件 ──
-with open("/tmp/hs-dash/index.html", "w", encoding="utf-8") as f:
+out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
+with open(out_path, "w", encoding="utf-8") as f:
     f.write(html)
 
 print(f"\n✅ index.html 已生成")
