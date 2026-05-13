@@ -119,25 +119,28 @@ for rec in order_records:
         date_str = msg_date.strftime("%Y-%m-%d")
     except: date_str = "?"
     
-    found = order_re.findall(content)
+    found = [o.upper() for o in order_re.findall(content)]
     found_g = g_re.findall(content)
     
     for o in found:
-        if o not in all_orders:
-            all_orders[o] = {"order_no":o,"g_count":0,"product_type":"树脂钮","step":"接单","date":date_str,"latest_date":date_str,"client":"恒业"}
-        if date_str > all_orders[o]["latest_date"]: all_orders[o]["latest_date"] = date_str
+        o_up = o.upper()
+        if o_up not in all_orders:
+            all_orders[o_up] = {"order_no":o_up,"g_count":0,"product_type":"树脂钮","step":"接单","date":date_str,"latest_date":date_str,"client":"恒业","first_date":date_str}
+        entry = all_orders[o_up]
+        if date_str > entry["latest_date"]: entry["latest_date"] = date_str
+        if date_str < entry["first_date"]: entry["first_date"] = date_str
         
         for g in found_g:
             gi = int(g)
-            if 1 <= gi <= 50000: all_orders[o]["g_count"] += gi
+            if 1 <= gi <= 50000: entry["g_count"] += gi
         
         for bt in BUTTON_TYPES:
-            if bt in content: all_orders[o]["product_type"] = bt; break
+            if bt in content: entry["product_type"] = bt; break
         
         for si,(step,kws) in enumerate(STEP_KW.items()):
             if any(kw in content for kw in kws):
-                cs = PROCESS_STEPS.index(all_orders[o]["step"])
-                if si >= cs: all_orders[o]["step"] = step
+                cs = PROCESS_STEPS.index(entry["step"])
+                if si >= cs: entry["step"] = step
 
 # 订单汇总
 today_orders = [o for o in all_orders.values() if o["latest_date"]==today_str]
@@ -183,10 +186,19 @@ for o in all_orders.values():
     client_g[c] = client_g.get(c,0) + o["g_count"]
 client_rank = sorted(client_g.items(), key=lambda x:-x[1])
 
-# 工序分布
+# 工序分布（全部在途，非仅今日）
 step_counts = {}
-for o in today_orders:
+for o in in_progress:
     step_counts[o["step"]] = step_counts.get(o["step"],0) + 1
+
+# 上月同比
+last_month = (datetime.date.today().replace(day=1) - datetime.timedelta(days=1)).strftime("%Y-%m")
+last_md = month_buckets.get(last_month, {"count":0,"g":0})
+month_trend = ""
+if last_md["g"] > 0 and month_g > 0:
+    pct = (month_g - last_md["g"]) / last_md["g"] * 100
+    arrow = "↑" if pct > 0 else ("↓" if pct < 0 else "→")
+    month_trend = f'<span style="color:{"#27AE60" if pct>=0 else "#C0392B"};font-size:12px">{arrow}{abs(pct):.0f}%</span>'
 
 # 钮扣类型
 type_g = {}
@@ -200,9 +212,19 @@ active_orders = sorted([o for o in all_orders.values() if o["step"]!="出货"],
     key=lambda x: (x["latest_date"],x["order_no"]), reverse=True)[:12]
 order_rows = ""
 STEP_C = {"接单":"#2980B9","调色":"#8E44AD","生产":"#1ABC9C","筛胚":"#F39C12","车钮":"#B8860B","抛光":"#DAA520","品检":"#E74C3C","出货":"#27AE60"}
+now_dt = datetime.date.today()
 for o in active_orders:
     sc = STEP_C.get(o["step"],"#888")
-    order_rows += f'<tr><td style="color:{sc};font-weight:700">●</td><td class="td-name">{o["order_no"]}</td><td class="tr">{o["g_count"]}G</td><td>{o["product_type"][:6]}</td><td><span style="background:{sc};color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">{o["step"]}</span></td><td style="font-size:11px;color:#8A95A5">{o["latest_date"][5:]}</td></tr>\n'
+    # 滞留天数
+    try:
+        fd = datetime.date.fromisoformat(o.get("first_date", o["date"]))
+        age = (now_dt - fd).days
+    except: age = 0
+    age_style = "color:#C0392B;font-weight:700" if age > 7 else "color:#8A95A5"
+    age_str = f'<span style="{age_style}">{age}天</span>' if age > 0 else "今天"
+    # G数显示
+    g_str = f'{o["g_count"]}G' if o["g_count"] > 0 else '<span style="color:#AAA">未提</span>'
+    order_rows += f'<tr><td style="color:{sc};font-weight:700">●</td><td class="td-name">{o["order_no"]}</td><td class="tr">{g_str}</td><td>{o["product_type"][:6]}</td><td><span style="background:{sc};color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">{o["step"]}</span></td><td style="font-size:11px;color:#8A95A5">{o["latest_date"][5:]}</td><td>{age_str}</td></tr>\n'
 
 # 工序管道
 pipe_html = ""
@@ -220,7 +242,7 @@ for i,(cname,cg) in enumerate(client_rank[:6]):
 
 # 订单KPI — 大卡片（含月度维度）
 order_kpi_cards = f"""<div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">{total_order_count}</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">本月{month_orders}单</div></div>
-<div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num">{total_g}G</div><div class="okpi-label">订单总量</div></div><div class="okpi-sub">本月{month_g}G</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num">{total_g}G</div><div class="okpi-label">订单总量 {month_trend}</div></div><div class="okpi-sub">本月{month_g}G</div></div>
 <div class="okpi"><div class="okpi-icon" style="background:#FFF3E0;color:#E67E22">📅</div><div class="okpi-body"><div class="okpi-num">{year_orders}</div><div class="okpi-label">{this_year}年</div></div><div class="okpi-sub">{year_g}G</div></div>
 <div class="okpi"><div class="okpi-icon" style="background:#FDECEC;color:#C0392B">⚙</div><div class="okpi-body"><div class="okpi-num">{len(in_progress)}</div><div class="okpi-label">进行中</div></div><div class="okpi-sub">{len(shipped)}已出货</div></div>
 <div class="okpi"><div class="okpi-icon" style="background:#F3E5F5;color:#8E44AD">🔍</div><div class="okpi-body"><div class="okpi-num">{len(no_g)}</div><div class="okpi-label">待补G数</div></div><div class="okpi-sub">需跟进</div></div>"""
@@ -493,7 +515,7 @@ body{{
   <div class="o-grid">
     <!-- 工序管道 -->
     <div class="o-pipeline">
-      <div class="o-subtitle">工序管道</div>
+      <div class="o-subtitle">工序管道 · {len(in_progress)}单在途</div>
       <div class="o-pipe-row">{pipe_html}</div>
       <div class="o-pipe-legend">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
     </div>
@@ -512,7 +534,7 @@ body{{
     <div class="o-subtitle">在途订单 · {len(active_orders)} 单</div>
     <div class="o-order-scroll">
       <table class="o-order-table">
-        <thead><tr><th></th><th>订单号</th><th class="tr">G数</th><th>类型</th><th>工序</th><th class="tr">日期</th></tr></thead>
+        <thead><tr><th></th><th>订单号</th><th class="tr">G数</th><th>类型</th><th>工序</th><th class="tr">日期</th><th>滞留</th></tr></thead>
         <tbody>{order_rows}</tbody>
       </table>
     </div>
