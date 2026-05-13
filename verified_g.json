@@ -1,0 +1,19 @@
+{
+  "_comment": "合约图片OCR提取的确凿G数——仅保留可溯源验证的",
+  "_updated": "2026-05-13",
+  "_note": "⚠️ 五月订单(除HX8299旧合约外)G数全部在加密图片中，未验证",
+  "orders": {
+    "HX8299": {
+      "g_count": 877,
+      "details": "PH40829 27L #707=465G + GREY=412G",
+      "source": "05-12 订购合同图片OCR",
+      "verified": true,
+      "note": "⚠️ 05-13 Long通知两个色都有加数，新G数在加密图片中无法读取"
+    },
+    "HX8244": {"g_count": 0, "verified": false, "note": "合约图加密未读取"},
+    "HX8245": {"g_count": 0, "verified": false, "note": "合约图加密未读取"},
+    "HX8148": {"g_count": 0, "verified": false, "note": "合约图加密未读取"},
+    "HX8150": {"g_count": 0, "verified": false, "note": "合约图加密未读取"},
+    "HX8161": {"g_count": 0, "verified": false, "note": "合约图加密未读取"}
+  }
+}
