@@ -3,291 +3,239 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HeSheng Button · 合盛辅料 运营仪表盘</title>
+<title>合盛辅料 HeSheng · 运营仪表盘</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#F2F1EE;color:#1C2333;font-size:15px;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1440px;margin:0 auto;padding:0 24px}
-
-/* ── 国际化抬头 ── */
-.hdr{background:#fff;position:relative;margin-bottom:16px}
-.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#3D4F6F 20%,#D0CFCC 80%)}
-.hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px}
-.hdr-left{display:flex;align-items:center;gap:18px}
-.hdr-logo{width:36px;height:36px;background:linear-gradient(135deg,#3D4F6F,#5B7FA6);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:800;flex-shrink:0}
-.hdr-brand{display:flex;flex-direction:column;gap:1px}
-.hdr-brand-en{font-size:11px;font-weight:600;color:#8A94A2;letter-spacing:2.5px;text-transform:uppercase}
-.hdr-brand-cn{font-size:17px;font-weight:800;color:#1A1A2E;letter-spacing:0.5px}
-.hdr-right{display:flex;align-items:center;gap:24px}
-.hdr-stat{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
-.hdr-stat-label{font-size:9px;color:#B0B8C4;letter-spacing:1.5px;text-transform:uppercase}
-.hdr-stat-val{font-size:14px;font-weight:700;color:#1A1A2E}
-.st{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
-.st.g{background:#E8F5E9;color:#2E7D32}.st.r{background:#FDECEC;color:#B85C5C}.st.o{background:#FEF3E2;color:#C4883A}
-
-/* Loading / Error */
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 0;gap:16px}
-.spinner{width:32px;height:32px;border:3px solid #E4E2DF;border-top-color:#3D4F6F;border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading p{color:#8A94A2;font-size:13px}
-.error-box{text-align:center;padding:60px 20px;background:#fff;border-radius:12px;margin-top:16px}
-.error-box p{color:#B85C5C;margin-bottom:12px;font-size:14px}
-.error-box button{padding:8px 24px;background:#3D4F6F;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer}
-
-/* KPI */
-.kpi-row{display:flex;gap:12px;margin-bottom:14px}
-.kpi{flex:1;background:#fff;border-radius:10px;padding:14px 16px;border:1px solid #E4E2DF;min-width:0}
-.kn{font-size:26px;font-weight:700;line-height:1;margin-bottom:2px}
-.kn.g{color:#4A8C6F}.kn.r{color:#B85C5C}.kn.o{color:#C4883A}.kn.n{color:#3D4F6F}
-.kl{font-size:12px;font-weight:500;color:#1C2333}.ks{font-size:10px;color:#8A95A5}
-
-/* 数据盘（中间行） */
-.mid-row{display:grid;grid-template-columns:1fr 280px;gap:14px;margin-bottom:14px;align-items:stretch}
-.card{background:#fff;border-radius:10px;border:1px solid #E4E2DF;overflow:hidden}
-.card-title{font-size:13px;font-weight:700;padding:10px 14px;border-bottom:2px solid #E8E7E3;display:flex;align-items:center;gap:6px}
-.pie-inner{display:flex;gap:14px;align-items:center;padding:10px 14px}
-.pie-svg{flex-shrink:0;width:180px;height:180px}
-.pie-legend{flex:1}
-.pie-legend table{width:100%;border-collapse:collapse;font-size:12px}
-.pie-legend td{padding:2px 4px;vertical-align:middle}
-.pie-legend td.num{text-align:right;color:#555E6D}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
-.order-list{padding:10px 14px;font-size:13px}
-.order-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #F0EFEC}
-.order-item:last-child{border:none}
-.order-label{color:#555E6D}.order-val{font-weight:600;color:#1C2333}
-
-/* 出入库左右并排 */
-.inout-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;align-items:stretch}
-.tbl-scroll{overflow-x:auto;max-height:340px;overflow-y:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-thead th{text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#555E6D;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #E8E7E3;position:sticky;top:0;background:#fff;white-space:nowrap}
-thead th.tr{text-align:right}
-tbody td{padding:6px 10px;border-bottom:1px solid #F0EFEC;vertical-align:middle}
-tbody td.tr{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
-tbody tr:hover{background:#F8F7F5}
-.td-dept{font-size:11px;color:#8A95A5}.td-date{color:#8A95A5;font-size:11px;white-space:nowrap}
-.badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:8px;margin-left:4px}
-.badge.b{background:#E8F0FE;color:#3D4F6F}.badge.r{background:#FDECEC;color:#B85C5C}.badge.o{background:#FEF3E2;color:#C4883A}
-.empty-row td{text-align:center;color:#B0B8C4;padding:24px 0;font-size:13px}
-
-/* 底部行 */
-.bot-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-bottom:20px;align-items:stretch}
-.bot-row .card{margin-bottom:0}
-.ftr{text-align:center;padding:6px 0 18px;font-size:10px;color:#B0B8C4;letter-spacing:1px}
+body{
+  font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  background:#F2F1EE;color:#1C2333;font-size:15px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1280px;margin:0 auto;padding:0 16px}
+.section-gap{margin-bottom:14px}
+.hdr{background:#fff;position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3D4F6F 0%,#5B7FA6 100%);}
+.hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;}
+.brand{display:flex;align-items:center;gap:16px}
+.brand-mark{width:42px;height:42px;background:#3D4F6F;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:800;flex-shrink:0;}
+.brand-name{font-size:20px;font-weight:800;color:#1A1A2E;letter-spacing:1px}
+.brand-en{font-size:11px;color:#8A94A2;letter-spacing:3px;text-transform:uppercase;margin-top:2px}
+.hdr-info{display:flex;align-items:center;gap:28px}
+.hdr-info-item{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.hdr-info-label{font-size:10px;color:#8A94A2;letter-spacing:2px;text-transform:uppercase}
+.hdr-info-value{font-size:17px;font-weight:700;color:#1A1A2E}
+.hdr-divider{width:1px;height:28px;background:#E8E7E3}
+.kpi-row{display:flex;gap:14px;padding:16px 0}
+.kpi{flex:1;background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #E4E2DF;min-width:0;}
+.kn{font-size:28px;font-weight:700;line-height:1;margin-bottom:3px}
+.kn.g{color:#4A8C6F}
+.kn.r{color:#B85C5C}
+.kn.o{color:#C4883A}
+.kl{font-size:13px;font-weight:500;color:#1C2333;margin-bottom:2px}
+.ks{font-size:11px;color:#8A95A5}
+.card{background:#fff;border-radius:12px;border:1px solid #E4E2DF;overflow:hidden;}
+.ctitle{font-size:14px;font-weight:700;padding:12px 16px;border-bottom:2px solid #E8E7E3;display:flex;align-items:center;gap:6px;}
+.ctitle.navy{border-bottom-color:#3D4F6F}
+.ctitle.orange{border-bottom-color:#C4883A}
+.cnt{font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px}
+.cnt.o{background:#FEF3E2;color:#C4883A}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+.mid-row{display:grid;grid-template-columns:1fr 340px;gap:14px;padding:0 0 14px;align-items:start;}
+.pie-section{display:flex;gap:16px;align-items:center;padding:12px 16px;}
+.pie-svg{flex-shrink:0;width:200px;height:200px;}
+.pie-legend{flex:1;}
+.pie-legend table{width:100%;border-collapse:collapse;font-size:13px;}
+.pie-legend td{padding:3px 4px;vertical-align:middle;}
+.pie-legend td.num{text-align:right;font-variant-numeric:tabular-nums;color:#555E6D;}
+.tab-bar{display:flex;border-bottom:2px solid #E8E7E3;}
+.tab{flex:1;padding:10px 0;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:#8A94A2;transition:all 0.15s;}
+.tab.active{color:#3D4F6F;border-bottom:2px solid #3D4F6F;margin-bottom:-2px;}
+.tab-body{padding:10px 14px;font-size:13px;max-height:170px;overflow-y:auto;}
+.tab-body table{width:100%;border-collapse:collapse;font-size:13px;}
+.tab-body td{padding:4px 6px;border-bottom:1px solid #F0EFEC;}
+.tab-body td.name{white-space:nowrap;}
+.note{font-size:11px;color:#8A95A5;padding:6px 16px 0;}
+.two-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 0 24px;align-items:start;}
+.tbl-scroll{overflow-x:auto;}
+.tbl-scroll table{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl-scroll th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;color:#555E6D;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #E8E7E3;position:sticky;top:0;background:#fff;}
+.tbl-scroll th.tr{text-align:right;}
+.tbl-scroll td{padding:6px 10px;border-bottom:1px solid #F0EFEC;vertical-align:middle;}
+.tbl-scroll td.tr{text-align:right;font-variant-numeric:tabular-nums;}
+.td-num{color:#8A95A5;font-size:11px;width:28px;text-align:center;}
+.td-name{font-weight:500;max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.st{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;}
+.st.r{background:#FDECEC;color:#B85C5C;}
+.ftr{text-align:center;padding:16px 0 24px;font-size:11px;color:#8A95A5;}
 </style>
 </head>
 <body>
 <div class="hdr"><div class="hdr-inner">
-  <div class="hdr-left">
-    <div class="hdr-logo">HS</div>
-    <div class="hdr-brand">
-      <div class="hdr-brand-en">HeSheng Button Co.</div>
-      <div class="hdr-brand-cn">合盛辅料</div>
-    </div>
+  <div class="brand">
+    <div class="brand-mark">HS</div>
+    <div><div class="brand-name">合盛辅料</div><div class="brand-en">HeSheng Button</div></div>
   </div>
-  <div class="hdr-right">
-    <div class="hdr-stat"><div class="hdr-stat-label">Status</div><div class="hdr-stat-val"><span id="statusBadge" class="st o">SYNC</span></div></div>
-    <div class="hdr-stat"><div class="hdr-stat-label">Updated</div><div class="hdr-stat-val" id="updateTime">—</div></div>
-    <div class="hdr-stat"><div class="hdr-stat-label">Source</div><div class="hdr-stat-val" style="font-size:11px;font-weight:500;color:#8A94A2">Feishu API</div></div>
+  <div class="hdr-info">
+    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-05-13 12:43</div></div>
+    <div class="hdr-divider"></div>
+    <div class="hdr-info-item"><div class="hdr-info-label">Source</div><div class="hdr-info-value">Feishu Bitable</div></div>
   </div>
 </div></div>
-
 <div class="wrap">
 
-<div id="loading" class="loading">
-  <div class="spinner"></div>
-  <p>Loading inventory data…</p>
-  <p style="font-size:11px;color:#B0B8C4">首次加载约需 5-10 秒</p>
+<div class="kpi-row section-gap">
+  <div class="kpi"><div class="kn">171</div><div class="kl">总 SKU</div><div class="ks">全部物料品类</div></div>
+  <div class="kpi"><div class="kn g">158</div><div class="kl">有库存</div><div class="ks">可正常领用</div></div>
+  <div class="kpi"><div class="kn r">11</div><div class="kl">无库存</div><div class="ks">当前缺货待补</div></div>
+  <div class="kpi"><div class="kn o">¥75,104</div><div class="kl">库存总值</div><div class="ks">已占用资金</div></div>
 </div>
 
-<div id="error" class="error-box" style="display:none">
-  <p>⚠️ 数据加载失败</p>
-  <p id="errMsg" style="font-size:12px;color:#8A95A5;margin-bottom:14px"></p>
-  <button onclick="location.reload()">重新加载</button>
-</div>
-
-<div id="dashboard" style="display:none">
-
-<!-- KPI -->
-<div class="kpi-row" id="kpiRow"></div>
-
-<!-- 数据盘：部门占比 + 订单状态 -->
-<div class="mid-row">
+<div class="mid-row section-gap">
   <div class="card">
-    <div class="card-title">🏭 各部门库存占比</div>
-    <div class="pie-inner" id="pieSection"></div>
+    <div class="ctitle navy">各部门库存金额占比</div>
+    <div class="pie-section">
+      <svg class="pie-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M30.5 16.0 A14.5 14.5 0 1 1 29.97 12.12 L25.64 13.32 A10 10 0 1 0 26.00 16.00 Z" fill="#3D4F6F"/>
+      <path d="M30.0 12.1 A14.5 14.5 0 0 1 30.50 16.00 L26.00 16.00 A10 10 0 0 0 25.64 13.32 Z" fill="#5B7FA6"/>
+      </svg>
+      <div class="pie-legend">
+        <table>
+          <tr><td><span class="dot" style="background:#3D4F6F"></span>未知</td><td class="num">95.7%</td><td class="num">¥71,866</td></tr>
+          <tr><td><span class="dot" style="background:#5B7FA6"></span>棍花&片桶</td><td class="num">4.3%</td><td class="num">¥3,238</td></tr>
+          <tr><td><span class="dot" style="background:#8BAA9E"></span>车钮部</td><td class="num">0.0%</td><td class="num">¥0</td></tr>
+        </table>
+      </div>
+    </div>
   </div>
   <div class="card">
-    <div class="card-title">📋 订单总览</div>
-    <div class="order-list" id="orderSummary"></div>
+    <div class="tab-bar">
+      <div class="tab active" onclick="swTab(this,'in')">入库</div>
+      <div class="tab" onclick="swTab(this,'out')">出库</div>
+    </div>
+    <div id="t-in" class="tab-body">
+      <div style="color:#4A8C6F;font-weight:600;margin-bottom:6px">今日入库 158 品</div>
+      <table><tbody>
+        <tr><td class="name">沽水（促进剂）</td><td style="text-align:right">100 kg</td><td style="color:#8A95A5">05-11</td></tr>
+      </tbody></table>
+    </div>
+    <div id="t-out" class="tab-body" style="display:none">
+      <div style="color:#8A95A5;text-align:center;padding:20px 0">暂无出库记录</div>
+    </div>
   </div>
 </div>
 
-<!-- 出入库左右并排 -->
-<div class="inout-row">
+<div class="section-gap two-row">
   <div class="card">
-    <div class="card-title">📥 入库明细 <span class="badge b" id="inboundCount">0</span></div>
+    <div class="ctitle navy">库存金额 TOP 20</div>
     <div class="tbl-scroll">
       <table>
-        <thead><tr><th style="width:30%">品名</th><th class="tr" style="width:12%">数量</th><th style="width:14%">部门</th><th style="width:12%">日期</th></tr></thead>
-        <tbody id="inboundBody"></tbody>
+        <thead><tr><th style="width:8%">#</th><th style="width:35%">品名</th><th style="width:20%">部门</th><th class="tr" style="width:17%">库存</th><th class="tr" style="width:20%">金额</th></tr></thead>
+        <tbody>
+        <tr><td class="td-num">1</td><td class="td-name">电加热管</td><td></td><td class="tr">501</td><td class="tr">¥25,050</td></tr>
+        <tr><td class="td-num">2</td><td class="td-name">陶瓷保险熔断器</td><td></td><td class="tr">22</td><td class="tr">¥22,000</td></tr>
+        <tr><td class="td-num">3</td><td class="td-name">红色系工业颜料</td><td></td><td class="tr">7</td><td class="tr">¥7,000</td></tr>
+        <tr><td class="td-num">4</td><td class="td-name">弹性夹头（钮扣）</td><td></td><td class="tr">4</td><td class="tr">¥4,000</td></tr>
+        <tr><td class="td-num">5</td><td class="td-name">沽水</td><td>棍花&片桶</td><td class="tr">175</td><td class="tr">¥3,238</td></tr>
+        <tr><td class="td-num">6</td><td class="td-name">颜料黄红 35(偶氮类有机颜料)</td><td></td><td class="tr">2</td><td class="tr">¥2,000</td></tr>
+        <tr><td class="td-num">7</td><td class="td-name">控制系统</td><td></td><td class="tr">19</td><td class="tr">¥1,900</td></tr>
+        <tr><td class="td-num">8</td><td class="td-name">真空滚揉机高强度
+尼龙托轮配轴承…</td><td></td><td class="tr">24</td><td class="tr">¥960</td></tr>
+        <tr><td class="td-num">9</td><td class="td-name">圆锯片</td><td></td><td class="tr">6</td><td class="tr">¥900</td></tr>
+        <tr><td class="td-num">10</td><td class="td-name">钢针</td><td></td><td class="tr">20</td><td class="tr">¥800</td></tr>
+        <tr><td class="td-num">11</td><td class="td-name">下料口机械备件</td><td></td><td class="tr">16</td><td class="tr">¥800</td></tr>
+        <tr><td class="td-num">12</td><td class="td-name">热风枪 喷火枪 燃气喷火枪</td><td></td><td class="tr">5</td><td class="tr">¥750</td></tr>
+        <tr><td class="td-num">13</td><td class="td-name">水泵</td><td></td><td class="tr">11</td><td class="tr">¥550</td></tr>
+        <tr><td class="td-num">14</td><td class="td-name">胶木板</td><td></td><td class="tr">9</td><td class="tr">¥450</td></tr>
+        <tr><td class="td-num">15</td><td class="td-name">吹尘枪气管</td><td></td><td class="tr">3</td><td class="tr">¥450</td></tr>
+        <tr><td class="td-num">16</td><td class="td-name">淡紫色系工业颜料</td><td></td><td class="tr">4</td><td class="tr">¥400</td></tr>
+        <tr><td class="td-num">17</td><td class="td-name">轴承油封</td><td></td><td class="tr">512</td><td class="tr">¥358</td></tr>
+        <tr><td class="td-num">18</td><td class="td-name">下总承板&珠茜机</td><td></td><td class="tr">8</td><td class="tr">¥320</td></tr>
+        <tr><td class="td-num">19</td><td class="td-name">鱼眼接头关节轴承</td><td></td><td class="tr">3</td><td class="tr">¥300</td></tr>
+        <tr><td class="td-num">20</td><td class="td-name">不锈钢球阀</td><td></td><td class="tr">3</td><td class="tr">¥300</td></tr>
+        </tbody>
       </table>
     </div>
   </div>
   <div class="card">
-    <div class="card-title">📤 出库明细 <span class="badge r" id="outboundCount">0</span></div>
-    <div class="tbl-scroll">
+    <div class="ctitle orange">缺货清单 <span class="cnt o">11 品</span></div>
+    <div class="note">缺货 ≠ 补货 · 高频消耗+缺货 → 立即采购</div>
+    <div class="tbl-scroll" style="max-height:400px;overflow-y:auto;">
       <table>
-        <thead><tr><th style="width:30%">品名</th><th class="tr" style="width:12%">数量</th><th style="width:14%">部门</th><th style="width:12%">日期</th></tr></thead>
-        <tbody id="outboundBody"></tbody>
+        <thead><tr><th style="width:38%">品名</th><th style="width:28%">部门</th><th style="width:34%">状态</th></tr></thead>
+        <tbody>
+        <tr><td class="td-name">压缩弹簧</td><td></td><td><span class="st r">缺货</span></td></tr>
+        <tr><td class="td-name">三菱交流接触器</td><td></td><td><span class="st r">缺货</span></td></tr>
+        <tr><td class="td-name">漏电塑壳断路器</td><td></td><td><span class="st r">缺货</span></td></tr>
+        <tr><td class="td-name">TO-50EC 无熔线断路器</td><td></td><td><span class="st r">缺货</span></td></tr>
+        <tr><td class="td-name">塑壳断路器</td><td></td><td><span class="st r">缺货</span></td></tr>
+        <tr><td class="td-name">安漏电开关&漏电保护器</td><td></td><td><span class="st r">缺货</span></td></tr>
+        <tr><td class="td-name">颜料黄红35(偶氮类有机颜料)</td><td></td><td><span class="st r">缺货</span></td></tr>
+        <tr><td class="td-name">酰菁&偶氮类绿色有机颜料</td><td></td><td><span class="st r">缺货</span></td></tr>
+        <tr><td class="td-name">脱模蜡</td><td></td><td><span class="st r">缺货</span></td></tr>
+        <tr><td class="td-name">珠茜夹头</td><td></td><td><span class="st r">缺货</span></td></tr>
+        <tr><td class="td-name">测试链接</td><td></td><td><span class="st r">缺货</span></td></tr>
+        </tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- 底部：TOP20 + 缺货 -->
-<div class="bot-row">
-  <div class="card">
-    <div class="card-title">📦 库存金额 TOP20</div>
-    <div class="tbl-scroll" style="max-height:340px">
-      <table>
-        <thead><tr><th style="width:6%">#</th><th style="width:32%">品名</th><th style="width:18%">部门</th><th class="tr" style="width:14%">库存</th><th class="tr" style="width:18%">金额</th></tr></thead>
-        <tbody id="top20Body"></tbody>
+<!-- ═══ 订单追踪 ═══ -->
+<div class="section-gap" style="background:#fff;border-radius:12px;border:1px solid #E4E2DF;padding:0 0 16px">
+  <div class="ctitle navy" style="border-bottom:2px solid #C4883A">订单追踪</div>
+  <div class="kpi-row" style="padding:14px 16px">
+<div class="kpi"><div class="kn">0</div><div class="kl">今日订单</div><div class="ks">实时追踪</div></div>
+<div class="kpi"><div class="kn g">0G</div><div class="kl">今日G数</div><div class="ks">0颗</div></div>
+<div class="kpi"><div class="kn o">14/19</div><div class="kl">进行中/已出货</div><div class="ks">33单在途</div></div>
+<div class="kpi"><div class="kn r">0单</div><div class="kl">待补G数</div><div class="ks">今天</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 380px 320px;gap:14px;padding:0 16px">
+    <div>
+      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">客户订单排名（按G数）</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr><th style="text-align:left;padding:4px 6px;border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">客户</th><th class="tr" style="border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">单数</th><th class="tr" style="border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">G数</th><th style="width:60px;border-bottom:2px solid #E8E7E3"></th></tr></thead>
+        <tbody><tr><td>恒业</td><td class="tr">33单</td><td class="tr">5G</td><td><div style="background:#3D4F6F;height:6px;width:50.0%;border-radius:3px;min-width:4px"></div></td></tr>
+</tbody>
       </table>
     </div>
-  </div>
-  <div class="card">
-    <div class="card-title">🔔 缺货清单 <span class="badge o" id="reorderCount">0</span></div>
-    <div class="tbl-scroll" style="max-height:340px">
-      <table>
-        <thead><tr><th style="width:55%">品名</th><th style="width:30%">部门</th><th style="width:15%">状态</th></tr></thead>
-        <tbody id="reorderBody"></tbody>
-      </table>
+    <div>
+      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">今日工序进度</div>
+      <div style="display:flex;gap:4px;margin-bottom:10px"><div style="flex:1;text-align:center"><div style="background:#2980B9;color:#fff;padding:10px 4px;border-radius:8px;font-size:12px;font-weight:600">接单</div><div style="font-size:20px;font-weight:700;color:#2980B9;margin-top:4px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#8E44AD;color:#fff;padding:10px 4px;border-radius:8px;font-size:12px;font-weight:600">调色</div><div style="font-size:20px;font-weight:700;color:#8E44AD;margin-top:4px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#1ABC9C;color:#fff;padding:10px 4px;border-radius:8px;font-size:12px;font-weight:600">生产</div><div style="font-size:20px;font-weight:700;color:#1ABC9C;margin-top:4px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#F39C12;color:#fff;padding:10px 4px;border-radius:8px;font-size:12px;font-weight:600">筛胚</div><div style="font-size:20px;font-weight:700;color:#F39C12;margin-top:4px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#B8860B;color:#fff;padding:10px 4px;border-radius:8px;font-size:12px;font-weight:600">车钮</div><div style="font-size:20px;font-weight:700;color:#B8860B;margin-top:4px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#DAA520;color:#fff;padding:10px 4px;border-radius:8px;font-size:12px;font-weight:600">抛光</div><div style="font-size:20px;font-weight:700;color:#DAA520;margin-top:4px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#E74C3C;color:#fff;padding:10px 4px;border-radius:8px;font-size:12px;font-weight:600">品检</div><div style="font-size:20px;font-weight:700;color:#E74C3C;margin-top:4px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#27AE60;color:#fff;padding:10px 4px;border-radius:8px;font-size:12px;font-weight:600">出货</div><div style="font-size:20px;font-weight:700;color:#27AE60;margin-top:4px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div></div>
+      <div style="font-size:11px;color:#8A95A5;text-align:center;margin-top:6px">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">在途订单（12单）</div>
+      <div style="max-height:220px;overflow-y:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <tbody><tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">HX8299</td><td class="tr">0G</td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5">05-12</td></tr>
+<tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">HX8150</td><td class="tr">0G</td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5">05-12</td></tr>
+<tr><td style="color:#1ABC9C;font-weight:700">●</td><td class="td-name">HX8148</td><td class="tr">0G</td><td>树脂钮</td><td><span style="background:#1ABC9C;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">生产</span></td><td style="font-size:11px;color:#8A95A5">05-05</td></tr>
+<tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">HX8107</td><td class="tr">0G</td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5">04-27</td></tr>
+<tr><td style="color:#1ABC9C;font-weight:700">●</td><td class="td-name">HX8048</td><td class="tr">0G</td><td>树脂钮</td><td><span style="background:#1ABC9C;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">生产</span></td><td style="font-size:11px;color:#8A95A5">04-18</td></tr>
+<tr><td style="color:#1ABC9C;font-weight:700">●</td><td class="td-name">HX8038</td><td class="tr">0G</td><td>树脂钮</td><td><span style="background:#1ABC9C;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">生产</span></td><td style="font-size:11px;color:#8A95A5">04-18</td></tr>
+<tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">HX8023</td><td class="tr">0G</td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5">04-18</td></tr>
+<tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">HX7976</td><td class="tr">0G</td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5">04-16</td></tr>
+<tr><td style="color:#1ABC9C;font-weight:700">●</td><td class="td-name">HX8074</td><td class="tr">0G</td><td>树脂钮</td><td><span style="background:#1ABC9C;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">生产</span></td><td style="font-size:11px;color:#8A95A5">04-13</td></tr>
+<tr><td style="color:#1ABC9C;font-weight:700">●</td><td class="td-name">HX8066</td><td class="tr">4G</td><td>树脂钮</td><td><span style="background:#1ABC9C;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">生产</span></td><td style="font-size:11px;color:#8A95A5">04-13</td></tr>
+<tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">HX8002</td><td class="tr">0G</td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5">04-10</td></tr>
+<tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">HX8001</td><td class="tr">0G</td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5">04-10</td></tr>
+</tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
-<div class="ftr">HE SHENG BUTTON CO. · 生产运营司 · POWERED BY FEISHU API</div>
-</div>
-</div>
+<div class="ftr">合盛钮扣厂 · 生产运营司 · 数据来源 飞书多维表格</div>
+</div><!-- end wrap -->
 
 <script>
-var PIE_C=['#3D4F6F','#5B7FA6','#8BAA9E','#C4883A','#B85C5C','#9B7EB5','#5A9E8F','#C49A6C'];
-
-function fmt(n){return n.toLocaleString('zh-CN')}
-function esc(s){var d=document.createElement('div');d.appendChild(document.createTextNode(s||''));return d.innerHTML}
-function fmtDate(v){
-  if(!v&&v!==0)return '—';
-  if(typeof v==='number'){var d=new Date(v);return (d.getMonth()+1)+'/'+d.getDate();}
-  return String(v);
+function swTab(el,tab){
+  document.querySelectorAll('.tab').forEach(function(e){e.classList.remove('active')});
+  el.classList.add('active');
+  document.getElementById('t-in').style.display=tab==='in'?'block':'none';
+  document.getElementById('t-out').style.display=tab==='out'?'block':'none';
 }
-
-var startTs=Date.now();
-
-// ── 库存数据 ──
-fetch('/api/inventory',{signal:AbortSignal.timeout(25000)})
-  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
-  .then(function(data){
-    var items=data.items||[];
-    var total=items.length,inS=0,outS=0,totalVal=0;
-    items.forEach(function(it){if(it.stock>0)inS++;else outS++;totalVal+=it.cost});
-    totalVal=Math.round(totalVal);
-
-    // 更新时间
-    var now=new Date();
-    document.getElementById('updateTime').textContent=(now.getMonth()+1)+'/'+now.getDate()+' '+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
-
-    // KPI
-    document.getElementById('kpiRow').innerHTML=
-      '<div class="kpi"><div class="kn n">'+total+'</div><div class="kl">总 SKU</div><div class="ks">Total SKUs</div></div>'+
-      '<div class="kpi"><div class="kn g">'+inS+'</div><div class="kl">有库存</div><div class="ks">In Stock</div></div>'+
-      '<div class="kpi"><div class="kn r">'+outS+'</div><div class="kl">缺货</div><div class="ks">Out of Stock</div></div>'+
-      '<div class="kpi"><div class="kn o">¥'+fmt(totalVal)+'</div><div class="kl">库存总值</div><div class="ks">Total Value</div></div>'+
-      '<div class="kpi"><div class="kn n">—</div><div class="kl">本月订单</div><div class="ks">Monthly Orders</div></div>'+
-      '<div class="kpi"><div class="kn r">—</div><div class="kl">未回款</div><div class="ks">Outstanding</div></div>';
-
-    // 饼图
-    var deptMap={},tv=0;
-    items.forEach(function(it){var d=it.dept||'未知';if(!deptMap[d])deptMap[d]={c:0,v:0};deptMap[d].c++;deptMap[d].v+=it.cost;tv+=it.cost});
-    var sorted=Object.keys(deptMap).map(function(k){return{n:k,c:deptMap[k].c,v:deptMap[k].v}}).sort(function(a,b){return b.v-a.v}).slice(0,8);
-    var t=tv||1,legend='<table>';
-    sorted.forEach(function(d,i){
-      var p=d.v/t*100;
-      legend+='<tr><td><span class="dot" style="background:'+PIE_C[i%PIE_C.length]+'"></span>'+esc(d.n)+'</td><td class="num">'+p.toFixed(1)+'%</td><td class="num">¥'+fmt(Math.round(d.v))+'</td></tr>';
-    });
-    legend+='</table>';
-    var cx=16,cy=16,ri=10,ro=14.5,angle=0,paths='';
-    sorted.forEach(function(d,i){
-      var pct=d.v/t,a2=angle+pct*360;
-      if(pct<0.005){angle=a2;return}
-      var r1=angle*Math.PI/180,r2=a2*Math.PI/180;
-      var x1o=cx+ro*Math.cos(r1),y1o=cy+ro*Math.sin(r1);
-      var x2o=cx+ro*Math.cos(r2),y2o=cy+ro*Math.sin(r2);
-      var x1i=cx+ri*Math.cos(r2),y1i=cy+ri*Math.sin(r2);
-      var x2i=cx+ri*Math.cos(r1),y2i=cy+ri*Math.sin(r1);
-      paths+='<path d="M'+x1o.toFixed(1)+' '+y1o.toFixed(1)+' A'+ro+' '+ro+' 0 '+(pct>0.5?1:0)+' 1 '+x2o.toFixed(2)+' '+y2o.toFixed(2)+' L'+x1i.toFixed(2)+' '+y1i.toFixed(2)+' A'+ri+' '+ri+' 0 '+(pct>0.5?1:0)+' 0 '+x2i.toFixed(2)+' '+y2i.toFixed(2)+' Z" fill="'+PIE_C[i%PIE_C.length]+'"/>';
-      angle=a2;
-    });
-    document.getElementById('pieSection').innerHTML='<svg class="pie-svg" viewBox="0 0 32 32">'+paths+'</svg><div class="pie-legend">'+legend+'</div>';
-
-    // 订单总览（placeholder）
-    document.getElementById('orderSummary').innerHTML=
-      '<div class="order-item"><span class="order-label">待处理</span><span class="order-val">— 笔</span></div>'+
-      '<div class="order-item"><span class="order-label">处理中</span><span class="order-val">— 笔</span></div>'+
-      '<div class="order-item"><span class="order-label">已完成</span><span class="order-val">— 笔</span></div>'+
-      '<div class="order-item"><span class="order-label">未回款</span><span class="order-val" style="color:#B85C5C">—</span></div>';
-
-    // TOP20
-    var top20=items.filter(function(it){return it.cost>0}).sort(function(a,b){return b.cost-a.cost}).slice(0,20);
-    var h='';
-    top20.forEach(function(it,i){h+='<tr><td class="td-dept">'+(i+1)+'</td><td>'+esc(it.name)+'</td><td class="td-dept">'+esc(it.dept)+'</td><td class="tr">'+it.stock+'</td><td class="tr">¥'+fmt(it.cost)+'</td></tr>'});
-    document.getElementById('top20Body').innerHTML=h;
-
-    // 缺货
-    var reorder=items.filter(function(it){return it.stock===0&&it.name.length>1});
-    document.getElementById('reorderCount').textContent=reorder.length;
-    h='';
-    reorder.slice(0,20).forEach(function(it){h+='<tr><td>'+esc(it.name)+'</td><td class="td-dept">'+esc(it.dept)+'</td><td><span class="st r">缺货</span></td></tr>'});
-    document.getElementById('reorderBody').innerHTML=h;
-
-    // 状态
-    var sec=((Date.now()-startTs)/1000).toFixed(1);
-    document.getElementById('statusBadge').textContent=sec+'s';
-    document.getElementById('statusBadge').className='st g';
-    document.getElementById('loading').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-  })
-  .catch(function(err){
-    document.getElementById('loading').style.display='none';
-    document.getElementById('error').style.display='block';
-    document.getElementById('errMsg').textContent=err.message||'网络请求失败';
-    document.getElementById('statusBadge').textContent='ERR';
-    document.getElementById('statusBadge').className='st r';
-  });
-
-// ── 入库 ──
-fetch('/api/inbound',{signal:AbortSignal.timeout(20000)})
-  .then(function(r){return r.json()}).then(function(data){
-    var items=data.items||[];
-    document.getElementById('inboundCount').textContent=items.length;
-    items.sort(function(a,b){var da=a.date||0,db=b.date||0;if(da&&!db)return -1;if(!da&&db)return 1;return db-da});
-    var h='';
-    items.slice(0,100).forEach(function(it){h+='<tr><td>'+esc(it.name)+'</td><td class="tr">'+it.qty+'</td><td class="td-dept">'+esc(it.dept||'—')+'</td><td class="td-date">'+fmtDate(it.date)+'</td></tr>'});
-    if(!items.length)h='<tr class="empty-row"><td colspan="4">暂无入库记录</td></tr>';
-    document.getElementById('inboundBody').innerHTML=h;
-  }).catch(function(){document.getElementById('inboundBody').innerHTML='<tr class="empty-row"><td colspan="4">加载失败</td></tr>'});
-
-// ── 出库 ──
-fetch('/api/outbound',{signal:AbortSignal.timeout(20000)})
-  .then(function(r){return r.json()}).then(function(data){
-    var items=data.items||[];
-    document.getElementById('outboundCount').textContent=items.length;
-    var h='';
-    items.forEach(function(it){h+='<tr><td>'+esc(it.name||'—')+'</td><td class="tr">'+(it.qty||0)+'</td><td class="td-dept">'+esc(it.dept||'—')+'</td><td class="td-date">'+fmtDate(it.date)+'</td></tr>'});
-    if(!items.length)h='<tr class="empty-row"><td colspan="4">暂无出库记录</td></tr>';
-    document.getElementById('outboundBody').innerHTML=h;
-  }).catch(function(){document.getElementById('outboundBody').innerHTML='<tr class="empty-row"><td colspan="4">加载失败</td></tr>'});
 </script>
 </body>
 </html>

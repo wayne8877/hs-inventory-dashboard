@@ -89,6 +89,115 @@ top20 = sorted([r for r in records if r["cost"] > 0], key=lambda x: x["cost"], r
 # 缺货清单
 reorder = [r for r in records if r["stock"] == 0 and len(r["name"]) > 1]
 
+# ── 1.5 拉订单数据 ──
+ORDER_TBL = "tblSakoiChynJrw5"
+print("拉取订单数据...")
+order_records = fetch_all(OPS_BASE, ORDER_TBL)
+print(f"共 {len(order_records)} 条群聊记录")
+
+import re as _re
+order_re = _re.compile(r'HX\d+')
+g_re = _re.compile(r'(\d+)\s*[Gg]')
+BUTTON_TYPES = ["磁钮","彩虹钮","仿贝壳钮","阴阳钮","树脂钮","金属钮","四合扣","工字钮","撞钉","鸡眼","五爪扣"]
+PROCESS_STEPS = ["接单","调色","生产","筛胚","车钮","抛光","品检","出货"]
+STEP_KW = {
+    "接单":["查收","新单","下单"],"调色":["调色","对色","色板"],
+    "生产":["生产","做货","做了","大货","直接做货"],"筛胚":["筛胚"],
+    "车钮":["车钮","车床"],"抛光":["抛光","抛"],
+    "品检":["品检","检验","全检"],"出货":["出货","寄出","交货","寄过来"],
+}
+
+all_orders = {}
+today_str = datetime.date.today().isoformat()
+
+for rec in order_records:
+    f = rec.get("fields",{})
+    content = f.get("消息内容","")
+    ts_val = f.get("发送时间",0)
+    try:
+        msg_date = datetime.datetime.fromtimestamp(ts_val/1000)
+        date_str = msg_date.strftime("%Y-%m-%d")
+    except: date_str = "?"
+    
+    found = order_re.findall(content)
+    found_g = g_re.findall(content)
+    
+    for o in found:
+        if o not in all_orders:
+            all_orders[o] = {"order_no":o,"g_count":0,"product_type":"树脂钮","step":"接单","date":date_str,"latest_date":date_str,"client":"恒业"}
+        if date_str > all_orders[o]["latest_date"]: all_orders[o]["latest_date"] = date_str
+        
+        for g in found_g:
+            gi = int(g)
+            if 1 <= gi <= 500: all_orders[o]["g_count"] = max(all_orders[o]["g_count"],gi)
+        
+        for bt in BUTTON_TYPES:
+            if bt in content: all_orders[o]["product_type"] = bt; break
+        
+        for si,(step,kws) in enumerate(STEP_KW.items()):
+            if any(kw in content for kw in kws):
+                cs = PROCESS_STEPS.index(all_orders[o]["step"])
+                if si >= cs: all_orders[o]["step"] = step
+
+# 订单汇总
+today_orders = [o for o in all_orders.values() if o["latest_date"]==today_str]
+in_progress = [o for o in all_orders.values() if o["step"]!="出货"]
+shipped = [o for o in all_orders.values() if o["step"]=="出货"]
+total_g = sum(o["g_count"] for o in all_orders.values())
+today_g = sum(o["g_count"] for o in today_orders)
+no_g = [o for o in today_orders if o["g_count"]==0]
+total_order_count = len(all_orders)
+
+# 客户排名
+client_g = {}
+for o in all_orders.values():
+    c = o["client"]
+    client_g[c] = client_g.get(c,0) + o["g_count"]
+client_rank = sorted(client_g.items(), key=lambda x:-x[1])
+
+# 工序分布
+step_counts = {}
+for o in today_orders:
+    step_counts[o["step"]] = step_counts.get(o["step"],0) + 1
+
+# 钮扣类型
+type_g = {}
+for o in all_orders.values():
+    t = o["product_type"]
+    type_g[t] = type_g.get(t,0) + o["g_count"]
+type_rank = sorted(type_g.items(), key=lambda x:-x[1])
+
+# 在途订单行
+active_orders = sorted([o for o in all_orders.values() if o["step"]!="出货"],
+    key=lambda x: (x["latest_date"],x["order_no"]), reverse=True)[:12]
+order_rows = ""
+STEP_C = {"接单":"#2980B9","调色":"#8E44AD","生产":"#1ABC9C","筛胚":"#F39C12","车钮":"#B8860B","抛光":"#DAA520","品检":"#E74C3C","出货":"#27AE60"}
+for o in active_orders:
+    sc = STEP_C.get(o["step"],"#888")
+    order_rows += f'<tr><td style="color:{sc};font-weight:700">●</td><td class="td-name">{o["order_no"]}</td><td class="tr">{o["g_count"]}G</td><td>{o["product_type"][:6]}</td><td><span style="background:{sc};color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">{o["step"]}</span></td><td style="font-size:11px;color:#8A95A5">{o["latest_date"][5:]}</td></tr>\n'
+
+# 工序管道
+pipe_html = ""
+for i,step in enumerate(PROCESS_STEPS):
+    sc = STEP_C.get(step,"#888")
+    cnt = step_counts.get(step,0)
+    pipe_html += f'<div style="flex:1;text-align:center"><div style="background:{sc};color:#fff;padding:10px 4px;border-radius:8px;font-size:12px;font-weight:600">{step}</div><div style="font-size:20px;font-weight:700;color:{sc};margin-top:4px">{cnt}</div><div style="font-size:10px;color:#8A95A5">单</div></div>'
+
+# 客户排名行
+client_rows = ""
+max_g = max([g for _,g in client_rank]) if client_rank else 1
+for i,(cname,cg) in enumerate(client_rank[:6]):
+    bar_w = cg/max_g*50 if max_g else 0
+    client_rows += f'<tr><td>{cname}</td><td class="tr">{sum(1 for o in all_orders.values() if o["client"]==cname)}单</td><td class="tr">{cg}G</td><td><div style="background:{["#3D4F6F","#5B7FA6","#8BAA9E","#C4883A","#B85C5C","#9B7EB5"][i%6]};height:6px;width:{bar_w}%;border-radius:3px;min-width:4px"></div></td></tr>\n'
+
+# 订单KPI
+order_kpi_cards = f"""<div class="kpi"><div class="kn">{len(today_orders)}</div><div class="kl">今日订单</div><div class="ks">实时追踪</div></div>
+<div class="kpi"><div class="kn g">{today_g}G</div><div class="kl">今日G数</div><div class="ks">{today_g*144:,}颗</div></div>
+<div class="kpi"><div class="kn o">{len(in_progress)}/{len(shipped)}</div><div class="kl">进行中/已出货</div><div class="ks">{total_order_count}单在途</div></div>
+<div class="kpi"><div class="kn r">{len(no_g)}单</div><div class="kl">待补G数</div><div class="ks">今天</div></div>"""
+
+print(f"订单: {total_order_count}个, 今日{len(today_orders)}个, {total_g}G")
+
 # ── 2. 生成HTML ──
 now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
@@ -142,7 +251,7 @@ html = f"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>合盛辅料 HeSheng · 库存健康看板</title>
+<title>合盛辅料 HeSheng · 运营仪表盘</title>
 <style>
 *{{margin:0;padding:0;box-sizing:border-box}}
 body{{
@@ -231,7 +340,7 @@ body{{
 
 <div class="mid-row section-gap">
   <div class="card">
-    <div class="ctitle navy">🏭 各部门库存金额占比</div>
+    <div class="ctitle navy">各部门库存金额占比</div>
     <div class="pie-section">
       <svg class="pie-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
 {pie_segments}      </svg>
@@ -243,8 +352,8 @@ body{{
   </div>
   <div class="card">
     <div class="tab-bar">
-      <div class="tab active" onclick="swTab(this,'in')">📥 入库</div>
-      <div class="tab" onclick="swTab(this,'out')">📤 出库</div>
+      <div class="tab active" onclick="swTab(this,'in')">入库</div>
+      <div class="tab" onclick="swTab(this,'out')">出库</div>
     </div>
     <div id="t-in" class="tab-body">
       <div style="color:#4A8C6F;font-weight:600;margin-bottom:6px">今日入库 {in_stock} 品</div>
@@ -260,7 +369,7 @@ body{{
 
 <div class="section-gap two-row">
   <div class="card">
-    <div class="ctitle navy">📦 库存金额 TOP 20</div>
+    <div class="ctitle navy">库存金额 TOP 20</div>
     <div class="tbl-scroll">
       <table>
         <thead><tr><th style="width:8%">#</th><th style="width:35%">品名</th><th style="width:20%">部门</th><th class="tr" style="width:17%">库存</th><th class="tr" style="width:20%">金额</th></tr></thead>
@@ -270,7 +379,7 @@ body{{
     </div>
   </div>
   <div class="card">
-    <div class="ctitle orange">🔔 缺货清单 <span class="cnt o">{len(reorder)} 品</span></div>
+    <div class="ctitle orange">缺货清单 <span class="cnt o">{len(reorder)} 品</span></div>
     <div class="note">缺货 ≠ 补货 · 高频消耗+缺货 → 立即采购</div>
     <div class="tbl-scroll" style="max-height:400px;overflow-y:auto;">
       <table>
@@ -278,6 +387,36 @@ body{{
         <tbody>
 {reorder_rows}        </tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 订单追踪 ═══ -->
+<div class="section-gap" style="background:#fff;border-radius:12px;border:1px solid #E4E2DF;padding:0 0 16px">
+  <div class="ctitle navy" style="border-bottom:2px solid #C4883A">订单追踪</div>
+  <div class="kpi-row" style="padding:14px 16px">
+{order_kpi_cards}
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 380px 320px;gap:14px;padding:0 16px">
+    <div>
+      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">客户订单排名（按G数）</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr><th style="text-align:left;padding:4px 6px;border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">客户</th><th class="tr" style="border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">单数</th><th class="tr" style="border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">G数</th><th style="width:60px;border-bottom:2px solid #E8E7E3"></th></tr></thead>
+        <tbody>{client_rows}</tbody>
+      </table>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">今日工序进度</div>
+      <div style="display:flex;gap:4px;margin-bottom:10px">{pipe_html}</div>
+      <div style="font-size:11px;color:#8A95A5;text-align:center;margin-top:6px">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">在途订单（{len(active_orders)}单）</div>
+      <div style="max-height:220px;overflow-y:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <tbody>{order_rows}</tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
