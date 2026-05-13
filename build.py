@@ -257,7 +257,18 @@ for o in active_orders:
     age_style = "color:#C0392B;font-weight:700" if age > 7 else "color:#8A95A5"
     age_str = f'<span style="{age_style}">{age}天</span>' if age > 0 else "今天"
     # G数显示
-    g_str = f'{o["g_count"]}G' if o["g_count"] > 0 else '<span style="color:#AAA">未提</span>'
+    # G数显示
+    verified = o.get("verified", True)
+    if o["g_count"] > 0:
+        vs = o.get("verified_source", "")
+        if vs:
+            g_str = f'{o["g_count"]}G <span style="color:#27AE60;font-size:9px" title="合约OCR确认">📋</span>'
+        else:
+            g_str = f'{o["g_count"]}G'
+    elif not verified:
+        g_str = '<span style="color:#E67E22" title="合约图加密未读">⚠️ 待确认</span>'
+    else:
+        g_str = '<span style="color:#AAA">未提</span>'
     order_rows += f'<tr><td style="color:{sc};font-weight:700">●</td><td class="td-name">{o["order_no"]}</td><td class="tr">{g_str}</td><td>{o["product_type"][:6]}</td><td><span style="background:{sc};color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">{o["step"]}</span></td><td style="font-size:11px;color:#8A95A5">{o["latest_date"][5:]}</td><td>{age_str}</td></tr>\n'
 
 # 工序管道
