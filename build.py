@@ -148,6 +148,34 @@ today_g = sum(o["g_count"] for o in today_orders)
 no_g = [o for o in today_orders if o["g_count"]==0]
 total_order_count = len(all_orders)
 
+# 月度统计
+import collections as _col
+month_buckets = _col.defaultdict(lambda: {"count":0,"g":0})
+this_month = datetime.date.today().strftime("%Y-%m")
+this_year = datetime.date.today().strftime("%Y")
+month_orders = 0; month_g = 0
+year_orders = 0; year_g = 0
+for o in all_orders.values():
+    d = o["date"]
+    if len(d) >= 7:
+        m = d[:7]
+        month_buckets[m]["count"] += 1
+        month_buckets[m]["g"] += o["g_count"]
+        if d.startswith(this_month):
+            month_orders += 1; month_g += o["g_count"]
+        if d.startswith(this_year):
+            year_orders += 1; year_g += o["g_count"]
+
+# 月度排行（最近12个月）
+month_rank = sorted(month_buckets.items(), reverse=True)[:12]
+month_chart_rows = ""
+max_mg = max([m["g"] for _,m in month_rank]) if month_rank else 1
+for m,(month_str,md) in enumerate(month_rank):
+    mn = md["count"]; mg = md["g"]
+    bar_w = mg/max_mg*60 if max_mg else 0
+    lbl = month_str[-2:]+"月" if len(month_str)>=7 else month_str
+    month_chart_rows += f'<tr><td>{lbl}</td><td class="tr">{mn}单</td><td class="tr">{mg}G</td><td><div style="background:#3D4F6F;height:6px;width:{bar_w}%;border-radius:3px;min-width:3px"></div></td></tr>\n'
+
 # 客户排名
 client_g = {}
 for o in all_orders.values():
@@ -190,11 +218,11 @@ for i,(cname,cg) in enumerate(client_rank[:6]):
     bar_w = cg/max_g*50 if max_g else 0
     client_rows += f'<tr><td>{cname}</td><td class="tr">{sum(1 for o in all_orders.values() if o["client"]==cname)}单</td><td class="tr">{cg}G</td><td><div style="background:{["#3D4F6F","#5B7FA6","#8BAA9E","#C4883A","#B85C5C","#9B7EB5"][i%6]};height:6px;width:{bar_w}%;border-radius:3px;min-width:4px"></div></td></tr>\n'
 
-# 订单KPI — 大卡片
-order_kpi_cards = f"""<div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">{total_order_count}</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">今日+{len(today_orders)}</div></div>
-<div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num">{total_g}G</div><div class="okpi-label">订单总量</div></div><div class="okpi-sub">≈{total_g*144:,}颗</div></div>
-<div class="okpi"><div class="okpi-icon" style="background:#FFF3E0;color:#E67E22">⚙</div><div class="okpi-body"><div class="okpi-num">{len(in_progress)}</div><div class="okpi-label">进行中</div></div><div class="okpi-sub">待完成</div></div>
-<div class="okpi"><div class="okpi-icon" style="background:#FDECEC;color:#C0392B">📦</div><div class="okpi-body"><div class="okpi-num">{len(shipped)}</div><div class="okpi-label">已出货</div></div><div class="okpi-sub">已完成</div></div>
+# 订单KPI — 大卡片（含月度维度）
+order_kpi_cards = f"""<div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">{total_order_count}</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">本月{month_orders}单</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num">{total_g}G</div><div class="okpi-label">订单总量</div></div><div class="okpi-sub">本月{month_g}G</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#FFF3E0;color:#E67E22">📅</div><div class="okpi-body"><div class="okpi-num">{year_orders}</div><div class="okpi-label">{this_year}年</div></div><div class="okpi-sub">{year_g}G</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#FDECEC;color:#C0392B">⚙</div><div class="okpi-body"><div class="okpi-num">{len(in_progress)}</div><div class="okpi-label">进行中</div></div><div class="okpi-sub">{len(shipped)}已出货</div></div>
 <div class="okpi"><div class="okpi-icon" style="background:#F3E5F5;color:#8E44AD">🔍</div><div class="okpi-body"><div class="okpi-num">{len(no_g)}</div><div class="okpi-label">待补G数</div></div><div class="okpi-sub">需跟进</div></div>"""
 
 print(f"订单: {total_order_count}个, 今日{len(today_orders)}个, {total_g}G")
@@ -347,6 +375,12 @@ body{{
 .o-order-table th.tr{{text-align:right;}}
 .o-order-table td{{padding:5px 8px;border-bottom:1px solid #F5F3F0;vertical-align:middle;}}
 .o-order-table td.tr{{text-align:right;font-variant-numeric:tabular-nums;}}
+.o-monthly{{padding:0 20px 16px;border-bottom:1px solid #F0EFEC;}}
+.o-month-table{{width:100%;border-collapse:collapse;font-size:12px;}}
+.o-month-table th{{text-align:left;padding:4px 8px;border-bottom:2px solid #E8E7E3;font-size:10px;font-weight:600;color:#8A95A5;}}
+.o-month-table th.tr,.o-month-table th.bar-col{{text-align:right;}}
+.o-month-table td{{padding:3px 8px;border-bottom:1px solid #F5F3F0;}}
+.o-month-table td.tr{{text-align:right;font-variant-numeric:tabular-nums;}}
 /* ── 手机端适配 ── */
 @media(max-width:768px){{
   body{{font-size:14px}}
@@ -374,6 +408,8 @@ body{{
   .o-pipeline{{border-right:none;border-bottom:1px solid #F0EFEC;padding:14px 14px}}
   .o-clients{{padding:14px 14px}}
   .o-active-orders{{padding:0 14px 14px}}
+  .o-monthly{{padding:0 14px 14px}}
+  .o-month-table{{font-size:11px}}
   .o-header{{padding:14px 14px}}
   .o-updated{{display:none}}
   .o-title{{font-size:15px}}
@@ -445,6 +481,15 @@ body{{
   </div>
   <div class="o-kpi-row">{order_kpi_cards}</div>
   
+  <!-- 月度概览 -->
+  <div class="o-monthly">
+    <div class="o-subtitle" style="padding:0 4px 8px;margin-bottom:0">📅 月度订单概览</div>
+    <table class="o-month-table">
+      <thead><tr><th>月份</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">趋势</th></tr></thead>
+      <tbody>{month_chart_rows}</tbody>
+    </table>
+  </div>
+
   <div class="o-grid">
     <!-- 工序管道 -->
     <div class="o-pipeline">

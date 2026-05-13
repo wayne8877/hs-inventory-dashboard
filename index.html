@@ -98,6 +98,12 @@ body{
 .o-order-table th.tr{text-align:right;}
 .o-order-table td{padding:5px 8px;border-bottom:1px solid #F5F3F0;vertical-align:middle;}
 .o-order-table td.tr{text-align:right;font-variant-numeric:tabular-nums;}
+.o-monthly{padding:0 20px 16px;border-bottom:1px solid #F0EFEC;}
+.o-month-table{width:100%;border-collapse:collapse;font-size:12px;}
+.o-month-table th{text-align:left;padding:4px 8px;border-bottom:2px solid #E8E7E3;font-size:10px;font-weight:600;color:#8A95A5;}
+.o-month-table th.tr,.o-month-table th.bar-col{text-align:right;}
+.o-month-table td{padding:3px 8px;border-bottom:1px solid #F5F3F0;}
+.o-month-table td.tr{text-align:right;font-variant-numeric:tabular-nums;}
 /* ── 手机端适配 ── */
 @media(max-width:768px){
   body{font-size:14px}
@@ -125,6 +131,8 @@ body{
   .o-pipeline{border-right:none;border-bottom:1px solid #F0EFEC;padding:14px 14px}
   .o-clients{padding:14px 14px}
   .o-active-orders{padding:0 14px 14px}
+  .o-monthly{padding:0 14px 14px}
+  .o-month-table{font-size:11px}
   .o-header{padding:14px 14px}
   .o-updated{display:none}
   .o-title{font-size:15px}
@@ -181,7 +189,7 @@ body{
     <div><div class="brand-name">合盛辅料</div><div class="brand-en">HeSheng Button</div></div>
   </div>
   <div class="hdr-info">
-    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-05-13 13:32</div></div>
+    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-05-13 13:47</div></div>
     <div class="hdr-divider"></div>
     <div class="hdr-info-item"><div class="hdr-info-label">Source</div><div class="hdr-info-value">Feishu Bitable</div></div>
   </div>
@@ -192,14 +200,25 @@ body{
 <div class="o-section">
   <div class="o-header">
     <div class="o-title">📋 订单追踪</div>
-    <div class="o-updated">更新于 2026-05-13 13:32</div>
+    <div class="o-updated">更新于 2026-05-13 13:47</div>
   </div>
-  <div class="o-kpi-row"><div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">36</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">今日+0</div></div>
-<div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num">752G</div><div class="okpi-label">订单总量</div></div><div class="okpi-sub">≈108,288颗</div></div>
-<div class="okpi"><div class="okpi-icon" style="background:#FFF3E0;color:#E67E22">⚙</div><div class="okpi-body"><div class="okpi-num">16</div><div class="okpi-label">进行中</div></div><div class="okpi-sub">待完成</div></div>
-<div class="okpi"><div class="okpi-icon" style="background:#FDECEC;color:#C0392B">📦</div><div class="okpi-body"><div class="okpi-num">20</div><div class="okpi-label">已出货</div></div><div class="okpi-sub">已完成</div></div>
+  <div class="o-kpi-row"><div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">36</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">本月5单</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num">752G</div><div class="okpi-label">订单总量</div></div><div class="okpi-sub">本月0G</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#FFF3E0;color:#E67E22">📅</div><div class="okpi-body"><div class="okpi-num">36</div><div class="okpi-label">2026年</div></div><div class="okpi-sub">752G</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#FDECEC;color:#C0392B">⚙</div><div class="okpi-body"><div class="okpi-num">16</div><div class="okpi-label">进行中</div></div><div class="okpi-sub">20已出货</div></div>
 <div class="okpi"><div class="okpi-icon" style="background:#F3E5F5;color:#8E44AD">🔍</div><div class="okpi-body"><div class="okpi-num">0</div><div class="okpi-label">待补G数</div></div><div class="okpi-sub">需跟进</div></div></div>
   
+  <!-- 月度概览 -->
+  <div class="o-monthly">
+    <div class="o-subtitle" style="padding:0 4px 8px;margin-bottom:0">📅 月度订单概览</div>
+    <table class="o-month-table">
+      <thead><tr><th>月份</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">趋势</th></tr></thead>
+      <tbody><tr><td>05月</td><td class="tr">5单</td><td class="tr">0G</td><td><div style="background:#3D4F6F;height:6px;width:0.0%;border-radius:3px;min-width:3px"></div></td></tr>
+<tr><td>04月</td><td class="tr">31单</td><td class="tr">752G</td><td><div style="background:#3D4F6F;height:6px;width:60.0%;border-radius:3px;min-width:3px"></div></td></tr>
+</tbody>
+    </table>
+  </div>
+
   <div class="o-grid">
     <!-- 工序管道 -->
     <div class="o-pipeline">
