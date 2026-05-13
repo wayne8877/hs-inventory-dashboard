@@ -190,11 +190,12 @@ for i,(cname,cg) in enumerate(client_rank[:6]):
     bar_w = cg/max_g*50 if max_g else 0
     client_rows += f'<tr><td>{cname}</td><td class="tr">{sum(1 for o in all_orders.values() if o["client"]==cname)}单</td><td class="tr">{cg}G</td><td><div style="background:{["#3D4F6F","#5B7FA6","#8BAA9E","#C4883A","#B85C5C","#9B7EB5"][i%6]};height:6px;width:{bar_w}%;border-radius:3px;min-width:4px"></div></td></tr>\n'
 
-# 订单KPI
-order_kpi_cards = f"""<div class="kpi"><div class="kn">{len(today_orders)}</div><div class="kl">今日订单</div><div class="ks">实时追踪</div></div>
-<div class="kpi"><div class="kn g">{today_g}G</div><div class="kl">今日G数</div><div class="ks">{today_g*144:,}颗</div></div>
-<div class="kpi"><div class="kn o">{len(in_progress)}/{len(shipped)}</div><div class="kl">进行中/已出货</div><div class="ks">{total_order_count}单在途</div></div>
-<div class="kpi"><div class="kn r">{len(no_g)}单</div><div class="kl">待补G数</div><div class="ks">今天</div></div>"""
+# 订单KPI — 大卡片
+order_kpi_cards = f"""<div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">{total_order_count}</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">今日+{len(today_orders)}</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num">{total_g}G</div><div class="okpi-label">订单总量</div></div><div class="okpi-sub">≈{total_g*144:,}颗</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#FFF3E0;color:#E67E22">⚙</div><div class="okpi-body"><div class="okpi-num">{len(in_progress)}</div><div class="okpi-label">进行中</div></div><div class="okpi-sub">待完成</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#FDECEC;color:#C0392B">📦</div><div class="okpi-body"><div class="okpi-num">{len(shipped)}</div><div class="okpi-label">已出货</div></div><div class="okpi-sub">已完成</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#F3E5F5;color:#8E44AD">🔍</div><div class="okpi-body"><div class="okpi-num">{len(no_g)}</div><div class="okpi-label">待补G数</div></div><div class="okpi-sub">需跟进</div></div>"""
 
 print(f"订单: {total_order_count}个, 今日{len(today_orders)}个, {total_g}G")
 
@@ -315,6 +316,37 @@ body{{
 .st{{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;}}
 .st.r{{background:#FDECEC;color:#B85C5C;}}
 .ftr{{text-align:center;padding:16px 0 24px;font-size:11px;color:#8A95A5;}}
+/* ── 订单追踪专属样式 ── */
+.o-section{{background:#fff;border-radius:14px;border:1px solid #E4E2DF;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.04);}}
+.o-header{{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #F0EFEC;background:linear-gradient(135deg,#FAFBFC 0%,#F5F3F0 100%);}}
+.o-title{{font-size:17px;font-weight:700;color:#1A1A2E;letter-spacing:0.5px;}}
+.o-updated{{font-size:11px;color:#8A95A5;}}
+.o-kpi-row{{display:flex;gap:12px;padding:16px 20px;}}
+.okpi{{flex:1;display:flex;align-items:center;gap:12px;background:#FAFBFC;border-radius:10px;padding:14px 16px;border:1px solid #EEEBE6;min-width:0;}}
+.okpi-icon{{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}}
+.okpi-body{{flex:1;min-width:0;}}
+.okpi-num{{font-size:24px;font-weight:700;line-height:1.2;color:#1A1A2E;}}
+.okpi-label{{font-size:12px;color:#555E6D;font-weight:500;margin-top:1px;}}
+.okpi-sub{{font-size:10px;color:#8A95A5;white-space:nowrap;}}
+.o-grid{{display:grid;grid-template-columns:1fr 320px;gap:0;border-top:1px solid #F0EFEC;}}
+.o-pipeline{{padding:18px 20px;border-right:1px solid #F0EFEC;}}
+.o-clients{{padding:18px 20px;}}
+.o-subtitle{{font-size:13px;font-weight:700;color:#1A1A2E;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #E8E7E3;}}
+.o-pipe-row{{display:flex;gap:5px;margin-bottom:10px;}}
+.o-pipe-legend{{font-size:10px;color:#8A95A5;text-align:center;letter-spacing:2px;}}
+.o-client-table{{width:100%;border-collapse:collapse;font-size:13px;}}
+.o-client-table th{{text-align:left;padding:5px 8px;border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D;font-weight:600;}}
+.o-client-table th.tr,.o-client-table th.bar-col{{text-align:right;}}
+.o-client-table td{{padding:6px 8px;border-bottom:1px solid #F5F3F0;}}
+.o-client-table td.tr{{text-align:right;font-variant-numeric:tabular-nums;}}
+.o-active-orders{{padding:0 20px 18px;border-top:1px solid #F0EFEC;}}
+.o-active-orders .o-subtitle{{margin-top:18px;}}
+.o-order-scroll{{max-height:280px;overflow-y:auto;}}
+.o-order-table{{width:100%;border-collapse:collapse;font-size:12px;}}
+.o-order-table th{{text-align:left;padding:6px 8px;border-bottom:2px solid #E8E7E3;font-size:10px;font-weight:600;color:#8A95A5;text-transform:uppercase;letter-spacing:1px;position:sticky;top:0;background:#fff;}}
+.o-order-table th.tr{{text-align:right;}}
+.o-order-table td{{padding:5px 8px;border-bottom:1px solid #F5F3F0;vertical-align:middle;}}
+.o-order-table td.tr{{text-align:right;font-variant-numeric:tabular-nums;}}
 </style>
 </head>
 <body>
@@ -332,31 +364,38 @@ body{{
 <div class="wrap">
 
 <!-- ═══ 订单追踪 ═══ -->
-<div class="section-gap" style="background:#fff;border-radius:12px;border:1px solid #E4E2DF;padding:0 0 16px">
-  <div class="ctitle navy" style="border-bottom:2px solid #C4883A">订单追踪</div>
-  <div class="kpi-row" style="padding:14px 16px">
-{order_kpi_cards}
+<div class="o-section">
+  <div class="o-header">
+    <div class="o-title">📋 订单追踪</div>
+    <div class="o-updated">更新于 {now}</div>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 380px 320px;gap:14px;padding:0 16px">
-    <div>
-      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">客户订单排名（按G数）</div>
-      <table style="width:100%;border-collapse:collapse;font-size:13px">
-        <thead><tr><th style="text-align:left;padding:4px 6px;border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">客户</th><th class="tr" style="border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">单数</th><th class="tr" style="border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D">G数</th><th style="width:60px;border-bottom:2px solid #E8E7E3"></th></tr></thead>
+  <div class="o-kpi-row">{order_kpi_cards}</div>
+  
+  <div class="o-grid">
+    <!-- 工序管道 -->
+    <div class="o-pipeline">
+      <div class="o-subtitle">工序管道</div>
+      <div class="o-pipe-row">{pipe_html}</div>
+      <div class="o-pipe-legend">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
+    </div>
+    <!-- 客户排名 -->
+    <div class="o-clients">
+      <div class="o-subtitle">客户排名（按G数）</div>
+      <table class="o-client-table">
+        <thead><tr><th>客户</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">占比</th></tr></thead>
         <tbody>{client_rows}</tbody>
       </table>
     </div>
-    <div>
-      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">今日工序进度</div>
-      <div style="display:flex;gap:4px;margin-bottom:10px">{pipe_html}</div>
-      <div style="font-size:11px;color:#8A95A5;text-align:center;margin-top:6px">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
-    </div>
-    <div>
-      <div style="font-size:13px;font-weight:700;margin:0 0 8px;color:#1C2333">在途订单（{len(active_orders)}单）</div>
-      <div style="max-height:220px;overflow-y:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <tbody>{order_rows}</tbody>
-        </table>
-      </div>
+  </div>
+
+  <!-- 在途订单 -->
+  <div class="o-active-orders">
+    <div class="o-subtitle">在途订单 · {len(active_orders)} 单</div>
+    <div class="o-order-scroll">
+      <table class="o-order-table">
+        <thead><tr><th></th><th>订单号</th><th class="tr">G数</th><th>类型</th><th>工序</th><th class="tr">日期</th></tr></thead>
+        <tbody>{order_rows}</tbody>
+      </table>
     </div>
   </div>
 </div>
