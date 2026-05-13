@@ -176,6 +176,35 @@ for rec in order_records:
                 cs = PROCESS_STEPS.index(entry["step"])
                 if si >= cs: entry["step"] = step
 
+# ── 合约图片OCR确凿G数覆盖 ──
+import os as _os
+_vg_path = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "verified_g.json")
+try:
+    with open(_vg_path, 'r', encoding='utf-8') as _f:
+        _vg = json.load(_f)
+    _vg_orders = _vg.get("orders", {})
+    for _oid, _vdata in _vg_orders.items():
+        if _oid in all_orders:
+            all_orders[_oid]["g_count"] = max(all_orders[_oid]["g_count"], _vdata.get("g_count", 0))
+            if _vdata.get("verified_source", "") or _vdata.get("note", ""):
+                all_orders[_oid]["verified_source"] = _vdata.get("source", "")
+            all_orders[_oid]["verified"] = _vdata.get("verified", True)
+        else:
+            all_orders[_oid] = {
+                "order_no": _oid,
+                "g_count": _vdata.get("g_count", 0),
+                "product_type": "",
+                "step": "接单",
+                "latest_date": _vdata.get("contract_date", ""),
+                "first_date": _vdata.get("contract_date", ""),
+                "verified_source": _vdata.get("source", ""),
+                "verified": _vdata.get("verified", True),
+                "history": [],
+                "senders": set()
+            }
+except Exception as _e:
+    pass
+
 # 订单汇总
 today_orders = [o for o in all_orders.values() if o["latest_date"]==today_str]
 in_progress = [o for o in all_orders.values() if o["step"]!="出货"]
