@@ -96,7 +96,7 @@ order_records = fetch_all(OPS_BASE, ORDER_TBL)
 print(f"共 {len(order_records)} 条群聊记录")
 
 import re as _re
-order_re = _re.compile(r'HX\d+')
+order_re = _re.compile(r'[Hh][Xx]\d+')
 g_re = _re.compile(r'(\d+)\s*[Gg]')
 BUTTON_TYPES = ["磁钮","彩虹钮","仿贝壳钮","阴阳钮","树脂钮","金属钮","四合扣","工字钮","撞钉","鸡眼","五爪扣"]
 PROCESS_STEPS = ["接单","调色","生产","筛胚","车钮","抛光","品检","出货"]
@@ -129,7 +129,7 @@ for rec in order_records:
         
         for g in found_g:
             gi = int(g)
-            if 1 <= gi <= 500: all_orders[o]["g_count"] = max(all_orders[o]["g_count"],gi)
+            if 1 <= gi <= 50000: all_orders[o]["g_count"] += gi
         
         for bt in BUTTON_TYPES:
             if bt in content: all_orders[o]["product_type"] = bt; break
