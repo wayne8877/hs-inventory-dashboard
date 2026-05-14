@@ -663,8 +663,9 @@ body{{
   .o-order-table td{{padding:3px 5px}}
   .tab{{font-size:13px}}
   .tab-body{{font-size:12px;max-height:200px}}
-  .tbl-scroll table{{font-size:12px}}
+  .tbl-scroll table{{font-size:12px;min-width:480px}}
   .tbl-scroll th{{font-size:10px;padding:6px 8px}}
+  .tbl-scroll{{overflow-x:auto;-webkit-overflow-scrolling:touch}}
   .ctitle{{font-size:13px;padding:10px 14px}}
   .note{{font-size:10px;padding:4px 12px}}
   .ftr{{font-size:10px;padding:12px 0 20px}}
