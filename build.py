@@ -404,7 +404,9 @@ def parse_spec(spec, name=""):
 
 # 构建名称→显示信息映射
 name_to_display = {}  # name -> (container, kg_per_container)
+name_to_spec = {}     # name -> spec
 for r in records:
+    name_to_spec[r["name"]] = r["spec"]
     parsed = parse_spec(r["spec"], r["name"])
     if parsed:
         container, per_unit, spec_str = parsed
@@ -431,14 +433,15 @@ for r in pass_through_candidates[:30]:
 # 入库行
 inbound_body = ""
 if in_rows:
-    inbound_body = '<table style="table-layout:fixed;width:100%"><colgroup><col style="width:32%"><col style="width:16%"><col style="width:20%"><col style="width:16%"><col style="width:16%"></colgroup><thead><tr><th>品名</th><th style="text-align:center">数量</th><th>部门</th><th style="text-align:center">库存</th><th style="text-align:center;white-space:nowrap">日期</th></tr></thead><tbody>\n'
+    inbound_body = '<table style="table-layout:fixed;width:100%"><colgroup><col style="width:22%"><col style="width:18%"><col style="width:12%"><col style="width:16%"><col style="width:12%"><col style="width:20%"></colgroup><thead><tr><th>品名</th><th>规格/型号</th><th style="text-align:center">数量</th><th>部门</th><th style="text-align:center">库存</th><th style="text-align:center;white-space:nowrap">日期</th></tr></thead><tbody>\n'
     for r in in_rows:
         stock = 0
         for rec in records:
             if rec['name'] == r['name']:
                 stock = rec['stock']
                 break
-        inbound_body += f"""        <tr><td class="name">{short(r['name'], 18)}</td><td style="text-align:center">{fmt_qty(r['qty'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{r['dept']}</td><td style="text-align:center">{fmt_qty(stock, *name_to_display.get(r['name'], ('个', 1)))}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
+        spec = name_to_spec.get(r['name'], '')
+        inbound_body += f"""        <tr><td class="name">{short(r['name'], 14)}</td><td class="spec">{short(spec, 14)}</td><td style="text-align:center">{fmt_qty(r['qty'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{r['dept']}</td><td style="text-align:center">{fmt_qty(stock, *name_to_display.get(r['name'], ('个', 1)))}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
     inbound_body += '</tbody></table>'
 else:
     inbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无入库记录</div>'
@@ -446,14 +449,15 @@ else:
 # 出库行
 outbound_body = ""
 if out_rows:
-    outbound_body = '<table style="table-layout:fixed;width:100%"><colgroup><col style="width:32%"><col style="width:16%"><col style="width:20%"><col style="width:16%"><col style="width:16%"></colgroup><thead><tr><th>品名</th><th style="text-align:center">数量</th><th>部门</th><th style="text-align:center">库存</th><th style="text-align:center;white-space:nowrap">日期</th></tr></thead><tbody>\n'
+    outbound_body = '<table style="table-layout:fixed;width:100%"><colgroup><col style="width:22%"><col style="width:18%"><col style="width:12%"><col style="width:16%"><col style="width:12%"><col style="width:20%"></colgroup><thead><tr><th>品名</th><th>规格/型号</th><th style="text-align:center">数量</th><th>部门</th><th style="text-align:center">库存</th><th style="text-align:center;white-space:nowrap">日期</th></tr></thead><tbody>\n'
     for r in out_rows:
         stock = 0
         for rec in records:
             if rec['name'] == r['name']:
                 stock = rec['stock']
                 break
-        outbound_body += f"""        <tr><td class="name">{short(r['name'], 18)}</td><td style="text-align:center">{fmt_qty(r['qty'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{r['dept']}</td><td style="text-align:center">{fmt_qty(stock, *name_to_display.get(r['name'], ('个', 1)))}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
+        spec = name_to_spec.get(r['name'], '')
+        outbound_body += f"""        <tr><td class="name">{short(r['name'], 14)}</td><td class="spec">{short(spec, 14)}</td><td style="text-align:center">{fmt_qty(r['qty'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{r['dept']}</td><td style="text-align:center">{fmt_qty(stock, *name_to_display.get(r['name'], ('个', 1)))}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
     outbound_body += '</tbody></table>'
 else:
     outbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无出库记录</div>'
@@ -559,6 +563,7 @@ body{{
 .tbl-scroll td.tr{{text-align:right;font-variant-numeric:tabular-nums;}}
 .td-num{{color:#8A95A5;font-size:11px;width:28px;text-align:center;}}
 .td-name{{font-weight:500;max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
+.spec{{font-size:12px;color:#8A95A5;max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
 .st{{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;}}
 .st.r{{background:#FDECEC;color:#B85C5C;}}
 .st.g{{background:#E8F5E9;color:#388E3C;}}
