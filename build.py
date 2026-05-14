@@ -555,7 +555,7 @@ body{{
 .cnt{{font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px}}
 .cnt.o{{background:#FEF3E2;color:#C4883A}}
 .dot{{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}}
-.mid-row{{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 0 14px;align-items:stretch;}}
+.mid-row{{display:grid;grid-template-columns:1fr;gap:14px;padding:0 0 14px;}}
 .pie-section{{display:flex;gap:16px;align-items:center;padding:12px 16px;}}
 .pie-svg{{flex-shrink:0;width:200px;height:200px;}}
 .pie-legend{{flex:1;}}
@@ -784,19 +784,16 @@ body{{
 </div>
 
 <div class="card section-gap">
-  <details style="cursor:pointer">
-    <summary class="ctitle navy" style="display:list-item;padding:10px 14px;font-size:13px;font-weight:600;user-select:none">
-      🔄 过手件识别 <span class="cnt">{len(pass_through_candidates)} 项</span>
-      <span style="font-weight:400;font-size:11px;color:#8A95A5;margin-left:8px">点击展开</span>
-    </summary>
-    <div class="tbl-scroll" style="max-height:300px;overflow-y:auto;padding:0 14px 10px">
+  <div class="ctitle navy" style="padding:10px 14px;font-size:13px;font-weight:600">
+    🔄 过手件识别 <span class="cnt">{len(pass_through_candidates)} 项</span>
+  </div>
+  <div class="tbl-scroll" style="max-height:300px;overflow-y:auto;padding:0 14px 10px">
       <table>
         <thead><tr><th style="width:30%">品名</th><th class="tr" style="width:12%">入库</th><th class="tr" style="width:12%">出库</th><th class="tr" style="width:12%">库存</th><th style="width:24%">标签</th></tr></thead>
         <tbody>
 {pass_through_rows}        </tbody>
       </table>
     </div>
-  </details>
 </div>
 
 <div class="section-gap two-row">
