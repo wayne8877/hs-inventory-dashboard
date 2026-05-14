@@ -365,33 +365,68 @@ reorder_rows = ""
 for r in reorder[:50]:
     reorder_rows += f"""        <tr><td class="td-name">{short(r['name'], 16)}</td><td>{r['dept']}</td><td><span class="st r">缺货</span></td></tr>\n"""
 
-# 过手件行
+# 过手件行（移至 fmt_qty 定义后生成）
 pass_through_rows = ""
+
+# ── 单位推断：从规格型号提取包装单位和换算系数 ──
+import re
+
+def parse_spec(spec, name=""):
+    """返回 (display_unit, kg_per_unit, spec_str) 或 None"""
+    s = (spec or "").strip()
+    if not s:
+        return None
+    
+    su = s.upper()
+    
+    # 匹配模式：数字+单位/包装容器 (如 "25KG/桶", "25公斤/桶", "32KG/包", "1KG/罐")
+    m = re.search(r'(\d+(?:\.\d+)?)\s*(KG|公斤|千克|KGS)\s*[/／](桶|罐|包|瓶|袋|箱|盒|条|卷)', su)
+    if m:
+        num = float(m.group(1))
+        container = m.group(3)
+        return (container, num, s)
+    
+    # 匹配模式：数字+包装容器 不含重量 (如 "500 毫升")
+    m = re.search(r'(\d+(?:\.\d+)?)\s*(毫升|ML)\s*[/／]?(桶|罐|瓶)?', su)
+    if m:
+        num = float(m.group(1))
+        container = m.group(3) or "瓶"
+        return (container, num / 1000, s)  # ml→L，假设1L≈1kg
+    
+    # 匹配模式：数字+单位 后面没有明确容器，尝试找容器词
+    m = re.search(r'(\d+(?:\.\d+)?)\s*(KG|公斤|千克|KGS|L)\s*(?:[/／])?\s*(桶|罐|包|瓶|袋|箱)?', su)
+    if m:
+        container = m.group(3) or "份"
+        return (container, float(m.group(1)), s)
+    
+    return None  # 无法解析，用默认 "个"
+
+
+# 构建名称→显示信息映射
+name_to_display = {}  # name -> (container, kg_per_container)
+for r in records:
+    parsed = parse_spec(r["spec"], r["name"])
+    if parsed:
+        container, per_unit, spec_str = parsed
+        name_to_display[r["name"]] = (container, per_unit)
+    else:
+        name_to_display[r["name"]] = ("个", 1)  # 默认计数单位
+
+
+def fmt_qty(qty, container, per_unit):
+    """格式化数量显示：从kg换算到包装单位"""
+    if container == "个":
+        return f"{int(qty)}个"
+    n = qty / per_unit
+    if n == int(n):
+        return f"{int(n)}{container}"
+    else:
+        return f"{n:.1f}{container}"
+
+# 过手件行（实际生成，fmt_qty 已定义）
 for r in pass_through_candidates[:30]:
     tag = '<span class="st g">✓ 已标记</span>' if r['type'] == "过手件" else '<span class="st o">? 建议标记</span>'
-    pass_through_rows += f"""        <tr><td class="td-name">{short(r['name'], 18)}</td><td class="tr">{r['t_in']}</td><td class="tr">{r['t_out']}</td><td class="tr">{r['stock']}</td><td>{tag}</td></tr>\n"""
-
-# ── 单位推断：从规格型号提取计量单位 ──
-def guess_unit(spec, name=""):
-    s = (spec or "").upper()
-    # 明确含kg/公斤的
-    if "KG" in s or "公斤" in s or "KGS" in s or "千克" in s:
-        return "kg"
-    if "G" in s and "KG" not in s and "KGS" not in s:
-        return "g"
-    if "毫升" in s or "ML" in s:
-        return "ml"
-    if "L" in s and "ML" not in s:
-        return "L"
-    if "米" in s or "M" == s.strip():
-        return "m"
-    return "个"  # 默认
-
-# 构建名称→单位映射（从台账规格型号推断）
-name_to_unit = {}
-for r in records:
-    unit = guess_unit(r["spec"], r["name"])
-    name_to_unit[r["name"]] = unit
+    pass_through_rows += f"""        <tr><td class="td-name">{short(r['name'], 18)}</td><td class="tr">{fmt_qty(r['t_in'], *name_to_display.get(r['name'], ('个', 1)))}</td><td class="tr">{fmt_qty(r['t_out'], *name_to_display.get(r['name'], ('个', 1)))}</td><td class="tr">{fmt_qty(r['stock'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{tag}</td></tr>\n"""
 
 # 入库行
 inbound_body = ""
@@ -403,7 +438,7 @@ if in_rows:
             if rec['name'] == r['name']:
                 stock = rec['stock']
                 break
-        inbound_body += f"""        <tr><td class="name">{short(r['name'], 18)}</td><td style="text-align:center">{int(r['qty'])}<span class="u">{name_to_unit.get(r['name'], '')}</span></td><td>{r['dept']}</td><td style="text-align:center">{stock}<span class="u">{name_to_unit.get(r['name'], '')}</span></td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
+        inbound_body += f"""        <tr><td class="name">{short(r['name'], 18)}</td><td style="text-align:center">{fmt_qty(r['qty'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{r['dept']}</td><td style="text-align:center">{fmt_qty(stock, *name_to_display.get(r['name'], ('个', 1)))}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
     inbound_body += '</tbody></table>'
 else:
     inbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无入库记录</div>'
@@ -418,7 +453,7 @@ if out_rows:
             if rec['name'] == r['name']:
                 stock = rec['stock']
                 break
-        outbound_body += f"""        <tr><td class="name">{short(r['name'], 18)}</td><td style="text-align:center">{int(r['qty'])}<span class="u">{name_to_unit.get(r['name'], '')}</span></td><td>{r['dept']}</td><td style="text-align:center">{stock}<span class="u">{name_to_unit.get(r['name'], '')}</span></td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
+        outbound_body += f"""        <tr><td class="name">{short(r['name'], 18)}</td><td style="text-align:center">{fmt_qty(r['qty'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{r['dept']}</td><td style="text-align:center">{fmt_qty(stock, *name_to_display.get(r['name'], ('个', 1)))}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
     outbound_body += '</tbody></table>'
 else:
     outbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无出库记录</div>'
