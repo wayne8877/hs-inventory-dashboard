@@ -800,7 +800,7 @@ body{{
 <div class="section-gap two-row">
   <div class="card">
     <div class="ctitle navy">库存金额 TOP 20</div>
-    <div class="tbl-scroll">
+    <div class="tbl-scroll" style="max-height:400px;overflow-y:auto;">
       <table>
         <thead><tr><th style="width:8%">#</th><th style="width:35%">品名</th><th style="width:20%">部门</th><th class="tr" style="width:17%">库存</th><th class="tr" style="width:20%">金额</th></tr></thead>
         <tbody>
@@ -809,8 +809,7 @@ body{{
     </div>
   </div>
   <div class="card">
-    <div class="ctitle orange">缺货清单 <span class="cnt o">{len(reorder)} 品</span></div>
-    <div class="note">缺货 ≠ 补货 · 高频消耗+缺货 → 立即采购</div>
+    <div class="ctitle navy">缺货清单 <span class="cnt">{len(reorder)} 品</span></div>
     <div class="tbl-scroll" style="max-height:400px;overflow-y:auto;">
       <table>
         <thead><tr><th style="width:38%">品名</th><th style="width:28%">部门</th><th style="width:34%">状态</th></tr></thead>
