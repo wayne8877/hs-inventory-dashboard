@@ -371,6 +371,28 @@ for r in pass_through_candidates[:30]:
     tag = '<span class="st g">✓ 已标记</span>' if r['type'] == "过手件" else '<span class="st o">? 建议标记</span>'
     pass_through_rows += f"""        <tr><td class="td-name">{short(r['name'], 18)}</td><td class="tr">{r['t_in']}</td><td class="tr">{r['t_out']}</td><td class="tr">{r['stock']}</td><td>{tag}</td></tr>\n"""
 
+# ── 单位推断：从规格型号提取计量单位 ──
+def guess_unit(spec, name=""):
+    s = (spec or "").upper()
+    # 明确含kg/公斤的
+    if "KG" in s or "公斤" in s or "KGS" in s or "千克" in s:
+        return "kg"
+    if "G" in s and "KG" not in s and "KGS" not in s:
+        return "g"
+    if "毫升" in s or "ML" in s:
+        return "ml"
+    if "L" in s and "ML" not in s:
+        return "L"
+    if "米" in s or "M" == s.strip():
+        return "m"
+    return "个"  # 默认
+
+# 构建名称→单位映射（从台账规格型号推断）
+name_to_unit = {}
+for r in records:
+    unit = guess_unit(r["spec"], r["name"])
+    name_to_unit[r["name"]] = unit
+
 # 入库行
 inbound_body = ""
 if in_rows:
@@ -381,7 +403,7 @@ if in_rows:
             if rec['name'] == r['name']:
                 stock = rec['stock']
                 break
-        inbound_body += f"""        <tr><td class="name">{short(r['name'], 18)}</td><td style="text-align:center">{int(r['qty'])}</td><td>{r['dept']}</td><td style="text-align:center">{stock}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
+        inbound_body += f"""        <tr><td class="name">{short(r['name'], 18)}</td><td style="text-align:center">{int(r['qty'])}<span class="u">{name_to_unit.get(r['name'], '')}</span></td><td>{r['dept']}</td><td style="text-align:center">{stock}<span class="u">{name_to_unit.get(r['name'], '')}</span></td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
     inbound_body += '</tbody></table>'
 else:
     inbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无入库记录</div>'
@@ -396,7 +418,7 @@ if out_rows:
             if rec['name'] == r['name']:
                 stock = rec['stock']
                 break
-        outbound_body += f"""        <tr><td class="name">{short(r['name'], 18)}</td><td style="text-align:center">{int(r['qty'])}</td><td>{r['dept']}</td><td style="text-align:center">{stock}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
+        outbound_body += f"""        <tr><td class="name">{short(r['name'], 18)}</td><td style="text-align:center">{int(r['qty'])}<span class="u">{name_to_unit.get(r['name'], '')}</span></td><td>{r['dept']}</td><td style="text-align:center">{stock}<span class="u">{name_to_unit.get(r['name'], '')}</span></td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
     outbound_body += '</tbody></table>'
 else:
     outbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无出库记录</div>'
@@ -506,6 +528,7 @@ body{{
 .st.r{{background:#FDECEC;color:#B85C5C;}}
 .st.g{{background:#E8F5E9;color:#388E3C;}}
 .st.o{{background:#FFF3E0;color:#E65100;}}
+.u{{font-size:10px;color:#8A95A5;margin-left:2px;}}
 .ftr{{text-align:center;padding:16px 0 24px;font-size:11px;color:#8A95A5;}}
 /* ── 订单追踪专属样式 ── */
 .o-section{{background:#fff;border-radius:14px;border:1px solid #E4E2DF;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.04);}}
