@@ -522,8 +522,9 @@ html = f"""<!DOCTYPE html>
 <style>
 *{{margin:0;padding:0;box-sizing:border-box}}
 body{{
-  font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
-  background:#F2F1EE;color:#1C2333;font-size:15px;
+  margin:0;padding:0;
+  background:#F7F6F3;color:#1C2333;font-size:15px;
+  font-family:-apple-system,'PingFang SC','Microsoft YaHei','Helvetica Neue',sans-serif;
   -webkit-font-smoothing:antialiased;
 }}
 .wrap{{max-width:1280px;margin:0 auto;padding:0 16px}}
@@ -541,16 +542,17 @@ body{{
 .hdr-info-value{{font-size:17px;font-weight:700;color:#1A1A2E}}
 .hdr-divider{{width:1px;height:28px;background:#E8E7E3}}
 .kpi-row{{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 0}}
-.kpi{{background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #E4E2DF;min-width:0;}}
+.kpi{{background:#fff;border-radius:14px;padding:18px 20px;border:1px solid #E8E6E2;min-width:0;box-shadow:0 2px 6px rgba(0,0,0,0.04);}}
 .kn{{font-size:28px;font-weight:700;line-height:1;margin-bottom:3px}}
 .kn.g{{color:#4A8C6F}}
 .kn.r{{color:#B85C5C}}
 .kn.o{{color:#C4883A}}
 .kl{{font-size:13px;font-weight:500;color:#1C2333;margin-bottom:2px}}
 .ks{{font-size:11px;color:#8A95A5}}
-.card{{background:#fff;border-radius:12px;border:1px solid #E4E2DF;overflow:hidden;}}
-.ctitle{{font-size:14px;font-weight:700;padding:12px 16px;border-bottom:2px solid #E8E7E3;display:flex;align-items:center;gap:6px;}}
-.ctitle.navy{{border-bottom-color:#3D4F6F}}
+.card{{background:#fff;border-radius:14px;border:1px solid #E8E6E2;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04);}}
+.ctitle{{font-size:14px;font-weight:700;padding:14px 18px;border-bottom:2px solid #E8E7E3;display:flex;align-items:center;gap:6px;color:#2C3A4F;}}
+.ctitle.navy{{border-bottom-color:#3D4F6F;color:#2C3A4F}}
+.ctitle.danger{{border-bottom-color:#B85C5C;color:#B85C5C}}
 .ctitle.orange{{border-bottom-color:#C4883A}}
 .cnt{{font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px}}
 .cnt.o{{background:#FEF3E2;color:#C4883A}}
@@ -722,6 +724,64 @@ body{{
 </div></div>
 <div class="wrap">
 
+<div class="kpi-row section-gap">
+  <div class="kpi"><div class="kn">{total}</div><div class="kl">总 SKU</div><div class="ks">全部物料品类</div></div>
+  <div class="kpi"><div class="kn g">{in_stock}</div><div class="kl">有库存</div><div class="ks">可正常领用</div></div>
+  <div class="kpi"><div class="kn r">{out_stock}</div><div class="kl">无库存</div><div class="ks">当前缺货待补</div></div>
+  <div class="kpi"><div class="kn o">¥{total_val:,}</div><div class="kl">库存总值</div><div class="ks">已占用资金</div></div>
+</div>
+
+<div class="section-gap two-row">
+  <div class="card">
+    <div class="ctitle danger">⚠️ 缺货清单 <span class="cnt">{len(reorder)} 品</span></div>
+    <div class="tbl-scroll" style="max-height:400px;overflow-y:auto;">
+      <table>
+        <thead><tr><th style="width:38%">品名</th><th style="width:28%">部门</th><th style="width:34%">状态</th></tr></thead>
+        <tbody>
+{reorder_rows}        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctitle navy">库存金额 TOP 20</div>
+    <div class="tbl-scroll" style="max-height:400px;overflow-y:auto;">
+      <table>
+        <thead><tr><th style="width:8%">#</th><th style="width:35%">品名</th><th style="width:20%">部门</th><th class="tr" style="width:17%">库存</th><th class="tr" style="width:20%">金额</th></tr></thead>
+        <tbody>
+{top20_rows}        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="mid-row section-gap">
+  <div class="card">
+    <div class="ctitle navy">📥 入库记录 <span class="cnt">{len(in_rows)} 条</span></div>
+    <div class="tbl-scroll" style="max-height:300px;overflow-y:auto">
+{inbound_body}
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctitle navy">📤 出库记录 <span class="cnt">{len(out_rows)} 条</span></div>
+    <div class="tbl-scroll" style="max-height:300px;overflow-y:auto">
+{outbound_body}
+    </div>
+  </div>
+</div>
+
+<div class="card section-gap">
+  <div class="ctitle navy" style="padding:10px 14px;font-size:13px;font-weight:600">
+    🔄 过手件识别 <span class="cnt">{len(pass_through_candidates)} 项</span>
+  </div>
+  <div class="tbl-scroll" style="max-height:300px;overflow-y:auto;padding:0 14px 10px">
+      <table>
+        <thead><tr><th style="width:30%">品名</th><th class="tr" style="width:12%">入库</th><th class="tr" style="width:12%">出库</th><th class="tr" style="width:12%">库存</th><th style="width:24%">标签</th></tr></thead>
+        <tbody>
+{pass_through_rows}        </tbody>
+      </table>
+    </div>
+</div>
+
 <!-- ═══ 订单追踪 ═══ -->
 <div class="o-section">
   <div class="o-header">
@@ -763,64 +823,6 @@ body{{
       <table class="o-order-table">
         <thead><tr><th></th><th>订单号</th><th class="tr">G数</th><th>类型</th><th>工序</th><th class="tr">日期</th><th>滞留</th></tr></thead>
         <tbody>{order_rows}</tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<div class="kpi-row section-gap">
-  <div class="kpi"><div class="kn">{total}</div><div class="kl">总 SKU</div><div class="ks">全部物料品类</div></div>
-  <div class="kpi"><div class="kn g">{in_stock}</div><div class="kl">有库存</div><div class="ks">可正常领用</div></div>
-  <div class="kpi"><div class="kn r">{out_stock}</div><div class="kl">无库存</div><div class="ks">当前缺货待补</div></div>
-  <div class="kpi"><div class="kn o">¥{total_val:,}</div><div class="kl">库存总值</div><div class="ks">已占用资金</div></div>
-</div>
-
-<div class="mid-row section-gap">
-  <div class="card">
-    <div class="ctitle navy">📥 入库记录 <span class="cnt">{len(in_rows)} 条</span></div>
-    <div class="tbl-scroll" style="max-height:300px;overflow-y:auto">
-{inbound_body}
-    </div>
-  </div>
-  <div class="card">
-    <div class="ctitle navy">📤 出库记录 <span class="cnt">{len(out_rows)} 条</span></div>
-    <div class="tbl-scroll" style="max-height:300px;overflow-y:auto">
-{outbound_body}
-    </div>
-  </div>
-</div>
-
-<div class="card section-gap">
-  <div class="ctitle navy" style="padding:10px 14px;font-size:13px;font-weight:600">
-    🔄 过手件识别 <span class="cnt">{len(pass_through_candidates)} 项</span>
-  </div>
-  <div class="tbl-scroll" style="max-height:300px;overflow-y:auto;padding:0 14px 10px">
-      <table>
-        <thead><tr><th style="width:30%">品名</th><th class="tr" style="width:12%">入库</th><th class="tr" style="width:12%">出库</th><th class="tr" style="width:12%">库存</th><th style="width:24%">标签</th></tr></thead>
-        <tbody>
-{pass_through_rows}        </tbody>
-      </table>
-    </div>
-</div>
-
-<div class="section-gap two-row">
-  <div class="card">
-    <div class="ctitle navy">库存金额 TOP 20</div>
-    <div class="tbl-scroll" style="max-height:400px;overflow-y:auto;">
-      <table>
-        <thead><tr><th style="width:8%">#</th><th style="width:35%">品名</th><th style="width:20%">部门</th><th class="tr" style="width:17%">库存</th><th class="tr" style="width:20%">金额</th></tr></thead>
-        <tbody>
-{top20_rows}        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="card">
-    <div class="ctitle navy">缺货清单 <span class="cnt">{len(reorder)} 品</span></div>
-    <div class="tbl-scroll" style="max-height:400px;overflow-y:auto;">
-      <table>
-        <thead><tr><th style="width:38%">品名</th><th style="width:28%">部门</th><th style="width:34%">状态</th></tr></thead>
-        <tbody>
-{reorder_rows}        </tbody>
       </table>
     </div>
   </div>
