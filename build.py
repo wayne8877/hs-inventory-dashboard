@@ -627,10 +627,11 @@ body{{
 @media(max-width:768px){{
   body{{font-size:14px}}
   .wrap{{padding:0 10px}}
-  .hdr-inner{{flex-direction:column;gap:10px;padding:14px 16px;align-items:flex-start}}
-  .hdr-info{{gap:16px;width:100%;justify-content:flex-start}}
+  .hdr-inner{{padding:12px 16px}}
+  .hdr-info{{gap:14px}}
   .hdr-info-value{{font-size:14px}}
   .hdr-divider{{display:none}}
+  .hdr-info-item:last-child{{display:none}}
   .brand-name{{font-size:17px}}
   .brand-mark{{width:34px;height:34px;font-size:18px}}
   .kpi-row{{flex-wrap:wrap;gap:8px;padding:12px 0}}
@@ -673,12 +674,16 @@ body{{
 }}
 @media(max-width:480px){{
   .wrap{{padding:0 6px}}
-  .hdr-inner{{padding:12px 12px}}
-  .brand-mark{{width:30px;height:30px;font-size:15px;border-radius:7px}}
-  .brand-name{{font-size:16px;letter-spacing:0}}
+  .hdr-inner{{padding:8px 10px;gap:8px}}
+  .brand{{gap:8px}}
+  .brand-mark{{width:28px;height:28px;font-size:13px;border-radius:6px}}
+  .brand-name{{font-size:14px;letter-spacing:0}}
   .brand-en{{display:none}}
-  .hdr-info-value{{font-size:12px}}
-  .hdr-info-label{{font-size:9px}}
+  .hdr-info{{gap:8px}}
+  .hdr-info-value{{font-size:11px}}
+  .hdr-info-label{{font-size:8px}}
+  .hdr-divider{{display:none}}
+  .hdr-info-item:last-child{{display:none}}
   .kpi-row .kpi{{flex:1 1 100%;padding:10px 12px}}
   .kn{{font-size:20px}}
   .kl{{font-size:12px}}
