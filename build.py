@@ -528,17 +528,18 @@ body{{
 }}
 .wrap{{max-width:1280px;margin:0 auto;padding:0 16px}}
 .section-gap{{margin-bottom:14px}}
-.hdr{{background:#fff;display:flex;align-items:stretch;border-bottom:1px solid #E4E2DF;overflow:hidden}}
-.brand{{background:#3D4F6F;padding:22px 28px;display:flex;align-items:center;gap:14px;min-width:260px;flex-shrink:0}}
-.brand-mark{{width:40px;height:40px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:800;flex-shrink:0;}}
-.brand-text{{display:flex;flex-direction:column;gap:2px}}
-.brand-name{{font-size:17px;font-weight:700;color:#fff;letter-spacing:1px}}
-.brand-en{{font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:2px;text-transform:uppercase;margin-top:0}}
-.hdr-info{{flex:1;display:flex;align-items:center;padding:0 28px;gap:32px}}
-.hdr-info-item{{display:flex;flex-direction:column;gap:2px}}
-.hdr-info-label{{font-size:11px;color:#8A95A5;letter-spacing:1px}}
-.hdr-info-value{{font-size:15px;font-weight:600;color:#1C2333}}
-.hdr-divider{{width:1px;height:28px;background:#E4E2DF}}
+.hdr{{background:#fff;position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.06);}}
+.hdr::before{{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3D4F6F 0%,#5B7FA6 100%);}}
+.hdr-inner{{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;}}
+.brand{{display:flex;align-items:center;gap:16px}}
+.brand-mark{{width:42px;height:42px;background:#3D4F6F;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:800;flex-shrink:0;}}
+.brand-name{{font-size:20px;font-weight:800;color:#1A1A2E;letter-spacing:1px}}
+.brand-en{{font-size:11px;color:#8A94A2;letter-spacing:3px;text-transform:uppercase;margin-top:2px}}
+.hdr-info{{display:flex;align-items:center;gap:28px}}
+.hdr-info-item{{display:flex;flex-direction:column;align-items:flex-end;gap:1px}}
+.hdr-info-label{{font-size:10px;color:#8A94A2;letter-spacing:2px;text-transform:uppercase}}
+.hdr-info-value{{font-size:17px;font-weight:700;color:#1A1A2E}}
+.hdr-divider{{width:1px;height:28px;background:#E8E7E3}}
 .kpi-row{{display:flex;gap:14px;padding:16px 0}}
 .kpi{{flex:1;background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #E4E2DF;min-width:0;}}
 .kn{{font-size:28px;font-weight:700;line-height:1;margin-bottom:3px}}
@@ -626,13 +627,12 @@ body{{
 @media(max-width:768px){{
   body{{font-size:14px}}
   .wrap{{padding:0 10px}}
-  .brand{{padding:16px 20px;min-width:180px}}
-  .brand-mark{{width:34px;height:34px;font-size:16px}}
-  .brand-name{{font-size:15px}}
-  .brand-en{{font-size:10px}}
-  .hdr-info{{gap:20px;padding:0 20px}}
-  .hdr-info-value{{font-size:13px}}
-  .hdr-info-label{{font-size:10px}}
+  .hdr-inner{{flex-direction:column;gap:10px;padding:14px 16px;align-items:flex-start}}
+  .hdr-info{{gap:16px;width:100%;justify-content:flex-start}}
+  .hdr-info-value{{font-size:14px}}
+  .hdr-divider{{display:none}}
+  .brand-name{{font-size:17px}}
+  .brand-mark{{width:34px;height:34px;font-size:18px}}
   .kpi-row{{flex-wrap:wrap;gap:8px;padding:12px 0}}
   .kpi-row .kpi{{flex:1 1 calc(50% - 4px);min-width:0;padding:12px 14px}}
   .kn{{font-size:22px}}
@@ -673,14 +673,12 @@ body{{
 }}
 @media(max-width:480px){{
   .wrap{{padding:0 6px}}
-  .brand{{padding:12px 16px;min-width:140px}}
+  .hdr-inner{{padding:12px 12px}}
   .brand-mark{{width:30px;height:30px;font-size:15px;border-radius:7px}}
-  .brand-name{{font-size:14px;letter-spacing:0}}
+  .brand-name{{font-size:16px;letter-spacing:0}}
   .brand-en{{display:none}}
-  .hdr-info{{gap:12px;padding:0 12px}}
-  .hdr-info-value{{font-size:11px}}
-  .hdr-info-label{{font-size:8px}}
-  .hdr-divider{{display:none}}
+  .hdr-info-value{{font-size:12px}}
+  .hdr-info-label{{font-size:9px}}
   .kpi-row .kpi{{flex:1 1 100%;padding:10px 12px}}
   .kn{{font-size:20px}}
   .kl{{font-size:12px}}
@@ -705,24 +703,17 @@ body{{
 </style>
 </head>
 <body>
-<div class="hdr">
+<div class="hdr"><div class="hdr-inner">
   <div class="brand">
-    <div class="brand-mark">合</div>
-    <div class="brand-text">
-      <div class="brand-name">合盛辅料</div>
-      <div class="brand-en">HeSheng</div>
-    </div>
+    <div class="brand-mark">HS</div>
+    <div><div class="brand-name">合盛辅料</div><div class="brand-en">HeSheng Button</div></div>
   </div>
   <div class="hdr-info">
-    <div class="hdr-info-item"><span class="hdr-info-label">物料 SKU</span><span class="hdr-info-value">{total}</span></div>
+    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">{now}</div></div>
     <div class="hdr-divider"></div>
-    <div class="hdr-info-item"><span class="hdr-info-label">有库存</span><span class="hdr-info-value">{in_stock}</span></div>
-    <div class="hdr-divider"></div>
-    <div class="hdr-info-item"><span class="hdr-info-label">库存总值</span><span class="hdr-info-value">¥{total_val:,}</span></div>
-    <div class="hdr-divider"></div>
-    <div class="hdr-info-item"><span class="hdr-info-label">更新时间</span><span class="hdr-info-value">{now}</span></div>
+    <div class="hdr-info-item"><div class="hdr-info-label">Source</div><div class="hdr-info-value">Feishu Bitable</div></div>
   </div>
-</div>
+</div></div>
 <div class="wrap">
 
 <!-- ═══ 订单追踪 ═══ -->
