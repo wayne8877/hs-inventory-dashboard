@@ -425,10 +425,26 @@ def fmt_qty(qty, container, per_unit):
     else:
         return f"{n:.1f}{container}"
 
+def clean_name(name, spec):
+    """品名去重：如果规格型号出现在品名末尾，去掉它"""
+    if not spec:
+        return name
+    s = spec.strip()
+    n = name.strip()
+    # 规格出现在品名末尾 → 去掉
+    if n.endswith(s):
+        return n[:-len(s)].rstrip()
+    # 规格出现在品名中间某处 → 截到规格前
+    idx = n.find(s)
+    if idx > 0:
+        return n[:idx].rstrip()
+    return n
+
 # 过手件行（实际生成，fmt_qty 已定义）
 for r in pass_through_candidates[:30]:
     tag = '<span class="st g">✓ 已标记</span>' if r['type'] == "过手件" else '<span class="st o">? 建议标记</span>'
-    pass_through_rows += f"""        <tr><td class="td-name">{short(r['name'], 18)}</td><td class="tr">{fmt_qty(r['t_in'], *name_to_display.get(r['name'], ('个', 1)))}</td><td class="tr">{fmt_qty(r['t_out'], *name_to_display.get(r['name'], ('个', 1)))}</td><td class="tr">{fmt_qty(r['stock'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{tag}</td></tr>\n"""
+    spec = name_to_spec.get(r['name'], '')
+    pass_through_rows += f"""        <tr><td class="td-name">{short(clean_name(r['name'], spec), 18)}</td><td class="tr">{fmt_qty(r['t_in'], *name_to_display.get(r['name'], ('个', 1)))}</td><td class="tr">{fmt_qty(r['t_out'], *name_to_display.get(r['name'], ('个', 1)))}</td><td class="tr">{fmt_qty(r['stock'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{tag}</td></tr>\n"""
 
 # 入库行
 inbound_body = ""
@@ -441,7 +457,7 @@ if in_rows:
                 stock = rec['stock']
                 break
         spec = name_to_spec.get(r['name'], '')
-        inbound_body += f"""        <tr><td class="name">{short(r['name'], 14)}</td><td class="spec">{short(spec, 14)}</td><td style="text-align:center">{fmt_qty(r['qty'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{r['dept']}</td><td style="text-align:center">{fmt_qty(stock, *name_to_display.get(r['name'], ('个', 1)))}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
+        inbound_body += f"""        <tr><td class="name">{short(clean_name(r['name'], spec), 16)}</td><td class="spec">{short(spec, 14)}</td><td style="text-align:center">{fmt_qty(r['qty'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{r['dept']}</td><td style="text-align:center">{fmt_qty(stock, *name_to_display.get(r['name'], ('个', 1)))}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
     inbound_body += '</tbody></table>'
 else:
     inbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无入库记录</div>'
@@ -457,7 +473,7 @@ if out_rows:
                 stock = rec['stock']
                 break
         spec = name_to_spec.get(r['name'], '')
-        outbound_body += f"""        <tr><td class="name">{short(r['name'], 14)}</td><td class="spec">{short(spec, 14)}</td><td style="text-align:center">{fmt_qty(r['qty'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{r['dept']}</td><td style="text-align:center">{fmt_qty(stock, *name_to_display.get(r['name'], ('个', 1)))}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
+        outbound_body += f"""        <tr><td class="name">{short(clean_name(r['name'], spec), 16)}</td><td class="spec">{short(spec, 14)}</td><td style="text-align:center">{fmt_qty(r['qty'], *name_to_display.get(r['name'], ('个', 1)))}</td><td>{r['dept']}</td><td style="text-align:center">{fmt_qty(stock, *name_to_display.get(r['name'], ('个', 1)))}</td><td style="text-align:center;color:#8A95A5">{r['date']}</td></tr>\n"""
     outbound_body += '</tbody></table>'
 else:
     outbound_body = '<div style="color:#8A95A5;text-align:center;padding:20px 0">暂无出库记录</div>'
