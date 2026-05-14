@@ -540,8 +540,8 @@ body{{
 .hdr-info-label{{font-size:10px;color:#8A94A2;letter-spacing:2px;text-transform:uppercase}}
 .hdr-info-value{{font-size:17px;font-weight:700;color:#1A1A2E}}
 .hdr-divider{{width:1px;height:28px;background:#E8E7E3}}
-.kpi-row{{display:flex;gap:14px;padding:16px 0}}
-.kpi{{flex:1;background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #E4E2DF;min-width:0;}}
+.kpi-row{{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 0}}
+.kpi{{background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #E4E2DF;min-width:0;}}
 .kn{{font-size:28px;font-weight:700;line-height:1;margin-bottom:3px}}
 .kn.g{{color:#4A8C6F}}
 .kn.r{{color:#B85C5C}}
@@ -633,8 +633,8 @@ body{{
   .hdr-divider{{display:none}}
   .brand-name{{font-size:17px}}
   .brand-mark{{width:34px;height:34px;font-size:18px}}
-  .kpi-row{{flex-wrap:wrap;gap:8px;padding:12px 0}}
-  .kpi-row .kpi{{flex:1 1 calc(50% - 4px);min-width:0;padding:12px 14px}}
+  .kpi-row{{gap:8px;padding:12px 0}}
+  .kpi{{padding:12px 14px}}
   .kn{{font-size:22px}}
   .mid-row{{grid-template-columns:1fr;gap:10px;padding:0 0 10px}}
   .two-row{{grid-template-columns:1fr;gap:10px;padding:0 0 16px}}
@@ -679,7 +679,8 @@ body{{
   .brand-en{{display:none}}
   .hdr-info-value{{font-size:12px}}
   .hdr-info-label{{font-size:9px}}
-  .kpi-row .kpi{{flex:1 1 100%;padding:10px 12px}}
+  .kpi{{padding:8px 10px}}
+  .kpi-row{{gap:6px}}
   .kn{{font-size:20px}}
   .kl{{font-size:12px}}
   .ks{{font-size:10px}}
