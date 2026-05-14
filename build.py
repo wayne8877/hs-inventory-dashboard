@@ -69,7 +69,8 @@ for r in items:
     stock = int(safe_num(f.get("当前库存", 0)))
     cost = round(safe_num(f.get("库存总价值", 0)))
     dept = safe_str(f.get("所属部门", ""))
-    records.append({"name": name, "spec": spec, "stock": stock, "cost": cost, "dept": dept})
+    mgmt_type = safe_str(f.get("管理类型", ""))
+    records.append({"name": name, "spec": spec, "stock": stock, "cost": cost, "dept": dept, "type": mgmt_type})
 
 total = len(records)
 in_stock = sum(1 for r in records if r["stock"] > 0)
@@ -114,6 +115,34 @@ for r in outbound_recs:
         date_str = f"{d.month:02d}-{d.day:02d}"
     out_rows.append({"name": name, "qty": qty, "dept": dept, "date": date_str})
 out_rows.sort(key=lambda r: r["date"], reverse=True)
+
+# ── 过手件识别（入库≈出库模式检测）──
+# 按名称汇总入库/出库总量，找出入库≈出库的物料
+in_sum = defaultdict(int)
+for r in inbound_recs:
+    f = r.get("fields", {})
+    name = safe_str(f.get("货品名称", ""))
+    if not name: continue
+    in_sum[name] += int(safe_num(f.get("入库数量", 0)))
+out_sum = defaultdict(int)
+for r in outbound_recs:
+    f = r.get("fields", {})
+    name = safe_str(f.get("货品名称", ""))
+    if not name: continue
+    out_sum[name] += int(safe_num(f.get("出库数量", 0)))
+
+pass_through_candidates = []
+for r in records:
+    name = r["name"]
+    t_in = in_sum.get(name, 0)
+    t_out = out_sum.get(name, 0)
+    # 已标过手件的
+    if r["type"] == "过手件":
+        pass_through_candidates.append({**r, "t_in": t_in, "t_out": t_out, "suggested": False})
+    # 未标但入库≈出库（差值≤2）且都有活动的
+    elif t_in > 0 and t_out > 0 and abs(t_in - t_out) <= 2:
+        pass_through_candidates.append({**r, "t_in": t_in, "t_out": t_out, "suggested": True})
+pass_through_candidates.sort(key=lambda x: (0 if x["type"]=="过手件" else 1, -x["t_in"]))
 
 dept_sorted = sorted(dept_data.items(), key=lambda x: x[1]["val"], reverse=True)
 
@@ -336,6 +365,12 @@ reorder_rows = ""
 for r in reorder[:50]:
     reorder_rows += f"""        <tr><td class="td-name">{short(r['name'], 16)}</td><td>{r['dept']}</td><td><span class="st r">缺货</span></td></tr>\n"""
 
+# 过手件行
+pass_through_rows = ""
+for r in pass_through_candidates[:30]:
+    tag = '<span class="st g">✓ 已标记</span>' if r['type'] == "过手件" else '<span class="st o">? 建议标记</span>'
+    pass_through_rows += f"""        <tr><td class="td-name">{short(r['name'], 18)}</td><td class="tr">{r['t_in']}</td><td class="tr">{r['t_out']}</td><td class="tr">{r['stock']}</td><td>{tag}</td></tr>\n"""
+
 # 入库行
 inbound_body = ""
 if in_rows:
@@ -469,6 +504,8 @@ body{{
 .td-name{{font-weight:500;max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
 .st{{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;}}
 .st.r{{background:#FDECEC;color:#B85C5C;}}
+.st.g{{background:#E8F5E9;color:#388E3C;}}
+.st.o{{background:#FFF3E0;color:#E65100;}}
 .ftr{{text-align:center;padding:16px 0 24px;font-size:11px;color:#8A95A5;}}
 /* ── 订单追踪专属样式 ── */
 .o-section{{background:#fff;border-radius:14px;border:1px solid #E4E2DF;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.04);}}
@@ -665,6 +702,22 @@ body{{
 {outbound_body}
     </div>
   </div>
+</div>
+
+<div class="card section-gap">
+  <details style="cursor:pointer">
+    <summary class="ctitle navy" style="display:list-item;padding:10px 14px;font-size:13px;font-weight:600;user-select:none">
+      🔄 过手件识别 <span class="cnt">{len(pass_through_candidates)} 项</span>
+      <span style="font-weight:400;font-size:11px;color:#8A95A5;margin-left:8px">点击展开</span>
+    </summary>
+    <div class="tbl-scroll" style="max-height:300px;overflow-y:auto;padding:0 14px 10px">
+      <table>
+        <thead><tr><th style="width:30%">品名</th><th class="tr" style="width:12%">入库</th><th class="tr" style="width:12%">出库</th><th class="tr" style="width:12%">库存</th><th style="width:24%">标签</th></tr></thead>
+        <tbody>
+{pass_through_rows}        </tbody>
+      </table>
+    </div>
+  </details>
 </div>
 
 <div class="section-gap two-row">
