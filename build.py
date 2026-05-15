@@ -173,11 +173,22 @@ for k, v in order_customer_map.items():
     print(f"  {k} → {v}")
 
 import re as _re
+# 统一订单号提取：HX/TX/P.O./SL 四种格式
 order_re = _re.compile(r'[Hh][Xx]\d+')
 tx_re = _re.compile(r'[Tt][Xx]\d+')
-po_re = _re.compile(r'[Pp]\.?[Oo]\.? ?0+(\d+)/\d+', _re.I)
+po_re = _re.compile(r'[Pp]\.? ?[Oo]\.? ?0+(\d+)/\d+', _re.I)
 sl_re = _re.compile(r'[Ss][Ll]\d+-\d+')
 g_re = _re.compile(r'(\d+)\s*[Gg]')
+
+def extract_all_orders(content):
+    """从消息内容提取所有订单号，返回列表"""
+    orders = []
+    orders.extend(o.upper() for o in order_re.findall(content))  # HX
+    orders.extend(o.upper() for o in tx_re.findall(content))     # TX
+    for m in po_re.finditer(content):                            # P.O. 完整保留
+        orders.append(m.group(0).upper())
+    orders.extend(o.upper() for o in sl_re.findall(content))    # SL
+    return orders
 BUTTON_TYPES = ["磁钮","彩虹钮","仿贝壳钮","阴阳钮","树脂钮","金属钮","四合扣","工字钮","撞钉","鸡眼","五爪扣"]
 PROCESS_STEPS = ["接单","调色","生产","筛胚","车钮","抛光","品检","出货"]
 STEP_KW = {
@@ -198,7 +209,7 @@ def get_client(order_no):
         return "恒业"
     if o.startswith("TX"):
         return "东莞市鑫和茂钮扣有限公司"
-    if "P.O." in o or ".00376" in o or ".00388" in o:
+    if "P.O." in o or "P O" in o or ".00376" in o or ".00388" in o:
         return "AR"
     if sl_re.match(o):
         return "Star Light Trading"
@@ -216,7 +227,7 @@ for rec in order_records:
         date_str = msg_date.strftime("%Y-%m-%d")
     except: date_str = "?"
     
-    found = [o.upper() for o in order_re.findall(content)]
+    found = extract_all_orders(content)
     found_g = g_re.findall(content)
     
     for o in found:
