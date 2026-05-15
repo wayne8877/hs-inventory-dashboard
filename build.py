@@ -218,6 +218,31 @@ def get_client(order_no):
 all_orders = {}
 today_str = datetime.date.today().isoformat()
 
+# 从订单主表直接补充订单（保证P.O./SL等也能进入列表）
+for rec in order_master_records:
+    f = rec.get("fields", {})
+    oid = f.get("订单编号", "")
+    if not oid or oid.startswith("SO-CUST"):
+        continue
+    oid_up = oid.upper()
+    if oid_up not in all_orders:
+        all_orders[oid_up] = {
+            "order_no": oid_up,
+            "g_count": 0,
+            "product_type": "树脂钮",
+            "step": "接单",
+            "date": "?",
+            "latest_date": "?",
+            "client": order_customer_map.get(oid_up, get_client(oid_up)),
+            "first_date": "?"
+        }
+    g_val = f.get("G数", 0) or 0
+    if isinstance(g_val, (int, float)) and 1 <= g_val <= 50000:
+        all_orders[oid_up]["g_count"] += int(g_val)
+    step_val = f.get("工序", "")
+    if step_val in PROCESS_STEPS:
+        all_orders[oid_up]["step"] = step_val
+
 for rec in order_records:
     f = rec.get("fields",{})
     content = f.get("消息内容","")
