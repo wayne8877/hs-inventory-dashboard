@@ -154,12 +154,29 @@ reorder = [r for r in records if r["stock"] == 0 and len(r["name"]) > 1]
 
 # ── 1.5 拉订单数据 ──
 ORDER_TBL = "tblSakoiChynJrw5"
+ORDER_MASTER_TBL = "tbldCV7UW5wQulrP"
 print("拉取订单数据...")
 order_records = fetch_all(OPS_BASE, ORDER_TBL)
 print(f"共 {len(order_records)} 条群聊记录")
 
+# 读取订单主表获取真实客户名称
+order_master_records = fetch_all(OPS_BASE, ORDER_MASTER_TBL)
+order_customer_map = {}
+for rec in order_master_records:
+    f = rec.get("fields", {})
+    oid = f.get("订单编号", "")
+    cname = f.get("客户名称", "")
+    if oid and cname and not oid.startswith("SO-CUST"):
+        order_customer_map[oid.upper()] = cname
+print(f"订单主表客户映射: {len(order_customer_map)} 条")
+for k, v in order_customer_map.items():
+    print(f"  {k} → {v}")
+
 import re as _re
 order_re = _re.compile(r'[Hh][Xx]\d+')
+tx_re = _re.compile(r'[Tt][Xx]\d+')
+po_re = _re.compile(r'[Pp]\.?[Oo]\.? ?0+(\d+)/\d+', _re.I)
+sl_re = _re.compile(r'[Ss][Ll]\d+-\d+')
 g_re = _re.compile(r'(\d+)\s*[Gg]')
 BUTTON_TYPES = ["磁钮","彩虹钮","仿贝壳钮","阴阳钮","树脂钮","金属钮","四合扣","工字钮","撞钉","鸡眼","五爪扣"]
 PROCESS_STEPS = ["接单","调色","生产","筛胚","车钮","抛光","品检","出货"]
@@ -169,6 +186,23 @@ STEP_KW = {
     "车钮":["车钮","车床"],"抛光":["抛光","抛"],
     "品检":["品检","检验","全检"],"出货":["出货","寄出","交货","寄过来"],
 }
+
+def get_client(order_no):
+    """根据订单号判断客户名称"""
+    o = order_no.upper()
+    if o in order_customer_map:
+        return order_customer_map[o]
+    if o.startswith("SO-CUST"):
+        return None  # 测试数据不显示
+    if o.startswith("HX"):
+        return "恒业"
+    if o.startswith("TX"):
+        return "东莞市鑫和茂钮扣有限公司"
+    if "P.O." in o or ".00376" in o or ".00388" in o:
+        return "AR"
+    if sl_re.match(o):
+        return "Star Light Trading"
+    return "恒业"
 
 all_orders = {}
 today_str = datetime.date.today().isoformat()
@@ -187,8 +221,9 @@ for rec in order_records:
     
     for o in found:
         o_up = o.upper()
+        client = get_client(o_up)
         if o_up not in all_orders:
-            all_orders[o_up] = {"order_no":o_up,"g_count":0,"product_type":"树脂钮","step":"接单","date":date_str,"latest_date":date_str,"client":"恒业","first_date":date_str}
+            all_orders[o_up] = {"order_no":o_up,"g_count":0,"product_type":"树脂钮","step":"接单","date":date_str,"latest_date":date_str,"client":client,"first_date":date_str}
         entry = all_orders[o_up]
         if date_str > entry["latest_date"]: entry["latest_date"] = date_str
         if date_str < entry["first_date"]: entry["first_date"] = date_str
@@ -274,8 +309,9 @@ for m,(month_str,md) in enumerate(month_rank):
 # 客户排名
 client_g = {}
 for o in all_orders.values():
-    c = o["client"]
-    client_g[c] = client_g.get(c,0) + o["g_count"]
+    c = o.get("client")
+    if not c: continue  # 跳过测试数据
+    client_g[c] = client_g.get(c, 0) + o["g_count"]
 client_rank = sorted(client_g.items(), key=lambda x:-x[1])
 
 # 工序分布（全部在途，非仅今日）
@@ -341,7 +377,8 @@ client_rows = ""
 max_g = max([g for _,g in client_rank]) if client_rank else 1
 for i,(cname,cg) in enumerate(client_rank[:6]):
     bar_w = cg/max_g*50 if max_g else 0
-    client_rows += f'<tr><td>{cname}</td><td class="tr">{sum(1 for o in all_orders.values() if o["client"]==cname)}单</td><td class="tr">{cg}G</td><td><div style="background:{["#3D4F6F","#5B7FA6","#8BAA9E","#C4883A","#B85C5C","#9B7EB5"][i%6]};height:6px;width:{bar_w}%;border-radius:3px;min-width:4px"></div></td></tr>\n'
+    order_count = sum(1 for o in all_orders.values() if o.get("client") == cname)
+    client_rows += f'<tr><td>{cname}</td><td class="tr">{order_count}单</td><td class="tr">{cg}G</td><td><div style="background:{["#3D4F6F","#5B7FA6","#8BAA9E","#C4883A","#B85C5C","#9B7EB5"][i%6]};height:6px;width:{bar_w}%;border-radius:3px;min-width:4px"></div></td></tr>\n'
 
 # 订单KPI — 大卡片（含月度维度）
 order_kpi_cards = f"""<div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">{total_order_count}</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">本月{month_orders}单</div></div>
@@ -724,6 +761,52 @@ body{{
 </div></div>
 <div class="wrap">
 
+<!-- ═══ 订单追踪 ═══ -->
+<div class="o-section">
+  <div class="o-header">
+    <div class="o-title">📋 订单追踪</div>
+    <div class="o-updated">更新于 {now}</div>
+  </div>
+  <div class="o-kpi-row">{order_kpi_cards}</div>
+
+  <!-- 月度概览 -->
+  <div class="o-monthly">
+    <div class="o-subtitle" style="padding:0 4px 8px;margin-bottom:0">📅 月度订单概览</div>
+    <table class="o-month-table">
+      <thead><tr><th>月份</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">趋势</th></tr></thead>
+      <tbody>{month_chart_rows}</tbody>
+    </table>
+  </div>
+
+  <div class="o-grid">
+    <!-- 工序管道 -->
+    <div class="o-pipeline">
+      <div class="o-subtitle">工序管道 · {len(in_progress)}单在途</div>
+      <div class="o-pipe-row">{pipe_html}</div>
+      <div class="o-pipe-legend">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
+    </div>
+    <!-- 客户排名 -->
+    <div class="o-clients">
+      <div class="o-subtitle">客户排名（按G数）</div>
+      <table class="o-client-table">
+        <thead><tr><th>客户</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">占比</th></tr></thead>
+        <tbody>{client_rows}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 在途订单 -->
+  <div class="o-active-orders">
+    <div class="o-subtitle">在途订单 · {len(active_orders)} 单</div>
+    <div class="o-order-scroll">
+      <table class="o-order-table">
+        <thead><tr><th></th><th>订单号</th><th class="tr">G数</th><th>类型</th><th>工序</th><th class="tr">日期</th><th>滞留</th></tr></thead>
+        <tbody>{order_rows}</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <div class="kpi-row section-gap">
   <div class="kpi"><div class="kn">{total}</div><div class="kl">总 SKU</div><div class="ks">全部物料品类</div></div>
   <div class="kpi"><div class="kn g">{in_stock}</div><div class="kl">有库存</div><div class="ks">可正常领用</div></div>
@@ -780,52 +863,6 @@ body{{
 {pass_through_rows}        </tbody>
       </table>
     </div>
-</div>
-
-<!-- ═══ 订单追踪 ═══ -->
-<div class="o-section">
-  <div class="o-header">
-    <div class="o-title">📋 订单追踪</div>
-    <div class="o-updated">更新于 {now}</div>
-  </div>
-  <div class="o-kpi-row">{order_kpi_cards}</div>
-  
-  <!-- 月度概览 -->
-  <div class="o-monthly">
-    <div class="o-subtitle" style="padding:0 4px 8px;margin-bottom:0">📅 月度订单概览</div>
-    <table class="o-month-table">
-      <thead><tr><th>月份</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">趋势</th></tr></thead>
-      <tbody>{month_chart_rows}</tbody>
-    </table>
-  </div>
-
-  <div class="o-grid">
-    <!-- 工序管道 -->
-    <div class="o-pipeline">
-      <div class="o-subtitle">工序管道 · {len(in_progress)}单在途</div>
-      <div class="o-pipe-row">{pipe_html}</div>
-      <div class="o-pipe-legend">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
-    </div>
-    <!-- 客户排名 -->
-    <div class="o-clients">
-      <div class="o-subtitle">客户排名（按G数）</div>
-      <table class="o-client-table">
-        <thead><tr><th>客户</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">占比</th></tr></thead>
-        <tbody>{client_rows}</tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- 在途订单 -->
-  <div class="o-active-orders">
-    <div class="o-subtitle">在途订单 · {len(active_orders)} 单</div>
-    <div class="o-order-scroll">
-      <table class="o-order-table">
-        <thead><tr><th></th><th>订单号</th><th class="tr">G数</th><th>类型</th><th>工序</th><th class="tr">日期</th><th>滞留</th></tr></thead>
-        <tbody>{order_rows}</tbody>
-      </table>
-    </div>
-  </div>
 </div>
 
 <div class="ftr">合盛钮扣厂 · 生产运营司 · 数据来源 飞书多维表格</div>
