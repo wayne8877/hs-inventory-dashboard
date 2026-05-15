@@ -376,20 +376,55 @@ for o in active_orders:
         g_str = '<span style="color:#AAA">未提</span>'
     order_rows += f'<tr><td style="color:{sc};font-weight:700">●</td><td class="td-name">{o["order_no"]}</td><td class="tr">{g_str}</td><td>{o["product_type"][:6]}</td><td><span style="background:{sc};color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">{o["step"]}</span></td><td style="font-size:11px;color:#8A95A5">{o["latest_date"][5:]}</td><td>{age_str}</td></tr>\n'
 
-# 工序管道
+# 工序管道（精简单排）
 pipe_html = ""
 for i,step in enumerate(PROCESS_STEPS):
     sc = STEP_C.get(step,"#888")
     cnt = step_counts.get(step,0)
-    pipe_html += f'<div style="flex:1;text-align:center"><div style="background:{sc};color:#fff;padding:10px 4px;border-radius:8px;font-size:12px;font-weight:600">{step}</div><div style="font-size:20px;font-weight:700;color:{sc};margin-top:4px">{cnt}</div><div style="font-size:10px;color:#8A95A5">单</div></div>'
+    pipe_html += f'<div style="flex:1;text-align:center"><div style="background:{sc};color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">{step}</div><div style="font-size:18px;font-weight:700;color:{sc};margin-top:2px">{cnt}</div><div style="font-size:10px;color:#8A95A5">单</div></div>'
 
-# 客户排名行
-client_rows = ""
-max_g = max([g for _,g in client_rank]) if client_rank else 1
-for i,(cname,cg) in enumerate(client_rank[:6]):
-    bar_w = cg/max_g*50 if max_g else 0
+# 客户排名 — 完整详情卡片
+client_detail_rows = ""
+total_all_g = sum(g for _,g in client_rank) if client_rank else 1
+COLORS = ["#3D4F6F","#5B7FA6","#8BAA9E","#C4883A","#B85C5C","#9B7EB5","#27AE60","#E67E22"]
+for i,(cname,cg) in enumerate(client_rank):
+    col = COLORS[i % len(COLORS)]
+    pct = cg/total_all_g*100
     order_count = sum(1 for o in all_orders.values() if o.get("client") == cname)
-    client_rows += f'<tr><td>{cname}</td><td class="tr">{order_count}单</td><td class="tr">{cg}G</td><td><div style="background:{["#3D4F6F","#5B7FA6","#8BAA9E","#C4883A","#B85C5C","#9B7EB5"][i%6]};height:6px;width:{bar_w}%;border-radius:3px;min-width:4px"></div></td></tr>\n'
+    # 各工序数量
+    step_bars = ""
+    for si, step in enumerate(PROCESS_STEPS):
+        sc = STEP_C.get(step,"#ccc")
+        cnt = sum(1 for o in all_orders.values() if o.get("client") == cname and o.get("step") == step)
+        if cnt > 0:
+            step_bars += f'<span style="display:inline-block;background:{sc};color:#fff;padding:1px 6px;border-radius:8px;font-size:10px;margin-right:3px">{step}{cnt}</span>'
+    # 订单号列表
+    client_orders = [(o["order_no"], o["g_count"], o["step"], o["latest_date"]) for o in all_orders.values() if o.get("client") == cname]
+    order_list = " · ".join([f'{no}({g}G)' for no,g,_,_ in client_orders[:5]])
+    if len(client_orders) > 5:
+        order_list += f" · +{len(client_orders)-5}单"
+    # 最早+最新日期
+    dates = [d for _,_,_,d in client_orders]
+    earliest = min(dates) if dates else "-"
+    latest = max(dates) if dates else "-"
+    client_detail_rows += f'''
+        <div style="flex:1;min-width:200px;background:#fff;border-radius:10px;padding:14px;margin:4px;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
+          <div style="display:flex;align-items:center;margin-bottom:8px">
+            <div style="width:10px;height:10px;border-radius:50%;background:{col};margin-right:8px;flex-shrink:0"></div>
+            <div style="font-weight:700;font-size:14px;color:#1A1A2E;flex:1">{cname}</div>
+          </div>
+          <div style="display:flex;gap:16px;margin-bottom:8px">
+            <div><div style="font-size:20px;font-weight:700;color:{col}">{order_count}</div><div style="font-size:10px;color:#8A95A5">订单数</div></div>
+            <div><div style="font-size:20px;font-weight:700;color:{col}">{cg:,}</div><div style="font-size:10px;color:#8A95A5">总G数</div></div>
+            <div><div style="font-size:20px;font-weight:700;color:{col}">{pct:.1f}%</div><div style="font-size:10px;color:#8A95A5">占比</div></div>
+          </div>
+          <div style="background:#F0F4FA;height:6px;border-radius:3px;margin-bottom:8px"><div style="background:{col};height:6px;border-radius:3px;width:{pct:.1f}%"></div></div>
+          <div style="margin-bottom:6px">{step_bars if step_bars else '<span style="color:#AAA;font-size:11px">无工序数据</span>'}</div>
+          <div style="font-size:10px;color:#8A95A5">{order_list if order_list else "无订单号"}</div>
+          <div style="font-size:10px;color:#AAA;margin-top:4px">{earliest} ~ {latest}</div>
+        </div>'''
+
+client_rows = ""  # 保留兼容，旧表格不再使用
 
 # 订单KPI — 大卡片（含月度维度）
 order_kpi_cards = f"""<div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">{total_order_count}</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">本月{month_orders}单</div></div>
@@ -790,20 +825,18 @@ body{{
   </div>
 
   <div class="o-grid">
-    <!-- 工序管道 -->
-    <div class="o-pipeline">
-      <div class="o-subtitle">工序管道 · {len(in_progress)}单在途</div>
-      <div class="o-pipe-row">{pipe_html}</div>
-      <div class="o-pipe-legend">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
+    <!-- 工序管道 — 精简单排 -->
+    <div class="o-pipeline" style="margin-bottom:12px">
+      <div class="o-subtitle" style="margin-bottom:8px">工序管道 · {len(in_progress)}单在途</div>
+      <div class="o-pipe-row" style="display:flex;gap:4px;align-items:flex-start">{pipe_html}</div>
+      <div class="o-pipe-legend" style="margin-top:6px;font-size:10px;color:#8A95A5">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
     </div>
-    <!-- 客户排名 -->
-    <div class="o-clients">
-      <div class="o-subtitle">客户排名（按G数）</div>
-      <table class="o-client-table">
-        <thead><tr><th>客户</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">占比</th></tr></thead>
-        <tbody>{client_rows}</tbody>
-      </table>
-    </div>
+  </div>
+
+  <!-- 客户排名 — 全宽详情卡片 -->
+  <div style="margin:12px 0">
+    <div class="o-subtitle" style="margin-bottom:10px">客户排名（按G数）</div>
+    <div style="display:flex;flex-wrap:wrap;gap:0">{client_detail_rows}</div>
   </div>
 
   <!-- 在途订单 -->
