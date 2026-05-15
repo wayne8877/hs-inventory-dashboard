@@ -198,14 +198,18 @@ STEP_KW = {
     "品检":["品检","检验","全检"],"出货":["出货","寄出","交货","寄过来"],
 }
 
-def get_client(order_no):
+def get_client(oid):
     """根据订单号判断客户名称（群名称）"""
-    o = order_no.upper()
+    o = oid.upper()
     if o in order_customer_map:
         cmap = order_customer_map[o]
-        # 将订单主表里的公司名称转为群名称
+        # 订单主表里的公司名称 → 群名称映射
         if "鑫和茂" in cmap: return "鑫和茂"
         if "恒业" in cmap: return "恒业"
+        if "豪华" in cmap: return "豪华"
+        if "荣荣" in cmap: return "荣荣"
+        if "AR" in cmap: return "豪华"
+        if "Star Light" in cmap: return "荣荣"
         return cmap
     if o.startswith("SO-CUST"):
         return None  # 测试数据不显示
@@ -420,10 +424,11 @@ for i,(cname,cg) in enumerate(client_rank):
     col = COLORS[i % len(COLORS)]
     pct = cg/total_all_g*100
     order_count = sum(1 for o in all_orders.values() if o.get("client") == cname)
-    # 各工序数量
+    # 各工序数量（只统计在途订单，与工序管道保持一致）
     step_detail = []
+    in_prog_orders = [o for o in all_orders.values() if o.get("client") == cname and o.get("step") != "出货"]
     for step in PROCESS_STEPS:
-        cnt = sum(1 for o in all_orders.values() if o.get("client") == cname and o.get("step") == step)
+        cnt = sum(1 for o in in_prog_orders if o.get("step") == step)
         if cnt > 0:
             step_detail.append(f"<span style='background:{STEP_C.get(step,'#888')};color:#fff;padding:1px 5px;border-radius:6px;font-size:10px;margin-right:2px;white-space:nowrap'>{step}{cnt}</span>")
     step_html = "".join(step_detail) if step_detail else "<span style='color:#AAA'>—</span>"
