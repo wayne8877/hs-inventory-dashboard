@@ -199,20 +199,24 @@ STEP_KW = {
 }
 
 def get_client(order_no):
-    """根据订单号判断客户名称"""
+    """根据订单号判断客户名称（群名称）"""
     o = order_no.upper()
     if o in order_customer_map:
-        return order_customer_map[o]
+        cmap = order_customer_map[o]
+        # 将订单主表里的公司名称转为群名称
+        if "鑫和茂" in cmap: return "鑫和茂"
+        if "恒业" in cmap: return "恒业"
+        return cmap
     if o.startswith("SO-CUST"):
         return None  # 测试数据不显示
     if o.startswith("HX"):
         return "恒业"
     if o.startswith("TX"):
-        return "东莞市鑫和茂钮扣有限公司"
+        return "鑫和茂"
     if "P.O." in o or "P O" in o or ".00376" in o or ".00388" in o:
-        return "AR"
+        return "豪华"
     if sl_re.match(o):
-        return "Star Light Trading"
+        return "荣荣"
     return "恒业"
 
 all_orders = {}
@@ -408,48 +412,37 @@ for i,step in enumerate(PROCESS_STEPS):
     cnt = step_counts.get(step,0)
     pipe_html += f'<div style="flex:1;text-align:center"><div style="background:{sc};color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">{step}</div><div style="font-size:18px;font-weight:700;color:{sc};margin-top:2px">{cnt}</div><div style="font-size:10px;color:#8A95A5">单</div></div>'
 
-# 客户排名 — 完整详情卡片
-client_detail_rows = ""
+# 客户排名 — 单一表格，不分卡
 total_all_g = sum(g for _,g in client_rank) if client_rank else 1
 COLORS = ["#3D4F6F","#5B7FA6","#8BAA9E","#C4883A","#B85C5C","#9B7EB5","#27AE60","#E67E22"]
+client_table_rows = ""
 for i,(cname,cg) in enumerate(client_rank):
     col = COLORS[i % len(COLORS)]
     pct = cg/total_all_g*100
     order_count = sum(1 for o in all_orders.values() if o.get("client") == cname)
     # 各工序数量
-    step_bars = ""
-    for si, step in enumerate(PROCESS_STEPS):
-        sc = STEP_C.get(step,"#ccc")
+    step_detail = []
+    for step in PROCESS_STEPS:
         cnt = sum(1 for o in all_orders.values() if o.get("client") == cname and o.get("step") == step)
         if cnt > 0:
-            step_bars += f'<span style="display:inline-block;background:{sc};color:#fff;padding:1px 6px;border-radius:8px;font-size:10px;margin-right:3px">{step}{cnt}</span>'
+            step_detail.append(f"<span style='background:{STEP_C.get(step,'#888')};color:#fff;padding:1px 5px;border-radius:6px;font-size:10px;margin-right:2px;white-space:nowrap'>{step}{cnt}</span>")
+    step_html = "".join(step_detail) if step_detail else "<span style='color:#AAA'>—</span>"
     # 订单号列表
-    client_orders = [(o["order_no"], o["g_count"], o["step"], o["latest_date"]) for o in all_orders.values() if o.get("client") == cname]
-    order_list = " · ".join([f'{no}({g}G)' for no,g,_,_ in client_orders[:5]])
-    if len(client_orders) > 5:
-        order_list += f" · +{len(client_orders)-5}单"
-    # 最早+最新日期
-    dates = [d for _,_,_,d in client_orders]
-    earliest = min(dates) if dates else "-"
-    latest = max(dates) if dates else "-"
-    client_detail_rows += f'''
-        <div style="flex:1;min-width:200px;background:#fff;border-radius:10px;padding:14px;margin:4px;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
-          <div style="display:flex;align-items:center;margin-bottom:8px">
-            <div style="width:10px;height:10px;border-radius:50%;background:{col};margin-right:8px;flex-shrink:0"></div>
-            <div style="font-weight:700;font-size:14px;color:#1A1A2E;flex:1">{cname}</div>
-          </div>
-          <div style="display:flex;gap:16px;margin-bottom:8px">
-            <div><div style="font-size:20px;font-weight:700;color:{col}">{order_count}</div><div style="font-size:10px;color:#8A95A5">订单数</div></div>
-            <div><div style="font-size:20px;font-weight:700;color:{col}">{cg:,}</div><div style="font-size:10px;color:#8A95A5">总G数</div></div>
-            <div><div style="font-size:20px;font-weight:700;color:{col}">{pct:.1f}%</div><div style="font-size:10px;color:#8A95A5">占比</div></div>
-          </div>
-          <div style="background:#F0F4FA;height:6px;border-radius:3px;margin-bottom:8px"><div style="background:{col};height:6px;border-radius:3px;width:{pct:.1f}%"></div></div>
-          <div style="margin-bottom:6px">{step_bars if step_bars else '<span style="color:#AAA;font-size:11px">无工序数据</span>'}</div>
-          <div style="font-size:10px;color:#8A95A5">{order_list if order_list else "无订单号"}</div>
-          <div style="font-size:10px;color:#AAA;margin-top:4px">{earliest} ~ {latest}</div>
-        </div>'''
+    client_orders_list = [(o["order_no"], o["g_count"]) for o in all_orders.values() if o.get("client") == cname]
+    order_nos = " · ".join([f"{no}({g}G)" if g > 0 else no for no,g in client_orders_list[:6]])
+    if len(client_orders_list) > 6:
+        order_nos += f" · +{len(client_orders_list)-6}单"
+    client_table_rows += f'''<tr>
+      <td style="font-weight:700;color:{col};padding:8px 12px">{cname}</td>
+      <td class="tr" style="padding:8px 12px">{order_count}单</td>
+      <td class="tr" style="padding:8px 12px;font-weight:700">{cg:,}G</td>
+      <td class="tr" style="padding:8px 12px">{pct:.1f}%</td>
+      <td style="padding:8px 12px"><div style="background:#F0F4FA;height:6px;border-radius:3px;min-width:80px"><div style="background:{col};height:6px;border-radius:3px;width:{pct:.1f}%"></div></div></td>
+      <td style="padding:8px 12px">{step_html}</td>
+      <td style="padding:8px 12px;font-size:11px;color:#666;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{order_nos}</td>
+    </tr>'''
 
-client_rows = ""  # 保留兼容，旧表格不再使用
+client_detail_rows = ""  # 不再使用卡片
 
 # 订单KPI — 大卡片（含月度维度）
 order_kpi_cards = f"""<div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">{total_order_count}</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">本月{month_orders}单</div></div>
@@ -858,10 +851,25 @@ body{{
     </div>
   </div>
 
-  <!-- 客户排名 — 全宽详情卡片 -->
-  <div style="margin:12px 0">
+  <!-- 客户排名 — 全宽单一表格 -->
+  <div style="margin:12px 0;background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
     <div class="o-subtitle" style="margin-bottom:10px">客户排名（按G数）</div>
-    <div style="display:flex;flex-wrap:wrap;gap:0">{client_detail_rows}</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:#F0F4FA">
+            <th style="padding:8px 12px;text-align:left;font-weight:600;color:#444">群名称</th>
+            <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">订单数</th>
+            <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">总G数</th>
+            <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">占比</th>
+            <th style="padding:8px 12px;font-weight:600;color:#444;min-width:100px">进度</th>
+            <th style="padding:8px 12px;font-weight:600;color:#444">在途工序</th>
+            <th style="padding:8px 12px;font-weight:600;color:#444;text-align:left">订单号</th>
+          </tr>
+        </thead>
+        <tbody>{client_table_rows}</tbody>
+      </table>
+    </div>
   </div>
 
   <!-- 在途订单 -->
