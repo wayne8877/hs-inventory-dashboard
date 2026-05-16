@@ -838,10 +838,11 @@ body{{
   </div>
   <div class="o-kpi-row">{order_kpi_cards}</div>
 
-  <!-- 月度概览 -->
-  <div class="o-monthly">
+  <!-- 月度概览 — 全宽横向占满 -->
+  <div class="o-monthly" style="width:100%;padding:0 0 16px">
     <div class="o-subtitle" style="padding:0 4px 8px;margin-bottom:0">📅 月度订单概览</div>
-    <table class="o-month-table">
+    <table class="o-month-table" style="width:100%">
+      <colgroup><col style="width:25%"><col style="width:20%"><col style="width:20%"><col style="width:35%"></colgroup>
       <thead><tr><th>月份</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">趋势</th></tr></thead>
       <tbody>{month_chart_rows}</tbody>
     </table>
