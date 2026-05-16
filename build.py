@@ -515,17 +515,18 @@ for r in records:
     name_to_spec[r["name"]] = r["spec"]
     parsed = parse_spec(r["spec"], r["name"])
     if parsed:
-        container, per_unit, spec_str = parsed
-        name_to_display[r["name"]] = (container, per_unit)
+        container, _, spec_str = parsed
+        name_to_display[r["name"]] = (container, 1)  # per_unit=1，qty就是直接桶数/袋数
     else:
         name_to_display[r["name"]] = ("个", 1)  # 默认计数单位
 
 
 def fmt_qty(qty, container, per_unit):
-    """格式化数量显示：从kg换算到包装单位"""
+    """格式化数量显示：qty直接显示为对应包装单位，不做kg换算"""
     if container == "个":
         return f"{int(qty)}个"
-    n = qty / per_unit
+    # qty就是包装单位数量，直接显示
+    n = qty / per_unit if per_unit and per_unit != 1 else qty
     if n == int(n):
         return f"{int(n)}{container}"
     else:
