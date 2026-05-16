@@ -711,7 +711,8 @@ body{{
 .o-pipeline{{padding:18px 20px;border-right:1px solid #F0EFEC;}}
 .o-clients{{padding:18px 20px;}}
 .o-subtitle{{font-size:13px;font-weight:700;color:#1A1A2E;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #E8E7E3;}}
-.o-pipe-row{{display:flex;gap:5px;margin-bottom:10px;}}
+.o-pipe-row{{display:flex;gap:6px;align-items:stretch}}
+.o-pipe-row > div{{flex:1;text-align:center;display:flex;flex-direction:column;justify-content:center}}
 .o-pipe-legend{{font-size:10px;color:#8A95A5;text-align:center;letter-spacing:2px;}}
 .o-client-table{{width:100%;border-collapse:collapse;font-size:13px;}}
 .o-client-table th{{text-align:left;padding:5px 8px;border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D;font-weight:600;}}
@@ -838,56 +839,56 @@ body{{
     <div class="o-updated">更新于 {now}</div>
   </div>
   <div class="o-kpi-row">{order_kpi_cards}</div>
+</div>
 
-  <!-- 月度概览 — 全宽横向占满 -->
-  <div class="o-monthly" style="width:100%;padding:0 0 16px">
-    <div class="o-subtitle" style="padding:0 4px 8px;margin-bottom:0">📅 月度订单概览</div>
-    <table class="o-month-table" style="width:100%">
-      <colgroup><col style="width:25%"><col style="width:20%"><col style="width:20%"><col style="width:35%"></colgroup>
-      <thead><tr><th>月份</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">趋势</th></tr></thead>
-      <tbody>{month_chart_rows}</tbody>
+<!-- 月度订单概览 -->
+<div class="o-section">
+  <div class="o-subtitle" style="padding:12px 20px 8px;border-bottom:1px solid #F0EFEC">📅 月度订单概览</div>
+  <table class="o-month-table" style="width:100%">
+    <colgroup><col style="width:25%"><col style="width:20%"><col style="width:20%"><col style="width:35%"></colgroup>
+    <thead><tr><th>月份</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">趋势</th></tr></thead>
+    <tbody>{month_chart_rows}</tbody>
+  </table>
+</div>
+
+<!-- 工序管道 — 全宽占满 -->
+<div class="o-section">
+  <div class="o-subtitle" style="padding:12px 20px 8px;border-bottom:1px solid #F0EFEC">工序管道 · {len(in_progress)}单在途</div>
+  <div style="padding:16px 20px">
+    <div class="o-pipe-row" style="display:flex;gap:4px;align-items:flex-start">{pipe_html}</div>
+    <div class="o-pipe-legend" style="margin-top:8px;font-size:11px;color:#8A95A5;text-align:center">接单 → 调色 → 生产 → 筛胚 → 车钮 → 抛光 → 品检 → 出货</div>
+  </div>
+</div>
+
+<!-- 客户排名 -->
+<div class="o-section">
+  <div class="o-subtitle" style="padding:12px 20px 8px;border-bottom:1px solid #F0EFEC">客户排名（按G数）</div>
+  <div style="padding:0 20px 16px;overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="background:#F7F6F3">
+          <th style="padding:8px 12px;text-align:left;font-weight:600;color:#444">群名称</th>
+          <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">订单数</th>
+          <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">总G数</th>
+          <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">占比</th>
+          <th style="padding:8px 12px;font-weight:600;color:#444;min-width:100px">进度</th>
+          <th style="padding:8px 12px;font-weight:600;color:#444">在途工序</th>
+          <th style="padding:8px 12px;font-weight:600;color:#444;text-align:left">订单号</th>
+        </tr>
+      </thead>
+      <tbody>{client_table_rows}</tbody>
     </table>
   </div>
+</div>
 
-  <div class="o-grid">
-    <!-- 工序管道 — 精简单排 -->
-    <div class="o-pipeline" style="margin-bottom:12px">
-      <div class="o-subtitle" style="margin-bottom:8px">工序管道 · {len(in_progress)}单在途</div>
-      <div class="o-pipe-row" style="display:flex;gap:4px;align-items:flex-start">{pipe_html}</div>
-      <div class="o-pipe-legend" style="margin-top:6px;font-size:10px;color:#8A95A5">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
-    </div>
-  </div>
-
-  <!-- 客户排名 — 全宽单一表格 -->
-  <div style="margin:12px 0;background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
-    <div class="o-subtitle" style="margin-bottom:10px">客户排名（按G数）</div>
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:13px">
-        <thead>
-          <tr style="background:#F0F4FA">
-            <th style="padding:8px 12px;text-align:left;font-weight:600;color:#444">群名称</th>
-            <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">订单数</th>
-            <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">总G数</th>
-            <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">占比</th>
-            <th style="padding:8px 12px;font-weight:600;color:#444;min-width:100px">进度</th>
-            <th style="padding:8px 12px;font-weight:600;color:#444">在途工序</th>
-            <th style="padding:8px 12px;font-weight:600;color:#444;text-align:left">订单号</th>
-          </tr>
-        </thead>
-        <tbody>{client_table_rows}</tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- 在途订单 -->
-  <div class="o-active-orders">
-    <div class="o-subtitle">在途订单 · {len(active_orders)} 单</div>
-    <div class="o-order-scroll">
-      <table class="o-order-table">
-        <thead><tr><th></th><th>订单号</th><th class="tr">G数</th><th>类型</th><th>工序</th><th class="tr">日期</th><th>滞留</th></tr></thead>
-        <tbody>{order_rows}</tbody>
-      </table>
-    </div>
+<!-- 在途订单 -->
+<div class="o-section">
+  <div class="o-subtitle" style="padding:12px 20px 8px;border-bottom:1px solid #F0EFEC">在途订单 · {len(active_orders)} 单</div>
+  <div class="o-order-scroll" style="max-height:300px;overflow-y:auto;padding:0 20px 16px">
+    <table class="o-order-table">
+      <thead><tr><th></th><th>订单号</th><th class="tr">G数</th><th>类型</th><th>工序</th><th class="tr">日期</th><th>滞留</th></tr></thead>
+      <tbody>{order_rows}</tbody>
+    </table>
   </div>
 </div>
 

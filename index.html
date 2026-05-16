@@ -89,7 +89,8 @@ body{
 .o-pipeline{padding:18px 20px;border-right:1px solid #F0EFEC;}
 .o-clients{padding:18px 20px;}
 .o-subtitle{font-size:13px;font-weight:700;color:#1A1A2E;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #E8E7E3;}
-.o-pipe-row{display:flex;gap:5px;margin-bottom:10px;}
+.o-pipe-row{display:flex;gap:6px;align-items:stretch}
+.o-pipe-row > div{flex:1;text-align:center;display:flex;flex-direction:column;justify-content:center}
 .o-pipe-legend{font-size:10px;color:#8A95A5;text-align:center;letter-spacing:2px;}
 .o-client-table{width:100%;border-collapse:collapse;font-size:13px;}
 .o-client-table th{text-align:left;padding:5px 8px;border-bottom:2px solid #E8E7E3;font-size:11px;color:#555E6D;font-weight:600;}
@@ -202,7 +203,7 @@ body{
     <div><div class="brand-name">合盛辅料</div><div class="brand-en">HeSheng Button</div></div>
   </div>
   <div class="hdr-info">
-    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-05-16 12:00</div></div>
+    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-05-16 12:03</div></div>
     <div class="hdr-divider"></div>
     <div class="hdr-info-item"><div class="hdr-info-label">Source</div><div class="hdr-info-value">Feishu Bitable</div></div>
   </div>
@@ -213,52 +214,53 @@ body{
 <div class="o-section">
   <div class="o-header">
     <div class="o-title">📋 订单追踪</div>
-    <div class="o-updated">更新于 2026-05-16 12:00</div>
+    <div class="o-updated">更新于 2026-05-16 12:03</div>
   </div>
   <div class="o-kpi-row"><div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">41</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">本月6单</div></div>
 <div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num">8111G</div><div class="okpi-label">订单总量 <span style="color:#C0392B;font-size:12px">↓83%</span></div></div><div class="okpi-sub">本月1057G</div></div>
 <div class="okpi"><div class="okpi-icon" style="background:#FFF3E0;color:#E67E22">📅</div><div class="okpi-body"><div class="okpi-num">38</div><div class="okpi-label">2026年</div></div><div class="okpi-sub">7227G</div></div>
 <div class="okpi"><div class="okpi-icon" style="background:#FDECEC;color:#C0392B">⚙</div><div class="okpi-body"><div class="okpi-num">19</div><div class="okpi-label">进行中</div></div><div class="okpi-sub">22已出货</div></div>
 <div class="okpi"><div class="okpi-icon" style="background:#F3E5F5;color:#8E44AD">🔍</div><div class="okpi-body"><div class="okpi-num">0</div><div class="okpi-label">待补G数</div></div><div class="okpi-sub">需跟进</div></div></div>
+</div>
 
-  <!-- 月度概览 — 全宽横向占满 -->
-  <div class="o-monthly" style="width:100%;padding:0 0 16px">
-    <div class="o-subtitle" style="padding:0 4px 8px;margin-bottom:0">📅 月度订单概览</div>
-    <table class="o-month-table" style="width:100%">
-      <colgroup><col style="width:25%"><col style="width:20%"><col style="width:20%"><col style="width:35%"></colgroup>
-      <thead><tr><th>月份</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">趋势</th></tr></thead>
-      <tbody><tr><td>05月</td><td class="tr">6单</td><td class="tr">1057G</td><td><div style="background:#3D4F6F;height:6px;width:10.278768233387359%;border-radius:3px;min-width:3px"></div></td></tr>
+<!-- 月度订单概览 -->
+<div class="o-section">
+  <div class="o-subtitle" style="padding:12px 20px 8px;border-bottom:1px solid #F0EFEC">📅 月度订单概览</div>
+  <table class="o-month-table" style="width:100%">
+    <colgroup><col style="width:25%"><col style="width:20%"><col style="width:20%"><col style="width:35%"></colgroup>
+    <thead><tr><th>月份</th><th class="tr">单数</th><th class="tr">G数</th><th class="bar-col">趋势</th></tr></thead>
+    <tbody><tr><td>05月</td><td class="tr">6单</td><td class="tr">1057G</td><td><div style="background:#3D4F6F;height:6px;width:10.278768233387359%;border-radius:3px;min-width:3px"></div></td></tr>
 <tr><td>04月</td><td class="tr">32单</td><td class="tr">6170G</td><td><div style="background:#3D4F6F;height:6px;width:60.0%;border-radius:3px;min-width:3px"></div></td></tr>
 </tbody>
-    </table>
-  </div>
+  </table>
+</div>
 
-  <div class="o-grid">
-    <!-- 工序管道 — 精简单排 -->
-    <div class="o-pipeline" style="margin-bottom:12px">
-      <div class="o-subtitle" style="margin-bottom:8px">工序管道 · 19单在途</div>
-      <div class="o-pipe-row" style="display:flex;gap:4px;align-items:flex-start"><div style="flex:1;text-align:center"><div style="background:#2980B9;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">接单</div><div style="font-size:18px;font-weight:700;color:#2980B9;margin-top:2px">13</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#8E44AD;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">调色</div><div style="font-size:18px;font-weight:700;color:#8E44AD;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#1ABC9C;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">生产</div><div style="font-size:18px;font-weight:700;color:#1ABC9C;margin-top:2px">6</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#F39C12;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">筛胚</div><div style="font-size:18px;font-weight:700;color:#F39C12;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#B8860B;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">车钮</div><div style="font-size:18px;font-weight:700;color:#B8860B;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#DAA520;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">抛光</div><div style="font-size:18px;font-weight:700;color:#DAA520;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#E74C3C;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">品检</div><div style="font-size:18px;font-weight:700;color:#E74C3C;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#27AE60;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">出货</div><div style="font-size:18px;font-weight:700;color:#27AE60;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div></div>
-      <div class="o-pipe-legend" style="margin-top:6px;font-size:10px;color:#8A95A5">接单→调色→生产→筛胚→车钮→抛光→品检→出货</div>
-    </div>
+<!-- 工序管道 — 全宽占满 -->
+<div class="o-section">
+  <div class="o-subtitle" style="padding:12px 20px 8px;border-bottom:1px solid #F0EFEC">工序管道 · 19单在途</div>
+  <div style="padding:16px 20px">
+    <div class="o-pipe-row" style="display:flex;gap:4px;align-items:flex-start"><div style="flex:1;text-align:center"><div style="background:#2980B9;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">接单</div><div style="font-size:18px;font-weight:700;color:#2980B9;margin-top:2px">13</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#8E44AD;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">调色</div><div style="font-size:18px;font-weight:700;color:#8E44AD;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#1ABC9C;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">生产</div><div style="font-size:18px;font-weight:700;color:#1ABC9C;margin-top:2px">6</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#F39C12;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">筛胚</div><div style="font-size:18px;font-weight:700;color:#F39C12;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#B8860B;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">车钮</div><div style="font-size:18px;font-weight:700;color:#B8860B;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#DAA520;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">抛光</div><div style="font-size:18px;font-weight:700;color:#DAA520;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#E74C3C;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">品检</div><div style="font-size:18px;font-weight:700;color:#E74C3C;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div><div style="flex:1;text-align:center"><div style="background:#27AE60;color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">出货</div><div style="font-size:18px;font-weight:700;color:#27AE60;margin-top:2px">0</div><div style="font-size:10px;color:#8A95A5">单</div></div></div>
+    <div class="o-pipe-legend" style="margin-top:8px;font-size:11px;color:#8A95A5;text-align:center">接单 → 调色 → 生产 → 筛胚 → 车钮 → 抛光 → 品检 → 出货</div>
   </div>
+</div>
 
-  <!-- 客户排名 — 全宽单一表格 -->
-  <div style="margin:12px 0;background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
-    <div class="o-subtitle" style="margin-bottom:10px">客户排名（按G数）</div>
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:13px">
-        <thead>
-          <tr style="background:#F0F4FA">
-            <th style="padding:8px 12px;text-align:left;font-weight:600;color:#444">群名称</th>
-            <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">订单数</th>
-            <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">总G数</th>
-            <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">占比</th>
-            <th style="padding:8px 12px;font-weight:600;color:#444;min-width:100px">进度</th>
-            <th style="padding:8px 12px;font-weight:600;color:#444">在途工序</th>
-            <th style="padding:8px 12px;font-weight:600;color:#444;text-align:left">订单号</th>
-          </tr>
-        </thead>
-        <tbody><tr>
+<!-- 客户排名 -->
+<div class="o-section">
+  <div class="o-subtitle" style="padding:12px 20px 8px;border-bottom:1px solid #F0EFEC">客户排名（按G数）</div>
+  <div style="padding:0 20px 16px;overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="background:#F7F6F3">
+          <th style="padding:8px 12px;text-align:left;font-weight:600;color:#444">群名称</th>
+          <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">订单数</th>
+          <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">总G数</th>
+          <th class="tr" style="padding:8px 12px;font-weight:600;color:#444">占比</th>
+          <th style="padding:8px 12px;font-weight:600;color:#444;min-width:100px">进度</th>
+          <th style="padding:8px 12px;font-weight:600;color:#444">在途工序</th>
+          <th style="padding:8px 12px;font-weight:600;color:#444;text-align:left">订单号</th>
+        </tr>
+      </thead>
+      <tbody><tr>
       <td style="font-weight:700;color:#3D4F6F;padding:8px 12px">恒业</td>
       <td class="tr" style="padding:8px 12px">36单</td>
       <td class="tr" style="padding:8px 12px;font-weight:700">7,227G</td>
@@ -307,17 +309,17 @@ body{
       <td style="padding:8px 12px"><span style='background:#2980B9;color:#fff;padding:1px 5px;border-radius:6px;font-size:10px;margin-right:2px;white-space:nowrap'>接单1</span></td>
       <td style="padding:8px 12px;font-size:11px;color:#666;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">P.O. 00388/2026</td>
     </tr></tbody>
-      </table>
-    </div>
+    </table>
   </div>
+</div>
 
-  <!-- 在途订单 -->
-  <div class="o-active-orders">
-    <div class="o-subtitle">在途订单 · 12 单</div>
-    <div class="o-order-scroll">
-      <table class="o-order-table">
-        <thead><tr><th></th><th>订单号</th><th class="tr">G数</th><th>类型</th><th>工序</th><th class="tr">日期</th><th>滞留</th></tr></thead>
-        <tbody><tr><td style="color:#1ABC9C;font-weight:700">●</td><td class="td-name">TX2663</td><td class="tr"><span style="color:#AAA">未提</span></td><td>树脂钮</td><td><span style="background:#1ABC9C;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">生产</span></td><td style="font-size:11px;color:#8A95A5"></td><td><span style="color:#8A95A5">2天</span></td></tr>
+<!-- 在途订单 -->
+<div class="o-section">
+  <div class="o-subtitle" style="padding:12px 20px 8px;border-bottom:1px solid #F0EFEC">在途订单 · 12 单</div>
+  <div class="o-order-scroll" style="max-height:300px;overflow-y:auto;padding:0 20px 16px">
+    <table class="o-order-table">
+      <thead><tr><th></th><th>订单号</th><th class="tr">G数</th><th>类型</th><th>工序</th><th class="tr">日期</th><th>滞留</th></tr></thead>
+      <tbody><tr><td style="color:#1ABC9C;font-weight:700">●</td><td class="td-name">TX2663</td><td class="tr"><span style="color:#AAA">未提</span></td><td>树脂钮</td><td><span style="background:#1ABC9C;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">生产</span></td><td style="font-size:11px;color:#8A95A5"></td><td><span style="color:#8A95A5">2天</span></td></tr>
 <tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">SL00061-26</td><td class="tr"><span style="color:#AAA">未提</span></td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5"></td><td>今天</td></tr>
 <tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">PO 00388/2026</td><td class="tr">180G</td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5">05-15</td><td><span style="color:#8A95A5">1天</span></td></tr>
 <tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">P.O. 00388/2026</td><td class="tr"><span style="color:#AAA">未提</span></td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5">05-15</td><td><span style="color:#8A95A5">1天</span></td></tr>
@@ -330,8 +332,7 @@ body{
 <tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">HX8023</td><td class="tr"><span style="color:#AAA">未提</span></td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5">04-18</td><td><span style="color:#C0392B;font-weight:700">33天</span></td></tr>
 <tr><td style="color:#2980B9;font-weight:700">●</td><td class="td-name">HX7976</td><td class="tr"><span style="color:#AAA">未提</span></td><td>树脂钮</td><td><span style="background:#2980B9;color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">接单</span></td><td style="font-size:11px;color:#8A95A5">04-16</td><td><span style="color:#C0392B;font-weight:700">30天</span></td></tr>
 </tbody>
-      </table>
-    </div>
+    </table>
   </div>
 </div>
 
