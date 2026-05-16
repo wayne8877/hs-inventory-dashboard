@@ -330,7 +330,7 @@ this_year = datetime.date.today().strftime("%Y")
 month_orders = 0; month_g = 0
 year_orders = 0; year_g = 0
 for o in all_orders.values():
-    d = o["date"]
+    d = o.get("date", "") or ""
     if len(d) >= 7:
         m = d[:7]
         month_buckets[m]["count"] += 1
@@ -417,7 +417,7 @@ for i,step in enumerate(PROCESS_STEPS):
     pipe_html += f'<div style="flex:1;text-align:center"><div style="background:{sc};color:#fff;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:600">{step}</div><div style="font-size:18px;font-weight:700;color:{sc};margin-top:2px">{cnt}</div><div style="font-size:10px;color:#8A95A5">单</div></div>'
 
 # 客户排名 — 单一表格，不分卡
-total_all_g = sum(g for _,g in client_rank) if client_rank else 1
+total_all_g = sum(g for _,g in client_rank) or 1
 COLORS = ["#3D4F6F","#5B7FA6","#8BAA9E","#C4883A","#B85C5C","#9B7EB5","#27AE60","#E67E22"]
 client_table_rows = ""
 for i,(cname,cg) in enumerate(client_rank):
