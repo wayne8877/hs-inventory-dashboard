@@ -896,6 +896,35 @@ body{{
   <div class="kpi"><div class="kn o">¥{total_val:,}</div><div class="kl">库存总值</div><div class="ks">已占用资金</div></div>
 </div>
 
+<div class="mid-row section-gap">
+  <div class="card">
+    <div class="ctitle navy">📥 入库记录 <span class="cnt">{len(in_rows)} 条</span></div>
+    <div class="tbl-scroll" style="max-height:300px;overflow-y:auto">
+{inbound_body}
+    </div>
+  </div>
+</div>
+
+<div class="card section-gap">
+  <div class="ctitle navy" style="padding:10px 14px;font-size:13px;font-weight:600">
+    🔄 过手件识别 <span class="cnt">{len(pass_through_candidates)} 项</span>
+  </div>
+  <div class="tbl-scroll" style="max-height:300px;overflow-y:auto;padding:0 14px 10px">
+      <table>
+        <thead><tr><th style="width:30%">品名</th><th class="tr" style="width:12%">入库</th><th class="tr" style="width:12%">出库</th><th class="tr" style="width:12%">库存</th><th style="width:24%">标签</th></tr></thead>
+        <tbody>
+{pass_through_rows}        </tbody>
+      </table>
+    </div>
+</div>
+
+<div class="card section-gap">
+  <div class="ctitle navy">📤 出库记录 <span class="cnt">{len(out_rows)} 条</span></div>
+  <div class="tbl-scroll" style="max-height:300px;overflow-y:auto">
+{outbound_body}
+  </div>
+</div>
+
 <div class="section-gap two-row">
   <div class="card">
     <div class="ctitle danger">⚠️ 缺货清单 <span class="cnt">{len(reorder)} 品</span></div>
@@ -917,34 +946,6 @@ body{{
       </table>
     </div>
   </div>
-</div>
-
-<div class="mid-row section-gap">
-  <div class="card">
-    <div class="ctitle navy">📥 入库记录 <span class="cnt">{len(in_rows)} 条</span></div>
-    <div class="tbl-scroll" style="max-height:300px;overflow-y:auto">
-{inbound_body}
-    </div>
-  </div>
-  <div class="card">
-    <div class="ctitle navy">📤 出库记录 <span class="cnt">{len(out_rows)} 条</span></div>
-    <div class="tbl-scroll" style="max-height:300px;overflow-y:auto">
-{outbound_body}
-    </div>
-  </div>
-</div>
-
-<div class="card section-gap">
-  <div class="ctitle navy" style="padding:10px 14px;font-size:13px;font-weight:600">
-    🔄 过手件识别 <span class="cnt">{len(pass_through_candidates)} 项</span>
-  </div>
-  <div class="tbl-scroll" style="max-height:300px;overflow-y:auto;padding:0 14px 10px">
-      <table>
-        <thead><tr><th style="width:30%">品名</th><th class="tr" style="width:12%">入库</th><th class="tr" style="width:12%">出库</th><th class="tr" style="width:12%">库存</th><th style="width:24%">标签</th></tr></thead>
-        <tbody>
-{pass_through_rows}        </tbody>
-      </table>
-    </div>
 </div>
 
 <div class="ftr">合盛钮扣厂 · 生产运营司 · 数据来源 飞书多维表格</div>
