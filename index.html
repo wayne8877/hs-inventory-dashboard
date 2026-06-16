@@ -203,7 +203,7 @@ body{
     <div><div class="brand-name">合盛辅料</div><div class="brand-en">HeSheng Button</div></div>
   </div>
   <div class="hdr-info">
-    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-06-16 09:00</div></div>
+    <div class="hdr-info-item"><div class="hdr-info-label">Updated</div><div class="hdr-info-value">2026-06-16 17:54</div></div>
     <div class="hdr-divider"></div>
     <div class="hdr-info-item"><div class="hdr-info-label">Source</div><div class="hdr-info-value">Feishu Bitable</div></div>
   </div>
@@ -214,13 +214,13 @@ body{
 <div class="o-section">
   <div class="o-header">
     <div class="o-title">📋 订单追踪</div>
-    <div class="o-updated">更新于 2026-06-16 09:00</div>
+    <div class="o-updated">更新于 2026-06-16 17:54</div>
   </div>
-  <div class="o-kpi-row"><div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num">6</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">本月0单</div></div>
-<div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num">877G</div><div class="okpi-label">订单总量 </div></div><div class="okpi-sub">本月0G</div></div>
-<div class="okpi"><div class="okpi-icon" style="background:#FFF3E0;color:#E67E22">📅</div><div class="okpi-body"><div class="okpi-num">0</div><div class="okpi-label">2026年</div></div><div class="okpi-sub">0G</div></div>
-<div class="okpi"><div class="okpi-icon" style="background:#FDECEC;color:#C0392B">⚙</div><div class="okpi-body"><div class="okpi-num">6</div><div class="okpi-label">进行中</div></div><div class="okpi-sub">0已出货</div></div>
-<div class="okpi"><div class="okpi-icon" style="background:#F3E5F5;color:#8E44AD">🔍</div><div class="okpi-body"><div class="okpi-num">0</div><div class="okpi-label">待补G数</div></div><div class="okpi-sub">需跟进</div></div></div>
+  <div class="o-kpi-row"><div class="okpi"><div class="okpi-icon" style="background:#EBF4FF;color:#2980B9">📋</div><div class="okpi-body"><div class="okpi-num" data-counter="6">0</div><div class="okpi-label">全部订单</div></div><div class="okpi-sub">本月<span data-counter="0">0</span>单</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#E8F8F0;color:#27AE60">⚖</div><div class="okpi-body"><div class="okpi-num"><span data-counter="877">0</span>G</div><div class="okpi-label">订单总量 </div></div><div class="okpi-sub">本月<span data-counter="0">0</span>G</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#FFF3E0;color:#E67E22">📅</div><div class="okpi-body"><div class="okpi-num" data-counter="0">0</div><div class="okpi-label">2026年</div></div><div class="okpi-sub"><span data-counter="0">0</span>G</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#FDECEC;color:#C0392B">⚙</div><div class="okpi-body"><div class="okpi-num" data-counter="6">0</div><div class="okpi-label">进行中</div></div><div class="okpi-sub"><span data-counter="0">0</span>已出货</div></div>
+<div class="okpi"><div class="okpi-icon" style="background:#F3E5F5;color:#8E44AD">🔍</div><div class="okpi-body"><div class="okpi-num" data-counter="0">0</div><div class="okpi-label">待补G数</div></div><div class="okpi-sub">需跟进</div></div></div>
 </div>
 
 <!-- 月度订单概览 -->
@@ -281,10 +281,10 @@ body{
 </div>
 
 <div class="kpi-row section-gap">
-  <div class="kpi"><div class="kn">0</div><div class="kl">总 SKU</div><div class="ks">全部物料品类</div></div>
-  <div class="kpi"><div class="kn g">0</div><div class="kl">有库存</div><div class="ks">可正常领用</div></div>
-  <div class="kpi"><div class="kn r">0</div><div class="kl">无库存</div><div class="ks">当前缺货待补</div></div>
-  <div class="kpi"><div class="kn o">¥0</div><div class="kl">库存总值</div><div class="ks">已占用资金</div></div>
+  <div class="kpi"><div class="kn" data-counter="0">0</div><div class="kl">总 SKU</div><div class="ks">全部物料品类</div></div>
+  <div class="kpi"><div class="kn g" data-counter="0">0</div><div class="kl">有库存</div><div class="ks">可正常领用</div></div>
+  <div class="kpi"><div class="kn r" data-counter="0">0</div><div class="kl">无库存</div><div class="ks">当前缺货待补</div></div>
+  <div class="kpi"><div class="kn o">¥<span data-counter="0">0</span></div><div class="kl">库存总值</div><div class="ks">已占用资金</div></div>
 </div>
 
 <div class="mid-row section-gap">
@@ -349,6 +349,34 @@ function swTab(el,tab){
   document.getElementById('t-in').style.display=tab==='in'?'block':'none';
   document.getElementById('t-out').style.display=tab==='out'?'block':'none';
 }
+</script>
+<!-- GSAP CDN (核心库，供 countUp 数字滚动使用) -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script>
+// countUp: 页面加载后，对所有 [data-counter] 元素从 0 滚到目标值
+(function(){
+  function run(){
+    var els = document.querySelectorAll('[data-counter]');
+    if(!els.length || typeof gsap === 'undefined') return;
+    els.forEach(function(el){
+      var target = parseFloat(el.getAttribute('data-counter')) || 0;
+      var obj = { val: 0 };
+      gsap.to(obj, {
+        val: target,
+        duration: 1.2,
+        ease: "power2.out",
+        onUpdate: function(){
+          el.textContent = Math.round(obj.val).toLocaleString('en-US');
+        }
+      });
+    });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
+  }
+})();
 </script>
 </body>
 </html>
